@@ -2,19 +2,19 @@ import type { Site, SocialObjects } from "astro-paper/types";
 
 export const SITE: Site = {
   website: "https://example.com",
-  author: "Blog Author",
-  desc: "Personal blog with life and tech articles",
-  title: "My Blog",
+  author: "Zhimin",
+  desc: "Personal blog about tech, life, and everything in between",
+  title: "Zhimin's Blog",
   ogImage: "astropaper-og.jpg",
   lightAndDarkMode: true,
   postPerPage: 10,
 };
 
 export const LOGO_IMAGE = {
-  enable: false,
+  enable: true,
   svg: true,
-  width: 216,
-  height: 46,
+  width: 64,
+  height: 64,
 };
 
 export const SOCIALS: SocialObjects = [
