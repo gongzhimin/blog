@@ -1,5 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content';
+import Giscus from '../components/Giscus.astro';
 
 type Props = CollectionEntry<'life'>['data'];
 
@@ -43,6 +44,9 @@ const formattedDate = pubDatetime.toLocaleDateString('en-US', {
       <article style="font-size: 1.1rem; line-height: 1.8;">
         <slot />
       </article>
+
+      <!-- Comments -->
+      <Giscus />
 
       <!-- Footer -->
       <footer style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid rgb(var(--color-border));">
