@@ -1,17 +1,57 @@
 ---
+import { getCollection } from 'astro:content';
 
+// Get all posts from both collections
+const blogPosts = await getCollection('blog');
+const lifePosts = await getCollection('life');
+
+// Combine and sort by date (newest first)
+const allPosts = [...blogPosts, ...lifePosts].sort(
+  (a, b) => b.data.pubDatetime.valueOf() - a.data.pubDatetime.valueOf()
+);
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Zhimin's Blog</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="alternate" type="application/rss+xml" title="RSS Feed" href="/rss.xml" />
+  </head>
+  <body>
+    <main style="max-width: 680px; margin: 0 auto; padding: 4rem 1.5rem;">
+      <!-- Header -->
+      <header style="margin-bottom: 3rem; text-align: center;">
+        <h1 style="font-size: 1.75rem; font-weight: normal; letter-spacing: 0.02em; margin-bottom: 0.5rem;">
+          Zhimin's Blog
+        </h1>
+        <p style="color: rgb(var(--color-text-muted)); font-size: 0.9rem;">
+          记录生活与技术的思考
+        </p>
+      </header>
+
+      <!-- Post List -->
+      <div style="border-top: 1px solid rgb(var(--color-border));">
+        {allPosts.map((post) => (
+          <article style="padding: 1rem 0; border-bottom: 1px dotted rgb(var(--color-border)); display: flex; justify-content: space-between; align-items: baseline;">
+            <a href={`/${post.collection}/${post.slug}`} style="text-decoration: none; color: inherit;">
+              <span style="font-size: 1rem;">{post.data.title}</span>
+            </a>
+            <time style="color: rgb(var(--color-text-muted)); font-size: 0.85rem; white-space: nowrap; margin-left: 1rem;">
+              {post.data.pubDatetime.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+            </time>
+          </article>
+        ))}
+      </div>
+
+      <!-- Footer -->
+      <footer style="margin-top: 4rem; text-align: center; color: rgb(var(--color-text-muted)); font-size: 0.85rem;">
+        <a href="/about" style="text-decoration: none; color: rgb(var(--color-text-muted));">About</a>
+        <span style="margin: 0 0.5rem;">·</span>
+        <a href="/rss.xml" style="text-decoration: none; color: rgb(var(--color-text-muted));">RSS</a>
+      </footer>
+    </main>
+  </body>
 </html>
