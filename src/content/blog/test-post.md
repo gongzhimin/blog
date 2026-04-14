@@ -1,7 +1,7 @@
 ---
 title: "Test Post"
 description: "Testing the deployment workflow"
-date: 2026-04-12
+pubDatetime: 2026-04-12
 tags: ["test"]
 ---
 

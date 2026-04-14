@@ -6,9 +6,11 @@ const blogPosts = await getCollection('blog');
 const lifePosts = await getCollection('life');
 
 // Combine and sort by date (newest first)
-const allPosts = [...blogPosts, ...lifePosts].sort(
-  (a, b) => b.data.pubDatetime.valueOf() - a.data.pubDatetime.valueOf()
-);
+const allPosts = [...blogPosts, ...lifePosts].sort((a, b) => {
+  const dateA = a.data.pubDatetime || a.data.date;
+  const dateB = b.data.pubDatetime || b.data.date;
+  return dateB.valueOf() - dateA.valueOf();
+});
 ---
 
 <!DOCTYPE html>
@@ -34,16 +36,19 @@ const allPosts = [...blogPosts, ...lifePosts].sort(
 
       <!-- Post List -->
       <div style="border-top: 1px solid rgb(var(--color-border));">
-        {allPosts.map((post) => (
-          <article style="padding: 1rem 0; border-bottom: 1px dotted rgb(var(--color-border)); display: flex; justify-content: space-between; align-items: baseline;">
-            <a href={`/${post.collection}/${post.slug}`} style="text-decoration: none; color: inherit;">
-              <span style="font-size: 1rem;">{post.data.title}</span>
-            </a>
-            <time style="color: rgb(var(--color-text-muted)); font-size: 0.85rem; white-space: nowrap; margin-left: 1rem;">
-              {post.data.pubDatetime.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-            </time>
-          </article>
-        ))}
+        {allPosts.map((post) => {
+          const date = post.data.pubDatetime || post.data.date;
+          return (
+            <article style="padding: 1rem 0; border-bottom: 1px dotted rgb(var(--color-border)); display: flex; justify-content: space-between; align-items: baseline;">
+              <a href={`/${post.collection}/${post.id}`} style="text-decoration: none; color: inherit;">
+                <span style="font-size: 1rem;">{post.data.title}</span>
+              </a>
+              <time style="color: rgb(var(--color-text-muted)); font-size: 0.85rem; white-space: nowrap; margin-left: 1rem;">
+                {date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+              </time>
+            </article>
+          );
+        })}
       </div>
 
       <!-- Footer -->

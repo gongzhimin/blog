@@ -4,9 +4,9 @@ import Giscus from '../components/Giscus.astro';
 
 type Props = CollectionEntry<'life'>['data'];
 
-const { title, pubDatetime, description } = Astro.props;
+const { title, date, description } = Astro.props;
 
-const formattedDate = pubDatetime.toLocaleDateString('en-US', {
+const formattedDate = date.toLocaleDateString('en-US', {
   year: 'numeric',
   month: 'long',
   day: 'numeric',
