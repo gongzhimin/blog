@@ -1,0 +1,64 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+type Props = CollectionEntry<'blog'>['data'];
+
+const { title, pubDatetime, description, tags } = Astro.props;
+
+const formattedDate = pubDatetime.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'short',
+  day: 'numeric',
+});
+---
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title} · Zhimin's Blog</title>
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="alternate" type="application/rss+xml" title="RSS Feed" href="/rss.xml" />
+  </head>
+  <body>
+    <main style="max-width: 720px; margin: 0 auto; padding: 4rem 1.5rem;">
+      <!-- Back link -->
+      <a href="/" style="color: rgb(var(--color-text-muted)); text-decoration: none; font-size: 0.9rem;">
+        ← Back
+      </a>
+
+      <!-- Article header -->
+      <header style="margin-top: 2rem; margin-bottom: 2rem;">
+        <time style="display: block; color: rgb(var(--color-text-muted)); font-size: 0.9rem; margin-bottom: 0.5rem;">
+          {formattedDate}
+        </time>
+        <h1 style="font-size: 1.75rem; font-weight: normal; line-height: 1.3; margin-bottom: 0.75rem;">
+          {title}
+        </h1>
+        {tags && tags.length > 0 && (
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            {tags.map((tag) => (
+              <span style="padding: 0.25rem 0.75rem; background-color: rgb(var(--color-card)); color: rgb(var(--color-text-secondary)); font-size: 0.8rem; border-radius: 2px;">
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
+      </header>
+
+      <!-- Article content -->
+      <article style="font-size: 1rem; line-height: 1.8;">
+        <slot />
+      </article>
+
+      <!-- Footer -->
+      <footer style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid rgb(var(--color-border));">
+        <a href="/" style="color: rgb(var(--color-text-muted)); text-decoration: none; font-size: 0.9rem;">
+          ← Back to all posts
+        </a>
+      </footer>
+    </main>
+  </body>
+</html>
