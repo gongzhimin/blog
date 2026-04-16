@@ -12,8 +12,8 @@ export async function GET(context) {
   });
 
   return rss({
-    title: "Zhimin's Blog",
-    description: '记录生活与技术的思考',
+    title: "Zhimin · Notes",
+    description: 'Writing down moments worth keeping',
     site: context.site,
     items: allPosts.map((post) => ({
       title: post.data.title,
