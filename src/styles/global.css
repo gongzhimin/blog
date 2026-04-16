@@ -24,20 +24,21 @@ html[data-theme="light"] {
 }
 
 /* Base styles */
-html {
-  font-family: var(--font-serif);
+html, body {
+  font-family: Georgia, 'Times New Roman', serif !important;
   background-color: rgb(var(--color-bg));
   color: rgb(var(--color-text-primary));
 }
 
 /* Typography */
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-serif);
+  font-family: Georgia, 'Times New Roman', serif !important;
   color: rgb(var(--color-text-primary));
 }
 
 body {
   line-height: 1.7;
+  font-size: 16px;
 }
 
 /* Links */
