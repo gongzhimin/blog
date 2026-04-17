@@ -40,46 +40,19 @@ tags: ["教程", "博客"]
 2. 新建文件，文件名格式：`2026-04-17-my-trip.md`
 3. 填写文章内容
 
-### Step 2: 创建模板
+### Step 2: 写文章
 
-为了省去每次手动添加元数据的麻烦，先创建一个模板文件：
-
-1. 在 `Documents/blog/` 目录新建文件：`template.md`
-2. 内容如下：
+直接写内容就行，frontmatter（标题、日期等元数据）会自动添加：
 
 ```markdown
----
-title: ""
-description: ""
-pubDatetime: 2026-04-17
-tags: []
----
-
-# 标题
-
-正文内容。
-```
-
-3. 以后写新文章时，复制 `template.md` 为新文件，在此基础上修改
-
-### Step 3: 填写内容
-
-复制模板后，编辑文件：
-
-```markdown
----
-title: "我的旅行"
-description: "2026年清明假期"
-pubDatetime: 2026-04-17
-tags: ["旅行"]
----
-
 # 我的旅行
 
 2026年清明假期，去了海边！
 
 ![海边照片](beach-sunset.jpg)
 ```
+
+不用操心 frontmatter，GitHub Action 会自动帮你加上。
 
 ### Step 3: 添加图片
 

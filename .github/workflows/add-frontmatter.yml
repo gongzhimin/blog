@@ -1,0 +1,30 @@
+name: Add frontmatter
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/content/blog/**'
+      - 'public/images/**'
+
+jobs:
+  frontmatter:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Add frontmatter to new posts
+        run: node .github/scripts/add-frontmatter.js
+
+      - name: Commit if changed
+        run: |
+          git config user.name "GitHub Action"
+          git config user.email "action@github.com"
+          git add -A
+          git diff --staged --quiet || git commit -m "chore: auto-add frontmatter"
+          git push
