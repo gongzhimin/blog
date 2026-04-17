@@ -43,19 +43,14 @@ tags: ["教程", "博客"]
 ### Step 2: 文章格式
 
 ```markdown
----
-title: "我的旅行"
-description: "2026年清明假期"
-pubDatetime: 2026-04-17
-tags: ["旅行"]
----
-
 # 我的旅行
 
-去了海边！
+2026年清明假期，去了海边！
 
 ![海边照片](beach-sunset.jpg)
 ```
+
+简单写法：标题用 `#`，日期可以在正文中提到，标签不需要。
 
 ### Step 3: 添加图片
 
@@ -104,7 +99,7 @@ GitHub → Webhook → 服务器 git pull → npm run build → 网站更新
 A: 确保已登录 GitHub 账号（Stats 设置中授权）
 
 **Q: 图片显示不出来？**
-A: 检查图片是否放在 `public/images/` 目录，引用路径是否为 `/images/图片名.jpg`
+A: 检查图片是否放在博客仓库的 `public/images/` 目录，引用路径是否为 `/images/图片名.jpg`
 
 **Q: 文章没有出现在网站上？**
 A: 检查 GitHub 仓库的 Actions 是否完成构建，或查看 Webhook 是否正常触发
