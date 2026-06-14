@@ -1,0 +1,14 @@
+[Unit]
+Description=Astro Blog Webhook Receiver
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/var/www/blog
+Environment=BLOG_WEBHOOK_TOKEN=zhimin_secret_post_2026
+ExecStart=/usr/bin/node /var/www/blog/scripts/webhook-receiver.cjs
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

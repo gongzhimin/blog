@@ -12,11 +12,13 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/check": "^0.9.9",
     "@astrojs/rss": "^4.0.18",
     "@tailwindcss/vite": "^4.2.2",
     "astro": "^6.1.5",
     "astro-icon": "^1.1.5",
     "astro-paper": "^2.2.0",
-    "tailwindcss": "^4.2.2"
+    "tailwindcss": "^4.2.2",
+    "typescript": "^5.9.3"
   }
 }
