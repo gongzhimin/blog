@@ -18,7 +18,10 @@
     "astro": "^6.1.5",
     "astro-icon": "^1.1.5",
     "astro-paper": "^2.2.0",
+    "jsdom": "^29.1.1",
     "tailwindcss": "^4.2.2",
+    "turndown": "^7.2.4",
+    "turndown-plugin-gfm": "^1.0.2",
     "typescript": "^5.9.3"
   }
 }
