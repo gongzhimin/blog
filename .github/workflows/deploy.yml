@@ -5,19 +5,40 @@ on:
     branches: [ main ]
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy to AWS Lightsail
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: 'blog/package-lock.json'
+
+      - name: Install and Build
+        run: |
+          cd blog
+          npm install
+          npm run build
+
+      - name: Create dist directory on server
         uses: appleboy/ssh-action@master
         with:
           host: 13.193.240.51
           username: ubuntu
           key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
           script: |
-            cd /var/www/blog
-            # Reset local changes to avoid conflicts from automatic mobile posts
-            git fetch origin main
-            git reset --hard origin/main
-            npm install
-            npm run build
+            mkdir -p /var/www/blog/dist
+
+      - name: Deploy with rsync
+        uses: Burnett01/rsync-deployments@7.0.1
+        with:
+          switches: -avzr --delete
+          path: blog/dist/
+          remote_path: /var/www/blog/dist/
+          remote_host: 13.193.240.51
+          remote_user: ubuntu
+          remote_key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
