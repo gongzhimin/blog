@@ -45,14 +45,14 @@ const topBlog = blogPosts.sort((a, b) => {
           <h2 class="category-title">Essays</h2>
           <div class="post-list">
             {topLife.map((post) => (
-              <article class="post-item">
+              <article class="post-item stagger-item">
                 <a href={`/life/${post.id}`} class="post-title">
                   {post.data.title}
                 </a>
               </article>
             ))}
           </div>
-          <a href="/life" class="archive-link">View all essays →</a>
+          <a href="/life" class="archive-link stagger-item">View all essays →</a>
         </section>
 
         <!-- Right Column: Technical -->
@@ -60,14 +60,14 @@ const topBlog = blogPosts.sort((a, b) => {
           <h2 class="category-title">Technical</h2>
           <div class="post-list">
             {topBlog.map((post) => (
-              <article class="post-item">
+              <article class="post-item stagger-item">
                 <a href={`/blog/${post.id}`} class="post-title">
                   {post.data.title}
                 </a>
               </article>
             ))}
           </div>
-          <a href="/blog" class="archive-link">View all technical →</a>
+          <a href="/blog" class="archive-link stagger-item">View all technical →</a>
         </section>
 
       </div>

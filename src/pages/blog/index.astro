@@ -33,7 +33,7 @@ const sortedPosts = blogPosts.sort((a, b) => {
         {sortedPosts.map((post) => {
           const date = post.data.pubDatetime || post.data.date;
           return (
-            <article style="padding: 1rem 0; border-bottom: 1px dotted rgb(var(--color-border)); display: flex; justify-content: space-between; align-items: baseline;">
+            <article class="stagger-item" style="padding: 1rem 0; border-bottom: 1px dotted rgb(var(--color-border)); display: flex; justify-content: space-between; align-items: baseline;">
               <a href={`/blog/${post.id}`} style="text-decoration: none; color: inherit;">
                 <span style="font-size: 1rem;">{post.data.title}</span>
               </a>
