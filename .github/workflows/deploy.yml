@@ -11,7 +11,7 @@ jobs:
       - name: Deploy to AWS Lightsail
         uses: appleboy/ssh-action@master
         with:
-          host: 52.194.254.9
+          host: 18.181.95.168
           username: ubuntu
           key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
           script: |
