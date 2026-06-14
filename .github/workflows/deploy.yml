@@ -1,0 +1,23 @@
+name: Deploy Blog
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to AWS Lightsail
+        uses: appleboy/ssh-action@master
+        with:
+          host: 52.194.254.9
+          username: ubuntu
+          key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
+          script: |
+            cd /var/www/blog
+            # Reset local changes to avoid conflicts from automatic mobile posts
+            git fetch origin main
+            git reset --hard origin/main
+            npm install
+            npm run build

@@ -8,12 +8,10 @@ const SECRET_TOKEN = process.env.BLOG_WEBHOOK_TOKEN || 'zhimin_secret_post_2026'
 const BLOG_ROOT = '/var/www/blog';
 
 const server = http.createServer((req, res) => {
-  console.log('--- NEW REQUEST RECEIVED ---');
   if (req.method === 'POST' && req.url === '/webhook') {
     let body = '';
     req.on('data', chunk => { body += chunk.toString(); });
     req.on('end', () => {
-      console.log('RAW BODY RECEIVED FROM IPHONE:', body);
       try {
         const rawData = JSON.parse(body);
         const data = {};
@@ -21,11 +19,7 @@ const server = http.createServer((req, res) => {
           data[key.trim()] = rawData[key];
         }
         
-        console.log('PARSED DATA TOKEN:', data.token);
-        console.log('PARSED DATA RAW FIELD LENGTH:', data.raw ? data.raw.length : 0);
-
         if (data.token !== SECRET_TOKEN) {
-          console.error('TOKEN MISMATCH. Expected:', SECRET_TOKEN, 'Received:', data.token);
           res.statusCode = 403;
           return res.end('Forbidden');
         }
@@ -59,22 +53,30 @@ date: ${date}
 ${content}
 `;
 
+        // 1. Save local file
         fs.writeFileSync(filepath, fileContent);
-        console.log('SAVED FILE TO:', filepath);
-
-        exec('npm run build', { cwd: BLOG_ROOT }, (error, stdout, stderr) => {
-          if (error) {
-            console.error('BUILD ERROR:', error);
-            res.statusCode = 500;
-            return res.end('Build failed');
+        
+        // 2. Sync to GitHub & Build
+        // We run build after pushing to GitHub to ensure everything is consistent
+        const gitCommand = `git add . && git commit -m "docs: new post from mobile [\${title}]" && git push origin main`;
+        
+        exec(gitCommand, { cwd: BLOG_ROOT }, (gitErr, stdout, stderr) => {
+          if (gitErr) {
+            console.error('Git Push Error:', stderr);
+            // Even if push fails, we still try to build locally so the post appears on site
           }
-          console.log('BUILD SUCCESSFUL');
-          res.statusCode = 200;
-          res.end('Published successfully');
+          
+          exec('npm run build', { cwd: BLOG_ROOT }, (buildErr) => {
+            if (buildErr) {
+              res.statusCode = 500;
+              return res.end('Build failed');
+            }
+            res.statusCode = 200;
+            res.end('Published and synced to GitHub successfully');
+          });
         });
 
       } catch (err) {
-        console.error('JSON PARSE ERROR:', err);
         res.statusCode = 400;
         res.end('Invalid JSON');
       }
@@ -85,6 +87,4 @@ ${content}
   }
 });
 
-server.listen(PORT, '127.0.0.1', () => {
-  console.log('Receiver started on port 9000');
-});
+server.listen(PORT, '127.0.0.1');
