@@ -102,3 +102,30 @@ article hr::after {
   letter-spacing: 0.5em;
   margin-left: 0.5em; /* Compensate for letter-spacing on the last char */
 }
+
+/* 3. Refined Blockquotes */
+article blockquote {
+  border-left: none;
+  font-style: italic;
+  color: rgb(var(--color-text-secondary));
+  margin: 2rem 2.5rem;
+  padding: 0;
+  position: relative;
+}
+
+article blockquote::before {
+  content: "“";
+  position: absolute;
+  top: -0.2em;
+  left: -0.6em;
+  font-size: 4em;
+  line-height: 1;
+  color: rgb(var(--color-text-muted));
+  opacity: 0.3;
+  font-family: var(--font-serif);
+}
+
+article blockquote p {
+  position: relative;
+  z-index: 1;
+}
