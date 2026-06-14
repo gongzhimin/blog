@@ -1,0 +1,49 @@
+---
+import '../../styles/global.css';
+import { getCollection } from 'astro:content';
+
+const lifePosts = await getCollection('life');
+const sortedPosts = lifePosts.sort((a, b) => {
+  const dateA = a.data.pubDatetime || a.data.date;
+  const dateB = b.data.pubDatetime || b.data.date;
+  return dateB.valueOf() - dateA.valueOf();
+});
+---
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Essays Archive · Zhimin</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body>
+    <main style="max-width: 680px; margin: 0 auto; padding: 4rem 1.5rem;">
+      <a href="/" style="color: rgb(var(--color-text-muted)); text-decoration: none; font-size: 0.9rem;">
+        ← Back
+      </a>
+      
+      <header style="margin-top: 2rem; margin-bottom: 3rem;">
+        <h1 style="font-size: 1.75rem; font-weight: normal; letter-spacing: 0.02em;">Essays</h1>
+        <p style="color: rgb(var(--color-text-muted)); font-style: italic; font-size: 0.9rem; margin-top: 0.5rem;">All life notes and essays.</p>
+      </header>
+
+      <div style="border-top: 1px solid rgb(var(--color-border));">
+        {sortedPosts.map((post) => {
+          const date = post.data.pubDatetime || post.data.date;
+          return (
+            <article style="padding: 1rem 0; border-bottom: 1px dotted rgb(var(--color-border)); display: flex; justify-content: space-between; align-items: baseline;">
+              <a href={`/life/${post.id}`} style="text-decoration: none; color: inherit;">
+                <span style="font-size: 1rem;">{post.data.title}</span>
+              </a>
+              <time style="color: rgb(var(--color-text-muted)); font-size: 0.85rem; white-space: nowrap; margin-left: 1rem;">
+                {date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+              </time>
+            </article>
+          );
+        })}
+      </div>
+    </main>
+  </body>
+</html>
