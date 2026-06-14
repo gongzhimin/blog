@@ -16,11 +16,10 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-          cache-dependency-path: 'blog/package-lock.json'
+          cache-dependency-path: 'package-lock.json'
 
       - name: Install and Build
         run: |
-          cd blog
           npm install
           npm run build
 
@@ -37,7 +36,7 @@ jobs:
         uses: Burnett01/rsync-deployments@7.0.1
         with:
           switches: -avzr --delete
-          path: blog/dist/
+          path: dist/
           remote_path: /var/www/blog/dist/
           remote_host: 13.193.240.51
           remote_user: ubuntu
