@@ -70,3 +70,17 @@ pre {
 ::selection {
   background-color: rgb(var(--color-accent) / 0.3);
 }
+
+/* --- Typography Tweaks --- */
+
+/* 1. Drop Caps for Life Articles */
+.life-article > p:first-of-type::first-letter {
+  float: left;
+  font-size: 3.5em;
+  line-height: 0.8;
+  padding-top: 0.1em;
+  padding-right: 0.1em;
+  margin-left: -0.05em;
+  color: rgb(var(--color-text-secondary));
+  font-family: var(--font-serif);
+}
