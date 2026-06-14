@@ -84,3 +84,21 @@ pre {
   color: rgb(var(--color-text-secondary));
   font-family: var(--font-serif);
 }
+
+/* 2. Ornamental Dividers */
+article hr {
+  border: none;
+  background: transparent;
+  margin: 3rem 0;
+  text-align: center;
+  height: auto;
+}
+
+article hr::after {
+  content: "* * *";
+  display: inline-block;
+  color: rgb(var(--color-text-muted));
+  font-size: 1.2em;
+  letter-spacing: 0.5em;
+  margin-left: 0.5em; /* Compensate for letter-spacing on the last char */
+}
