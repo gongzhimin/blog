@@ -15,39 +15,35 @@ const turndownService = new TurndownService({ headingStyle: 'atx', codeBlockStyl
 turndownService.use(gfm);
 
 const server = http.createServer((req, res) => {
-  console.log('--- RAW HTTP REQUEST ---');
   if (req.method === 'POST' && req.url === '/webhook') {
     let body = '';
     req.on('data', chunk => { body += chunk.toString(); });
     req.on('end', () => {
-      console.log('BODY RECEIVED:', body); // CRITICAL DEBUG LINE
       try {
-        if (!body) {
-          console.error('ERROR: Empty body');
-          res.statusCode = 400;
-          return res.end('Empty Body');
-        }
-
         const rawData = JSON.parse(body);
-        // Trim keys
         const data = {};
         for (let key in rawData) { data[key.trim()] = rawData[key]; }
         
         if (data.token !== SECRET_TOKEN) {
-          console.error('ERROR: Token mismatch');
           res.statusCode = 403;
           return res.end('Forbidden');
         }
 
-        // Support both "html" (from rich media) and "raw" (from text shortcut)
-        let htmlContent = data.html || '';
-        if (!htmlContent && data.raw) {
-          // Wrap raw text in basic HTML so the parser handles it the same way
-          htmlContent = '<h1>' + data.raw.split('\n')[0] + '</h1><p>' + data.raw.split('\n').slice(1).join('<br>') + '</p>';
+        let htmlContent = '';
+        let title = 'Untitled Post';
+
+        if (data.raw) {
+          const lines = data.raw.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+          if (lines.length > 0) {
+            title = lines[0];
+            const rest = lines.slice(1).join('\n\n');
+            htmlContent = '<h1>' + title + '</h1>' + (rest ? '<p>' + rest.replace(/\n/g, '<br>') + '</p>' : '');
+          }
+        } else if (data.html) {
+          htmlContent = data.html;
         }
 
         if (!htmlContent) {
-          console.error('ERROR: No content found in fields html or raw');
           res.statusCode = 400;
           return res.end('Missing content');
         }
@@ -55,7 +51,7 @@ const server = http.createServer((req, res) => {
         const dom = new JSDOM(htmlContent);
         const document = dom.window.document;
 
-        // 1. Process Images
+        // Process Images
         const images = document.querySelectorAll('img');
         for (let img of images) {
           const src = img.getAttribute('src');
@@ -73,37 +69,43 @@ const server = http.createServer((req, res) => {
           }
         }
 
-        // 2. Extract Title
-        const firstH1 = document.querySelector('h1');
-        let title = firstH1 ? firstH1.textContent.trim() : 'Untitled Post';
-        if (firstH1) firstH1.remove();
+        const h1 = document.querySelector('h1');
+        if (h1) {
+          title = h1.textContent.trim() || title;
+          h1.remove();
+        }
 
-        // 3. Markdown
         const markdown = turndownService.turndown(document.body.innerHTML);
-
-        // 4. Save
         const slug = title.toLowerCase().replace(/[^\w\s-]/g, '').replace(/[\s_]+/g, '-').trim() || 'post';
-        const filename = `${new Date().toISOString().split('T')[0]}-${slug}-${Math.floor(Math.random() * 1000)}.md`;
+        const date = new Date().toISOString().split('T')[0];
+        const filename = `${date}-${slug}-${Math.floor(Math.random() * 1000)}.md`;
         const filepath = path.join(BLOG_ROOT, 'src/content/life', filename);
 
         fs.writeFileSync(filepath, `---
 title: "${title}"
 description: "Posted from mobile"
-date: ${new Date().toISOString().split('T')[0]}
+date: ${date}
 ---
 
 ${markdown}
 `);
 
-        // 5. Push and Sync
-        exec('git add . && git commit -m "docs: mobile post [${title}]" && git push origin main', { cwd: BLOG_ROOT }, (err) => {
-          console.log('Build and push sequence triggered');
+        // SYNC AND PUSH with robust title injection
+        const commitMsg = `docs: mobile post [${title}]`;
+        const gitCmd = `git add . && git commit -m "${commitMsg.replace(/"/g, '\\"')}" && git push origin main`;
+        
+        exec(gitCmd, { cwd: BLOG_ROOT }, (err, stdout, stderr) => {
+          if (err) {
+            console.error('GIT ERROR:', stderr);
+            res.statusCode = 500;
+            return res.end('Git sync failed');
+          }
           res.statusCode = 200;
           res.end('Success');
         });
 
       } catch (err) {
-        console.error('JSON PARSE ERROR:', err.message);
+        console.error('JSON ERROR:', err);
         res.statusCode = 400;
         res.end('Error');
       }
