@@ -2,16 +2,21 @@
 import '../styles/global.css';
 import { getCollection } from 'astro:content';
 
-// Get all posts from both collections
-const blogPosts = await getCollection('blog');
+// Get and sort life posts (top 5)
 const lifePosts = await getCollection('life');
-
-// Combine and sort by date (newest first)
-const allPosts = [...blogPosts, ...lifePosts].sort((a, b) => {
+const topLife = lifePosts.sort((a, b) => {
   const dateA = a.data.pubDatetime || a.data.date;
   const dateB = b.data.pubDatetime || b.data.date;
   return dateB.valueOf() - dateA.valueOf();
-});
+}).slice(0, 5);
+
+// Get and sort blog posts (top 5)
+const blogPosts = await getCollection('blog');
+const topBlog = blogPosts.sort((a, b) => {
+  const dateA = a.data.pubDatetime || a.data.date;
+  const dateB = b.data.pubDatetime || b.data.date;
+  return dateB.valueOf() - dateA.valueOf();
+}).slice(0, 5);
 ---
 
 <!DOCTYPE html>
@@ -24,36 +29,54 @@ const allPosts = [...blogPosts, ...lifePosts].sort((a, b) => {
     <link rel="alternate" type="application/rss+xml" title="RSS Feed" href="/rss.xml" />
   </head>
   <body>
-    <main style="max-width: 680px; margin: 0 auto; padding: 4rem 1.5rem;">
+    <main style="max-width: 800px; margin: 0 auto; padding: 4rem 1.5rem;">
       <!-- Header -->
-      <header style="margin-bottom: 3rem; text-align: center;">
-        <h1 style="font-size: 1.75rem; font-weight: normal; letter-spacing: 0.02em; margin-bottom: 0.5rem;">
+      <header style="margin-bottom: 4rem; text-align: center;">
+        <h1 style="font-size: 1.75rem; font-weight: normal; letter-spacing: 0.02em;">
           Zhimin
         </h1>
       </header>
 
-      <!-- Post List -->
-      <div style="border-top: 1px solid rgb(var(--color-border));">
-        {allPosts.map((post) => {
-          const date = post.data.pubDatetime || post.data.date;
-          return (
-            <article style="padding: 1rem 0; border-bottom: 1px dotted rgb(var(--color-border)); display: flex; justify-content: space-between; align-items: baseline;">
-              <a href={`/${post.collection}/${post.id}`} style="text-decoration: none; color: inherit;">
-                <span style="font-size: 1rem;">{post.data.title}</span>
-              </a>
-              <time style="color: rgb(var(--color-text-muted)); font-size: 0.85rem; white-space: nowrap; margin-left: 1rem;">
-                {date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-              </time>
-            </article>
-          );
-        })}
+      <!-- Showcase Grid -->
+      <div class="showcase-grid">
+        
+        <!-- Left Column: Essays -->
+        <section>
+          <h2 class="category-title">Essays</h2>
+          <div class="post-list">
+            {topLife.map((post) => (
+              <article class="post-item">
+                <a href={`/life/${post.id}`} class="post-title">
+                  {post.data.title}
+                </a>
+              </article>
+            ))}
+          </div>
+          <a href="/life" class="archive-link">View all essays →</a>
+        </section>
+
+        <!-- Right Column: Technical -->
+        <section>
+          <h2 class="category-title">Technical</h2>
+          <div class="post-list">
+            {topBlog.map((post) => (
+              <article class="post-item">
+                <a href={`/blog/${post.id}`} class="post-title">
+                  {post.data.title}
+                </a>
+              </article>
+            ))}
+          </div>
+          <a href="/blog" class="archive-link">View all technical →</a>
+        </section>
+
       </div>
 
       <!-- Footer -->
-      <footer style="margin-top: 4rem; text-align: center; color: rgb(var(--color-text-muted)); font-size: 0.85rem;">
-        <a href="/about" style="text-decoration: none; color: rgb(var(--color-text-muted));">About</a>
+      <footer style="margin-top: 5rem; text-align: center; color: rgb(var(--color-text-muted)); font-size: 0.85rem;">
+        <a href="/about" style="text-decoration: none; color: inherit;">About</a>
         <span style="margin: 0 0.5rem;">·</span>
-        <a href="/rss.xml" style="text-decoration: none; color: rgb(var(--color-text-muted));">RSS</a>
+        <a href="/rss.xml" style="text-decoration: none; color: inherit;">RSS</a>
       </footer>
     </main>
   </body>
