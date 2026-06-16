@@ -158,15 +158,6 @@ article blockquote p {
   }
 }
 
-.category-title {
-  font-size: 0.9rem;
-  font-style: italic;
-  color: rgb(var(--color-text-muted));
-  margin-bottom: 1rem;
-  border-bottom: 1px solid rgb(var(--color-border));
-  padding-bottom: 0.5rem;
-}
-
 .post-item {
   margin-bottom: 1.25rem;
   line-height: 1.4;
@@ -220,3 +211,58 @@ main {
 .stagger-item:nth-child(8) { animation-delay: 0.40s; }
 .stagger-item:nth-child(9) { animation-delay: 0.45s; }
 .stagger-item:nth-child(10) { animation-delay: 0.50s; }
+
+/* Functional Text (Meta, Categories, Links) */
+.functional-text,
+.category-title,
+.archive-link,
+footer a,
+header a[href="/"] h1 {
+  font-family: var(--font-sans);
+}
+
+.category-title {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgb(var(--color-text-muted));
+  margin-bottom: 2rem;
+  /* Hairline border */
+  border-bottom: none;
+  position: relative;
+  padding-bottom: 1rem;
+}
+
+.category-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background-color: rgba(var(--color-border), 0.5); /* Extremely subtle line */
+}
+
+/* Redefine post item borders to hairline */
+.post-item,
+.archive-article {
+  border-bottom: none; /* override old inline styles if any */
+  position: relative;
+}
+
+.post-item::after,
+.archive-article::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background-color: rgba(var(--color-border), 0.3);
+}
+
+/* Remove border from last item */
+.post-item:last-child::after,
+.archive-article:last-child::after {
+  display: none;
+}
