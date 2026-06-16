@@ -2,7 +2,6 @@
 import '../styles/global.css';
 import { getCollection } from 'astro:content';
 
-// Get and sort life posts (top 5)
 const lifePosts = await getCollection('life');
 const topLife = lifePosts.sort((a, b) => {
   const dateA = a.data.pubDatetime || a.data.date;
@@ -10,7 +9,6 @@ const topLife = lifePosts.sort((a, b) => {
   return dateB.valueOf() - dateA.valueOf();
 }).slice(0, 5);
 
-// Get and sort blog posts (top 5)
 const blogPosts = await getCollection('blog');
 const topBlog = blogPosts.sort((a, b) => {
   const dateA = a.data.pubDatetime || a.data.date;
@@ -29,12 +27,12 @@ const topBlog = blogPosts.sort((a, b) => {
     <link rel="alternate" type="application/rss+xml" title="RSS Feed" href="/rss.xml" />
   </head>
   <body>
-    <main style="max-width: 800px; margin: 0 auto; padding: 4rem 1.5rem;">
+    <main style="max-width: 900px; margin: 0 auto; padding: 6rem 2rem;">
       <!-- Header -->
-      <header style="margin-bottom: 4rem; display: flex; align-items: center; justify-content: center; gap: 1rem;">
-        <a href="/" style="text-decoration: none; display: flex; align-items: center; gap: 1rem;">
-          <img src="/logo.svg" alt="Logo" style="width: 40px; height: 40px; border-radius: 6px; display: block;" />
-          <h1 style="font-size: 1.75rem; font-weight: normal; letter-spacing: 0.02em; margin: 0;">
+      <header style="margin-bottom: 6rem; display: flex; align-items: center; justify-content: center; gap: 1.5rem;">
+        <a href="/" style="text-decoration: none; display: flex; align-items: center; gap: 1.5rem;">
+          <img src="/logo.svg" alt="Logo" style="width: 32px; height: 32px; border-radius: 4px; display: block;" />
+          <h1 style="font-size: 1.25rem; font-weight: 500; letter-spacing: 0.1em; margin: 0; text-transform: uppercase;">
             Zhimin
           </h1>
         </a>
@@ -42,20 +40,19 @@ const topBlog = blogPosts.sort((a, b) => {
 
       <!-- Showcase Grid -->
       <div class="showcase-grid">
-        
         <!-- Left Column: Essays -->
         <section>
           <h2 class="category-title">Essays</h2>
           <div class="post-list">
             {topLife.map((post) => (
-              <article class="post-item stagger-item">
+              <article class="post-item stagger-item" >
                 <a href={`/life/${post.id}`} class="post-title">
                   {post.data.title}
                 </a>
               </article>
             ))}
           </div>
-          <a href="/life" class="archive-link stagger-item">View all essays →</a>
+          <a href="/life" class="archive-link stagger-item" >View all essays →</a>
         </section>
 
         <!-- Right Column: Technical -->
@@ -63,22 +60,21 @@ const topBlog = blogPosts.sort((a, b) => {
           <h2 class="category-title">Technical</h2>
           <div class="post-list">
             {topBlog.map((post) => (
-              <article class="post-item stagger-item">
+              <article class="post-item stagger-item" >
                 <a href={`/blog/${post.id}`} class="post-title">
                   {post.data.title}
                 </a>
               </article>
             ))}
           </div>
-          <a href="/blog" class="archive-link stagger-item">View all technical →</a>
+          <a href="/blog" class="archive-link stagger-item" >View all technical →</a>
         </section>
-
       </div>
 
       <!-- Footer -->
-      <footer style="margin-top: 5rem; text-align: center; color: rgb(var(--color-text-muted)); font-size: 0.85rem;">
+      <footer class="functional-text" style="margin-top: 8rem; text-align: center; color: rgb(var(--color-text-muted)); font-size: 0.75rem; letter-spacing: 0.05em; text-transform: uppercase;">
         <a href="/about" style="text-decoration: none; color: inherit;">About</a>
-        <span style="margin: 0 0.5rem;">·</span>
+        <span style="margin: 0 1rem;">·</span>
         <a href="/rss.xml" style="text-decoration: none; color: inherit;">RSS</a>
       </footer>
     </main>
