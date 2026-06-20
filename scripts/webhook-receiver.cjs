@@ -1,6 +1,4 @@
 const http = require('http');
-const fs = require('fs');
-const path = require('path');
 const { JSDOM } = require('jsdom');
 const TurndownService = require('turndown');
 const { gfm } = require('turndown-plugin-gfm');
@@ -10,63 +8,92 @@ const SECRET_TOKEN = process.env.BLOG_WEBHOOK_TOKEN || 'zhimin_secret_post_2026'
 const GITHUB_REPO = process.env.BLOG_GITHUB_REPO || 'gongzhimin/blog';
 const GITHUB_BRANCH = process.env.BLOG_GITHUB_BRANCH || 'main';
 const GITHUB_TOKEN = process.env.BLOG_GITHUB_TOKEN;
-const BLOG_ROOT = '/var/www/blog';
-const IMAGE_DIR = '/public/images/mobile';
 const GITHUB_API_BASE = 'https://api.github.com';
+const LIFE_POST_PREFIX = 'src/content/life/';
 
-const turndownService = new TurndownService({ headingStyle: 'atx', codeBlockStyle: 'fenced' });
+const turndownService = new TurndownService({
+  headingStyle: 'atx',
+  codeBlockStyle: 'fenced',
+});
 turndownService.use(gfm);
 
 function toBase64(buffer) {
-  return Buffer.isBuffer(buffer) ? buffer.toString('base64') : Buffer.from(buffer).toString('base64');
+  return Buffer.isBuffer(buffer)
+    ? buffer.toString('base64')
+    : Buffer.from(buffer).toString('base64');
 }
 
 function normalizeTitleToSlug(title) {
-  return title.toLowerCase().replace(/[^\w\s-]/g, '').replace(/[\s_]+/g, '-').trim() || 'post';
+  return (
+    title
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/[\s_]+/g, '-')
+      .trim() || 'post'
+  );
 }
 
-function extractFrontmatterTitle(content) {
-  const match = content.match(/^---\n([\s\S]*?)\n---/);
-  if (!match) {
+function extractFrontmatterField(content, field) {
+  const frontmatter = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+  if (!frontmatter) {
     return null;
   }
 
-  const titleMatch = match[1].match(/^title:\s*["']?(.+?)["']?$/m);
-  return titleMatch ? titleMatch[1].trim() : null;
+  const fieldPattern = new RegExp(`^${field}:\\s*["']?(.+?)["']?\\s*$`, 'm');
+  const match = frontmatter[1].match(fieldPattern);
+  return match ? match[1].trim() : null;
 }
 
-function findLifePostMatches(blogRoot, title) {
-  const contentDir = path.join(blogRoot, 'src/content/life');
-  if (!fs.existsSync(contentDir)) {
-    return [];
+function extractFrontmatterTitle(content) {
+  return extractFrontmatterField(content, 'title');
+}
+
+function extractFrontmatterDate(content) {
+  return extractFrontmatterField(content, 'date');
+}
+
+function buildGitHubLifePostPlan({
+  posts,
+  title,
+  markdown,
+  date,
+  randomSuffix = Math.floor(Math.random() * 1000),
+}) {
+  const matches = posts
+    .filter((post) => extractFrontmatterTitle(post.content) === title)
+    .sort((a, b) => b.repoPath.localeCompare(a.repoPath));
+  const canonicalPost = matches[0];
+  const postDate = canonicalPost
+    ? extractFrontmatterDate(canonicalPost.content) || date
+    : date;
+  const repoPath =
+    canonicalPost?.repoPath ||
+    `${LIFE_POST_PREFIX}${date}-${normalizeTitleToSlug(title)}-${randomSuffix}.md`;
+  const frontmatter = [
+    '---',
+    `title: ${JSON.stringify(title)}`,
+    'description: "Posted from mobile"',
+    `date: ${postDate}`,
+    '---',
+    '',
+    markdown,
+    '',
+  ].join('\n');
+
+  return {
+    repoPath,
+    frontmatter,
+    duplicateRepoPaths: matches.slice(1).map((post) => post.repoPath),
+  };
+}
+
+function repositoryApiPath(pathname) {
+  const [owner, repo] = GITHUB_REPO.split('/');
+  if (!owner || !repo) {
+    throw new Error(`Invalid BLOG_GITHUB_REPO: ${GITHUB_REPO}`);
   }
 
-  const slug = normalizeTitleToSlug(title);
-  return fs
-    .readdirSync(contentDir)
-    .filter((fileName) => fileName.endsWith('.md'))
-    .map((fileName) => {
-      const filepath = path.join(contentDir, fileName);
-      const content = fs.readFileSync(filepath, 'utf8');
-      return {
-        filepath,
-        title: extractFrontmatterTitle(content),
-        mtimeMs: fs.statSync(filepath).mtimeMs,
-      };
-    })
-    .filter((file) => file.title === title)
-    .sort((a, b) => b.mtimeMs - a.mtimeMs);
-}
-
-function buildLifePostPlan({ blogRoot, title, markdown, date, randomSuffix = Math.floor(Math.random() * 1000) }) {
-  const matches = findLifePostMatches(blogRoot, title);
-  const canonicalFile = matches[0]?.filepath;
-  const duplicatePaths = matches.slice(1).map((file) => file.filepath);
-  const slug = normalizeTitleToSlug(title);
-  const filepath = canonicalFile || path.join(blogRoot, 'src/content/life', `${date}-${slug}-${randomSuffix}.md`);
-  const frontmatter = `---\ntitle: "${title}"\ndescription: "Posted from mobile"\ndate: ${date}\n---\n\n${markdown}\n`;
-
-  return { filepath, frontmatter, duplicatePaths };
+  return `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}${pathname}`;
 }
 
 async function githubRequest(method, pathname, body) {
@@ -96,33 +123,174 @@ async function githubRequest(method, pathname, body) {
   }
 
   if (!response.ok) {
-    const message = payload && typeof payload === 'object' && payload.message ? payload.message : text || `GitHub API error (${response.status})`;
+    const message =
+      payload && typeof payload === 'object' && payload.message
+        ? payload.message
+        : text || `GitHub API error (${response.status})`;
     throw new Error(message);
   }
 
   return payload;
 }
 
-async function publishFilesToGitHub(files, commitMessage) {
-  const [owner, repo] = GITHUB_REPO.split('/');
-  if (!owner || !repo) {
-    throw new Error(`Invalid BLOG_GITHUB_REPO: ${GITHUB_REPO}`);
-  }
-
-  const ref = await githubRequest(
+async function loadGitHubRepositoryState(request = githubRequest) {
+  const ref = await request(
     'GET',
-    `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/git/ref/heads/${encodeURIComponent(GITHUB_BRANCH)}`
+    repositoryApiPath(
+      `/git/ref/heads/${encodeURIComponent(GITHUB_BRANCH)}`
+    )
   );
   const headCommitSha = ref.object.sha;
-
-  const headCommit = await githubRequest(
+  const headCommit = await request(
     'GET',
-    `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/git/commits/${headCommitSha}`
+    repositoryApiPath(`/git/commits/${headCommitSha}`)
   );
   const baseTreeSha = headCommit.tree.sha;
+  const tree = await request(
+    'GET',
+    repositoryApiPath(`/git/trees/${baseTreeSha}?recursive=1`)
+  );
 
+  if (tree.truncated) {
+    throw new Error('GitHub repository tree is truncated');
+  }
+
+  const treeEntries = Array.isArray(tree.tree) ? tree.tree : [];
+  const lifeEntries = treeEntries.filter(
+    (entry) =>
+      entry.type === 'blob' &&
+      entry.path.startsWith(LIFE_POST_PREFIX) &&
+      entry.path.endsWith('.md')
+  );
+  const posts = await Promise.all(
+    lifeEntries.map(async (entry) => {
+      const blob = await request(
+        'GET',
+        repositoryApiPath(`/git/blobs/${entry.sha}`)
+      );
+      if (blob.encoding !== 'base64') {
+        throw new Error(`Unsupported GitHub blob encoding: ${blob.encoding}`);
+      }
+
+      return {
+        repoPath: entry.path,
+        content: Buffer.from(
+          blob.content.replace(/\s/g, ''),
+          'base64'
+        ).toString('utf8'),
+      };
+    })
+  );
+
+  return {
+    headCommitSha,
+    baseTreeSha,
+    existingPaths: new Set(treeEntries.map((entry) => entry.path)),
+    posts,
+  };
+}
+
+function buildMobilePublication({
+  data,
+  repositoryState,
+  date = new Date().toISOString().split('T')[0],
+  randomSuffix = Math.floor(Math.random() * 1000),
+  imageTimestamp = Date.now(),
+}) {
+  let htmlContent = '';
+  let title = 'Untitled Post';
+
+  if (data.raw) {
+    const lines = data.raw
+      .split('\n')
+      .map((line) => line.trim())
+      .filter(Boolean);
+    if (lines.length > 0) {
+      title = lines[0];
+      const rest = lines.slice(1).join('\n\n');
+      htmlContent =
+        `<h1>${title}</h1>` +
+        (rest ? `<p>${rest.replace(/\n/g, '<br>')}</p>` : '');
+    }
+  } else if (data.html) {
+    htmlContent = data.html;
+  }
+
+  if (!htmlContent) {
+    throw new Error('Missing content');
+  }
+
+  const dom = new JSDOM(htmlContent);
+  const document = dom.window.document;
+  const files = [];
+  const images = document.querySelectorAll('img');
+  let imageIndex = 0;
+
+  for (const image of images) {
+    const src = image.getAttribute('src');
+    if (!src || !src.startsWith('data:image/')) {
+      continue;
+    }
+
+    const match = src.match(/^data:image\/([\w.+-]+);base64,(.+)$/);
+    if (!match) {
+      continue;
+    }
+
+    const extension = match[1];
+    const base64Data = match[2];
+    const imageSuffix = (randomSuffix + imageIndex) % 1000;
+    const fileName = `img-${imageTimestamp}-${imageSuffix}.${extension}`;
+    imageIndex += 1;
+    image.setAttribute('src', `/images/mobile/${fileName}`);
+    files.push({
+      repoPath: `public/images/mobile/${fileName}`,
+      content: Buffer.from(base64Data, 'base64'),
+    });
+  }
+
+  const h1 = document.querySelector('h1');
+  if (h1) {
+    title = h1.textContent.trim() || title;
+    h1.remove();
+  }
+
+  const markdown = turndownService.turndown(document.body.innerHTML);
+  const plan = buildGitHubLifePostPlan({
+    posts: repositoryState.posts,
+    title,
+    markdown,
+    date,
+    randomSuffix,
+  });
+  files.push({
+    repoPath: plan.repoPath,
+    content: Buffer.from(plan.frontmatter, 'utf8'),
+  });
+  for (const repoPath of plan.duplicateRepoPaths) {
+    files.push({ repoPath, delete: true });
+  }
+
+  return {
+    files,
+    commitMessage: `docs: mobile post [${title}]`,
+  };
+}
+
+async function publishFilesToGitHub(
+  files,
+  commitMessage,
+  repositoryState,
+  request = githubRequest
+) {
+  const state =
+    repositoryState || (await loadGitHubRepositoryState(request));
+  const validFiles = files.filter(
+    (file) => !file.delete || state.existingPaths.has(file.repoPath)
+  );
   const treeEntries = [];
-  for (const file of files) {
+
+  for (const file of validFiles) {
     if (file.delete) {
       treeEntries.push({
         path: file.repoPath,
@@ -133,14 +301,10 @@ async function publishFilesToGitHub(files, commitMessage) {
       continue;
     }
 
-    const blob = await githubRequest(
-      'POST',
-      `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/git/blobs`,
-      {
-        content: toBase64(file.content),
-        encoding: 'base64',
-      }
-    );
+    const blob = await request('POST', repositoryApiPath('/git/blobs'), {
+      content: toBase64(file.content),
+      encoding: 'base64',
+    });
     treeEntries.push({
       path: file.repoPath,
       mode: '100644',
@@ -149,142 +313,70 @@ async function publishFilesToGitHub(files, commitMessage) {
     });
   }
 
-  const tree = await githubRequest(
-    'POST',
-    `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/git/trees`,
-    {
-      base_tree: baseTreeSha,
-      tree: treeEntries,
-    }
-  );
-
-  const commit = await githubRequest(
-    'POST',
-    `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/git/commits`,
-    {
-      message: commitMessage,
-      tree: tree.sha,
-      parents: [headCommitSha],
-    }
-  );
-
-  await githubRequest(
+  const tree = await request('POST', repositoryApiPath('/git/trees'), {
+    base_tree: state.baseTreeSha,
+    tree: treeEntries,
+  });
+  const commit = await request('POST', repositoryApiPath('/git/commits'), {
+    message: commitMessage,
+    tree: tree.sha,
+    parents: [state.headCommitSha],
+  });
+  await request(
     'PATCH',
-    `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/git/refs/heads/${encodeURIComponent(GITHUB_BRANCH)}`,
+    repositoryApiPath(
+      `/git/refs/heads/${encodeURIComponent(GITHUB_BRANCH)}`
+    ),
     {
       sha: commit.sha,
+      force: false,
     }
   );
 }
 
 const server = http.createServer((req, res) => {
-  if (req.method === 'POST' && req.url === '/webhook') {
-    let body = '';
-    req.on('data', chunk => { body += chunk.toString(); });
-    req.on('end', async () => {
-      try {
-        const rawData = JSON.parse(body);
-        const data = {};
-        for (let key in rawData) { data[key.trim()] = rawData[key]; }
-        
-        if (data.token !== SECRET_TOKEN) {
-          res.statusCode = 403;
-          return res.end('Forbidden');
-        }
-
-        let htmlContent = '';
-        let title = 'Untitled Post';
-
-        if (data.raw) {
-          const lines = data.raw.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-          if (lines.length > 0) {
-            title = lines[0];
-            const rest = lines.slice(1).join('\n\n');
-            htmlContent = '<h1>' + title + '</h1>' + (rest ? '<p>' + rest.replace(/\n/g, '<br>') + '</p>' : '');
-          }
-        } else if (data.html) {
-          htmlContent = data.html;
-        }
-
-        if (!htmlContent) {
-          res.statusCode = 400;
-          return res.end('Missing content');
-        }
-
-        const dom = new JSDOM(htmlContent);
-        const document = dom.window.document;
-        const filesToPublish = [];
-
-        // Process Images
-        const images = document.querySelectorAll('img');
-        for (let img of images) {
-          const src = img.getAttribute('src');
-          if (src && src.startsWith('data:image/')) {
-            const match = src.match(/^data:image\/(\w+);base64,(.+)$/);
-            if (match) {
-              const ext = match[1];
-              const base64Data = match[2];
-              const fileName = `img-${Date.now()}-${Math.floor(Math.random() * 1000)}.${ext}`;
-              const fullPath = path.join(BLOG_ROOT, IMAGE_DIR, fileName);
-              if (!fs.existsSync(path.join(BLOG_ROOT, IMAGE_DIR))) fs.mkdirSync(path.join(BLOG_ROOT, IMAGE_DIR), { recursive: true });
-              fs.writeFileSync(fullPath, base64Data, 'base64');
-              img.setAttribute('src', `/images/mobile/${fileName}`);
-              filesToPublish.push({
-                repoPath: `public/images/mobile/${fileName}`,
-                content: Buffer.from(base64Data, 'base64'),
-              });
-            }
-          }
-        }
-
-        const h1 = document.querySelector('h1');
-        if (h1) {
-          title = h1.textContent.trim() || title;
-          h1.remove();
-        }
-
-        const markdown = turndownService.turndown(document.body.innerHTML);
-        const date = new Date().toISOString().split('T')[0];
-        const plan = buildLifePostPlan({
-          blogRoot: BLOG_ROOT,
-          title,
-          markdown,
-          date,
-        });
-
-        fs.mkdirSync(path.dirname(plan.filepath), { recursive: true });
-        fs.writeFileSync(plan.filepath, plan.frontmatter);
-        for (const duplicatePath of plan.duplicatePaths) {
-          if (duplicatePath !== plan.filepath && fs.existsSync(duplicatePath)) {
-            fs.unlinkSync(duplicatePath);
-          }
-        }
-        filesToPublish.push({
-          repoPath: path.relative(BLOG_ROOT, plan.filepath).replace(/\\/g, '/'),
-          content: Buffer.from(plan.frontmatter, 'utf8'),
-        });
-        for (const duplicatePath of plan.duplicatePaths) {
-          filesToPublish.push({
-            repoPath: path.relative(BLOG_ROOT, duplicatePath).replace(/\\/g, '/'),
-            delete: true,
-          });
-        }
-
-        const commitMsg = `docs: mobile post [${title}]`;
-        await publishFilesToGitHub(filesToPublish, commitMsg);
-        res.statusCode = 200;
-        res.end('Success');
-
-      } catch (err) {
-        console.error('WEBHOOK ERROR:', err);
-        res.statusCode = 400;
-        res.end(err && err.message ? err.message : 'Error');
-      }
-    });
-  } else {
+  if (req.method !== 'POST' || req.url !== '/webhook') {
     res.statusCode = 404;
     res.end('Not Found');
+    return;
   }
+
+  let body = '';
+  req.on('data', (chunk) => {
+    body += chunk.toString();
+  });
+  req.on('end', async () => {
+    try {
+      const rawData = JSON.parse(body);
+      const data = {};
+      for (const key in rawData) {
+        data[key.trim()] = rawData[key];
+      }
+
+      if (data.token !== SECRET_TOKEN) {
+        res.statusCode = 403;
+        res.end('Forbidden');
+        return;
+      }
+
+      const repositoryState = await loadGitHubRepositoryState();
+      const publication = buildMobilePublication({
+        data,
+        repositoryState,
+      });
+      await publishFilesToGitHub(
+        publication.files,
+        publication.commitMessage,
+        repositoryState
+      );
+      res.statusCode = 200;
+      res.end('Success');
+    } catch (error) {
+      console.error('WEBHOOK ERROR:', error);
+      res.statusCode = 400;
+      res.end(error && error.message ? error.message : 'Error');
+    }
+  });
 });
 
 if (require.main === module) {
@@ -292,10 +384,12 @@ if (require.main === module) {
 }
 
 module.exports = {
-  buildLifePostPlan,
-  normalizeTitleToSlug,
+  buildGitHubLifePostPlan,
+  buildMobilePublication,
+  extractFrontmatterDate,
   extractFrontmatterTitle,
-  findLifePostMatches,
-  toBase64,
+  loadGitHubRepositoryState,
+  normalizeTitleToSlug,
   publishFilesToGitHub,
+  toBase64,
 };
