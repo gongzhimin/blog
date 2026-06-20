@@ -21,6 +21,54 @@ function toBase64(buffer) {
   return Buffer.isBuffer(buffer) ? buffer.toString('base64') : Buffer.from(buffer).toString('base64');
 }
 
+function normalizeTitleToSlug(title) {
+  return title.toLowerCase().replace(/[^\w\s-]/g, '').replace(/[\s_]+/g, '-').trim() || 'post';
+}
+
+function extractFrontmatterTitle(content) {
+  const match = content.match(/^---\n([\s\S]*?)\n---/);
+  if (!match) {
+    return null;
+  }
+
+  const titleMatch = match[1].match(/^title:\s*["']?(.+?)["']?$/m);
+  return titleMatch ? titleMatch[1].trim() : null;
+}
+
+function findLifePostMatches(blogRoot, title) {
+  const contentDir = path.join(blogRoot, 'src/content/life');
+  if (!fs.existsSync(contentDir)) {
+    return [];
+  }
+
+  const slug = normalizeTitleToSlug(title);
+  return fs
+    .readdirSync(contentDir)
+    .filter((fileName) => fileName.endsWith('.md'))
+    .map((fileName) => {
+      const filepath = path.join(contentDir, fileName);
+      const content = fs.readFileSync(filepath, 'utf8');
+      return {
+        filepath,
+        title: extractFrontmatterTitle(content),
+        mtimeMs: fs.statSync(filepath).mtimeMs,
+      };
+    })
+    .filter((file) => file.title === title)
+    .sort((a, b) => b.mtimeMs - a.mtimeMs);
+}
+
+function buildLifePostPlan({ blogRoot, title, markdown, date, randomSuffix = Math.floor(Math.random() * 1000) }) {
+  const matches = findLifePostMatches(blogRoot, title);
+  const canonicalFile = matches[0]?.filepath;
+  const duplicatePaths = matches.slice(1).map((file) => file.filepath);
+  const slug = normalizeTitleToSlug(title);
+  const filepath = canonicalFile || path.join(blogRoot, 'src/content/life', `${date}-${slug}-${randomSuffix}.md`);
+  const frontmatter = `---\ntitle: "${title}"\ndescription: "Posted from mobile"\ndate: ${date}\n---\n\n${markdown}\n`;
+
+  return { filepath, frontmatter, duplicatePaths };
+}
+
 async function githubRequest(method, pathname, body) {
   if (!GITHUB_TOKEN) {
     throw new Error('Missing BLOG_GITHUB_TOKEN');
@@ -75,6 +123,16 @@ async function publishFilesToGitHub(files, commitMessage) {
 
   const treeEntries = [];
   for (const file of files) {
+    if (file.delete) {
+      treeEntries.push({
+        path: file.repoPath,
+        mode: '100644',
+        type: 'blob',
+        sha: null,
+      });
+      continue;
+    }
+
     const blob = await githubRequest(
       'POST',
       `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/git/blobs`,
@@ -186,17 +244,31 @@ const server = http.createServer((req, res) => {
         }
 
         const markdown = turndownService.turndown(document.body.innerHTML);
-        const slug = title.toLowerCase().replace(/[^\w\s-]/g, '').replace(/[\s_]+/g, '-').trim() || 'post';
         const date = new Date().toISOString().split('T')[0];
-        const filename = `${date}-${slug}-${Math.floor(Math.random() * 1000)}.md`;
-        const filepath = path.join(BLOG_ROOT, 'src/content/life', filename);
-        const frontmatter = `---\ntitle: "${title}"\ndescription: "Posted from mobile"\ndate: ${date}\n---\n\n${markdown}\n`;
-
-        fs.writeFileSync(filepath, frontmatter);
-        filesToPublish.push({
-          repoPath: `src/content/life/${filename}`,
-          content: Buffer.from(frontmatter, 'utf8'),
+        const plan = buildLifePostPlan({
+          blogRoot: BLOG_ROOT,
+          title,
+          markdown,
+          date,
         });
+
+        fs.mkdirSync(path.dirname(plan.filepath), { recursive: true });
+        fs.writeFileSync(plan.filepath, plan.frontmatter);
+        for (const duplicatePath of plan.duplicatePaths) {
+          if (duplicatePath !== plan.filepath && fs.existsSync(duplicatePath)) {
+            fs.unlinkSync(duplicatePath);
+          }
+        }
+        filesToPublish.push({
+          repoPath: path.relative(BLOG_ROOT, plan.filepath).replace(/\\/g, '/'),
+          content: Buffer.from(plan.frontmatter, 'utf8'),
+        });
+        for (const duplicatePath of plan.duplicatePaths) {
+          filesToPublish.push({
+            repoPath: path.relative(BLOG_ROOT, duplicatePath).replace(/\\/g, '/'),
+            delete: true,
+          });
+        }
 
         const commitMsg = `docs: mobile post [${title}]`;
         await publishFilesToGitHub(filesToPublish, commitMsg);
@@ -215,4 +287,15 @@ const server = http.createServer((req, res) => {
   }
 });
 
-server.listen(PORT, '127.0.0.1');
+if (require.main === module) {
+  server.listen(PORT, '127.0.0.1');
+}
+
+module.exports = {
+  buildLifePostPlan,
+  normalizeTitleToSlug,
+  extractFrontmatterTitle,
+  findLifePostMatches,
+  toBase64,
+  publishFilesToGitHub,
+};
