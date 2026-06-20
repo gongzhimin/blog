@@ -1,0 +1,38 @@
+name: Deploy Webhook
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'scripts/webhook-receiver.cjs'
+      - 'scripts/blog-webhook.service'
+      - '.github/workflows/deploy-webhook.yml'
+
+jobs:
+  deploy-webhook:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Upload webhook files
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: 13.193.240.51
+          username: ubuntu
+          key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
+          source: "scripts/webhook-receiver.cjs,scripts/blog-webhook.service"
+          target: /tmp/blog-webhook-deploy
+
+      - name: Install and restart service
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: 13.193.240.51
+          username: ubuntu
+          key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
+          script: |
+            sudo install -m 0644 /tmp/blog-webhook-deploy/scripts/webhook-receiver.cjs /var/www/blog/scripts/webhook-receiver.cjs
+            sudo install -m 0644 /tmp/blog-webhook-deploy/scripts/blog-webhook.service /etc/systemd/system/blog-webhook.service
+            sudo systemctl daemon-reload
+            sudo systemctl restart blog-webhook.service
+            sudo systemctl status blog-webhook.service --no-pager -l | sed -n '1,40p'
