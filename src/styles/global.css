@@ -477,6 +477,10 @@ img {
   font-size: 1.06rem;
 }
 
+.article-body > h1:first-child {
+  display: none;
+}
+
 .article-body > *:first-child {
   margin-top: 0;
 }
