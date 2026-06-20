@@ -3,6 +3,14 @@ name: Deploy Blog
 on:
   push:
     branches: [ main ]
+    paths:
+      - 'astro.config.mjs'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'public/**'
+      - 'src/**'
+      - 'tsconfig.json'
+      - '.github/workflows/deploy.yml'
 
 jobs:
   build-and-deploy:
