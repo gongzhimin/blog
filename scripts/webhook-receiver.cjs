@@ -95,6 +95,66 @@ function parseShortcutMarkdown(markdown, explicitTitle) {
   };
 }
 
+function isMarkdownBlockLine(line) {
+  return /^(?:#{1,6}\s|>\s?|[-+*]\s+|\d+[.)]\s+|```|~~~|\|)/.test(
+    line.trimStart()
+  );
+}
+
+function addMarkdownHardBreaks(lines) {
+  let insideFence = false;
+
+  return lines.map((line, index) => {
+    const trimmedEnd = line.replace(/[ \t]+$/, '');
+    const trimmedStart = trimmedEnd.trimStart();
+    if (/^(?:```|~~~)/.test(trimmedStart)) {
+      insideFence = !insideFence;
+      return trimmedEnd;
+    }
+
+    const nextLine = lines[index + 1];
+    const shouldAddHardBreak =
+      !insideFence &&
+      trimmedEnd.length > 0 &&
+      nextLine !== undefined &&
+      nextLine.trim().length > 0 &&
+      !isMarkdownBlockLine(trimmedEnd);
+
+    return shouldAddHardBreak ? `${trimmedEnd}  ` : trimmedEnd;
+  });
+}
+
+function parseShortcutRaw(raw, explicitTitle) {
+  const normalized = String(raw || '').replace(/\r\n?/g, '\n');
+  const lines = normalized.split('\n');
+  const firstContentIndex = lines.findIndex((line) => line.trim());
+  if (firstContentIndex === -1) {
+    throw new Error('Missing raw content');
+  }
+
+  const title =
+    String(explicitTitle || '').trim() ||
+    cleanMarkdownTitle(lines[firstContentIndex]);
+  if (!title) {
+    throw new Error('Missing article title');
+  }
+
+  if (!explicitTitle) {
+    lines.splice(firstContentIndex, 1);
+  }
+  while (lines.length && !lines[0].trim()) {
+    lines.shift();
+  }
+  while (lines.length && !lines[lines.length - 1].trim()) {
+    lines.pop();
+  }
+
+  return {
+    title,
+    markdown: addMarkdownHardBreaks(lines).join('\n'),
+  };
+}
+
 function buildGitHubLifePostPlan({
   posts,
   title,
@@ -249,17 +309,9 @@ function buildMobilePublication({
     title = parsed.title;
     markdown = parsed.markdown;
   } else if (data.raw) {
-    const lines = data.raw
-      .split('\n')
-      .map((line) => line.trim())
-      .filter(Boolean);
-    if (lines.length > 0) {
-      title = lines[0];
-      const rest = lines.slice(1).join('\n\n');
-      htmlContent =
-        `<h1>${title}</h1>` +
-        (rest ? `<p>${rest.replace(/\n/g, '<br>')}</p>` : '');
-    }
+    const parsed = parseShortcutRaw(data.raw, title);
+    title = parsed.title;
+    markdown = parsed.markdown;
   } else if (data.html) {
     htmlContent = data.html;
   }
@@ -453,6 +505,7 @@ module.exports = {
   extractFrontmatterTitle,
   loadGitHubRepositoryState,
   normalizeTitleToSlug,
+  parseShortcutRaw,
   parseShortcutMarkdown,
   publishFilesToGitHub,
   toBase64,

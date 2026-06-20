@@ -216,6 +216,43 @@ test('uses the first markdown text line as title when there is no heading', () =
   assert.match(content, /正文第一段\n\n正文第二段/);
 });
 
+test('converts raw shortcut text directly to markdown without escaping syntax', () => {
+  const publication = buildMobilePublication({
+    data: {
+      raw: [
+        '答案',
+        '',
+        '在高空盘旋，',
+        '拒不降落。',
+        '',
+        '> 这是一段引用。',
+        '',
+        '**TODO**: 保留粗体',
+        '',
+        '- 第一项',
+        '- 第二项',
+        '',
+        '[链接](https://example.com)',
+      ].join('\n'),
+    },
+    repositoryState: {
+      posts: [],
+    },
+    date: '2026-06-20',
+    randomSuffix: 789,
+  });
+
+  assert.equal(publication.commitMessage, 'docs: mobile post [答案]');
+  const content = publication.files[0].content.toString('utf8');
+  assert.match(content, /在高空盘旋，  \n拒不降落。/);
+  assert.match(content, /^> 这是一段引用。$/m);
+  assert.match(content, /^\*\*TODO\*\*: 保留粗体$/m);
+  assert.match(content, /^- 第一项$/m);
+  assert.match(content, /^- 第二项$/m);
+  assert.match(content, /^\[链接\]\(https:\/\/example\.com\)$/m);
+  assert.doesNotMatch(content, /\\>|\\\*\\\*/);
+});
+
 test('does not submit deletion entries for paths missing from the GitHub tree', async () => {
   const requests = [];
   const request = async (method, pathname, body) => {
