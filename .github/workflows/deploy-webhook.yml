@@ -6,7 +6,6 @@ on:
     paths:
       - 'scripts/webhook-receiver.cjs'
       - 'scripts/blog-webhook.service'
-      - '.github/workflows/deploy-webhook.yml'
 
 jobs:
   deploy-webhook:
