@@ -12,44 +12,28 @@ import '../styles/global.css';
     <link rel="alternate" type="application/rss+xml" title="RSS Feed" href="/rss.xml" />
   </head>
   <body>
-    <main style="max-width: 640px; margin: 0 auto; padding: 4rem 1.5rem;">
-      <!-- Back link -->
-      <a href="/" style="color: rgb(var(--color-text-muted)); text-decoration: none; font-size: 0.9rem;">
-        ← Back
-      </a>
+    <main class="site-shell site-shell--compact">
+      <a href="/" class="article-page__back">← Back</a>
 
-      <!-- About content -->
-      <div style="margin-top: 3rem;">
-        <!-- Profile header -->
-        <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
-          <img src="/logo.svg" alt="Logo" style="width: 56px; height: 56px; border-radius: 8px; flex-shrink: 0;" />
+      <section class="about-page__section">
+        <div class="about-page__profile">
+          <img src="/logo.svg" alt="Zhimin" class="about-page__avatar" />
           <div>
-            <h1 style="font-size: 1.5rem; font-weight: normal; margin-bottom: 0.25rem;">
-              Zhimin
-            </h1>
-            <p style="color: rgb(var(--color-text-muted)); font-size: 0.9rem; margin: 0;">
-              安全研究 · 上海
-            </p>
+            <h1 class="about-page__name">Zhimin</h1>
+            <p class="about-page__meta">安全研究 · 上海</p>
           </div>
         </div>
 
-        <!-- Bio -->
-        <div style="font-size: 1rem; line-height: 1.8; color: rgb(var(--color-text-secondary));">
-          <p style="margin-top: 0;">
-            文字留住瞬间
-          </p>
+        <div class="about-page__bio">
+          <p>文字留住瞬间。</p>
+          <p>这里主要记录生活随笔、技术笔记，以及一些持续整理中的想法。</p>
         </div>
 
-        <!-- Social links -->
-        <div style="display: flex; gap: 0.75rem; margin-top: 2rem;">
-          <a href="https://github.com/gongzhimin" style="width: 40px; height: 40px; background-color: rgb(var(--color-text-primary)); border-radius: 4px; display: flex; align-items: center; justify-content: center; text-decoration: none;">
-            <span style="color: rgb(var(--color-bg)); font-size: 12px; font-weight: bold;">GH</span>
-          </a>
-          <a href="mailto:zhimin.aisecty@gmail.com" style="width: 40px; height: 40px; background-color: rgb(var(--color-text-primary)); border-radius: 4px; display: flex; align-items: center; justify-content: center; text-decoration: none;">
-            <span style="color: rgb(var(--color-bg)); font-size: 12px;">@</span>
-          </a>
+        <div class="about-page__links">
+          <a href="https://github.com/gongzhimin" class="about-page__link">GH</a>
+          <a href="mailto:zhimin.aisecty@gmail.com" class="about-page__link">@</a>
         </div>
-      </div>
+      </section>
 
     </main>
   </body>

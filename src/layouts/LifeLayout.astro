@@ -25,28 +25,28 @@ const formattedDate = date.toLocaleDateString('en-US', {
     <link rel="alternate" type="application/rss+xml" title="RSS Feed" href="/rss.xml" />
   </head>
   <body>
-    <main style="max-width: 640px; margin: 0 auto; padding: 4rem 1.5rem;">
-      <!-- Back link -->
-      <a href="/" style="color: rgb(var(--color-text-muted)); text-decoration: none; font-size: 0.9rem;">
-        ← Back
-      </a>
+    <main class="site-shell site-shell--compact article-page">
+      <a href="/" class="article-page__back">← Back</a>
 
-      <!-- Article header -->
-      <header style="margin-top: 2rem; margin-bottom: 2rem;">
-        <time style="display: block; color: rgb(var(--color-text-muted)); font-size: 0.9rem; margin-bottom: 0.5rem;">
-          {formattedDate}
-        </time>
-        <h1 style="font-size: 2rem; font-weight: normal; line-height: 1.3; margin-bottom: 0.5rem;">
+      <header class="article-hero">
+        <div class="article-hero__meta">
+          <time>{formattedDate}</time>
+          <span class="editorial-note">Essay</span>
+        </div>
+        <h1 class="article-title">
           {title}
         </h1>
+        {description && (
+          <p class="article-dek">
+            {description}
+          </p>
+        )}
       </header>
 
-      <!-- Article content -->
-      <article class="life-article" style="font-size: 1.1rem; line-height: 1.8;">
+      <article class="article-body life-article">
         <slot />
       </article>
 
-      <!-- Comments -->
       <Giscus />
 
     </main>
