@@ -1,5 +1,4 @@
 const http = require('http');
-const { exec } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const { JSDOM } = require('jsdom');
@@ -8,17 +7,123 @@ const { gfm } = require('turndown-plugin-gfm');
 
 const PORT = 9000;
 const SECRET_TOKEN = process.env.BLOG_WEBHOOK_TOKEN || 'zhimin_secret_post_2026';
+const GITHUB_REPO = process.env.BLOG_GITHUB_REPO || 'gongzhimin/blog';
+const GITHUB_BRANCH = process.env.BLOG_GITHUB_BRANCH || 'main';
+const GITHUB_TOKEN = process.env.BLOG_GITHUB_TOKEN;
 const BLOG_ROOT = '/var/www/blog';
 const IMAGE_DIR = '/public/images/mobile';
+const GITHUB_API_BASE = 'https://api.github.com';
 
 const turndownService = new TurndownService({ headingStyle: 'atx', codeBlockStyle: 'fenced' });
 turndownService.use(gfm);
+
+function toBase64(buffer) {
+  return Buffer.isBuffer(buffer) ? buffer.toString('base64') : Buffer.from(buffer).toString('base64');
+}
+
+async function githubRequest(method, pathname, body) {
+  if (!GITHUB_TOKEN) {
+    throw new Error('Missing BLOG_GITHUB_TOKEN');
+  }
+
+  const response = await fetch(`${GITHUB_API_BASE}${pathname}`, {
+    method,
+    headers: {
+      Authorization: `Bearer ${GITHUB_TOKEN}`,
+      Accept: 'application/vnd.github+json',
+      'X-GitHub-Api-Version': '2022-11-28',
+      ...(body ? { 'Content-Type': 'application/json' } : {}),
+    },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+
+  const text = await response.text();
+  let payload = null;
+  if (text) {
+    try {
+      payload = JSON.parse(text);
+    } catch {
+      payload = text;
+    }
+  }
+
+  if (!response.ok) {
+    const message = payload && typeof payload === 'object' && payload.message ? payload.message : text || `GitHub API error (${response.status})`;
+    throw new Error(message);
+  }
+
+  return payload;
+}
+
+async function publishFilesToGitHub(files, commitMessage) {
+  const [owner, repo] = GITHUB_REPO.split('/');
+  if (!owner || !repo) {
+    throw new Error(`Invalid BLOG_GITHUB_REPO: ${GITHUB_REPO}`);
+  }
+
+  const ref = await githubRequest(
+    'GET',
+    `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/git/ref/heads/${encodeURIComponent(GITHUB_BRANCH)}`
+  );
+  const headCommitSha = ref.object.sha;
+
+  const headCommit = await githubRequest(
+    'GET',
+    `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/git/commits/${headCommitSha}`
+  );
+  const baseTreeSha = headCommit.tree.sha;
+
+  const treeEntries = [];
+  for (const file of files) {
+    const blob = await githubRequest(
+      'POST',
+      `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/git/blobs`,
+      {
+        content: toBase64(file.content),
+        encoding: 'base64',
+      }
+    );
+    treeEntries.push({
+      path: file.repoPath,
+      mode: '100644',
+      type: 'blob',
+      sha: blob.sha,
+    });
+  }
+
+  const tree = await githubRequest(
+    'POST',
+    `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/git/trees`,
+    {
+      base_tree: baseTreeSha,
+      tree: treeEntries,
+    }
+  );
+
+  const commit = await githubRequest(
+    'POST',
+    `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/git/commits`,
+    {
+      message: commitMessage,
+      tree: tree.sha,
+      parents: [headCommitSha],
+    }
+  );
+
+  await githubRequest(
+    'PATCH',
+    `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/git/refs/heads/${encodeURIComponent(GITHUB_BRANCH)}`,
+    {
+      sha: commit.sha,
+    }
+  );
+}
 
 const server = http.createServer((req, res) => {
   if (req.method === 'POST' && req.url === '/webhook') {
     let body = '';
     req.on('data', chunk => { body += chunk.toString(); });
-    req.on('end', () => {
+    req.on('end', async () => {
       try {
         const rawData = JSON.parse(body);
         const data = {};
@@ -50,6 +155,7 @@ const server = http.createServer((req, res) => {
 
         const dom = new JSDOM(htmlContent);
         const document = dom.window.document;
+        const filesToPublish = [];
 
         // Process Images
         const images = document.querySelectorAll('img');
@@ -65,6 +171,10 @@ const server = http.createServer((req, res) => {
               if (!fs.existsSync(path.join(BLOG_ROOT, IMAGE_DIR))) fs.mkdirSync(path.join(BLOG_ROOT, IMAGE_DIR), { recursive: true });
               fs.writeFileSync(fullPath, base64Data, 'base64');
               img.setAttribute('src', `/images/mobile/${fileName}`);
+              filesToPublish.push({
+                repoPath: `public/images/mobile/${fileName}`,
+                content: Buffer.from(base64Data, 'base64'),
+              });
             }
           }
         }
@@ -80,34 +190,23 @@ const server = http.createServer((req, res) => {
         const date = new Date().toISOString().split('T')[0];
         const filename = `${date}-${slug}-${Math.floor(Math.random() * 1000)}.md`;
         const filepath = path.join(BLOG_ROOT, 'src/content/life', filename);
+        const frontmatter = `---\ntitle: "${title}"\ndescription: "Posted from mobile"\ndate: ${date}\n---\n\n${markdown}\n`;
 
-        fs.writeFileSync(filepath, `---
-title: "${title}"
-description: "Posted from mobile"
-date: ${date}
----
-
-${markdown}
-`);
-
-        // SYNC AND PUSH with robust title injection
-        const commitMsg = `docs: mobile post [${title}]`;
-        const gitCmd = `git add . && git commit -m "${commitMsg.replace(/"/g, '\\"')}" && git push origin main`;
-        
-        exec(gitCmd, { cwd: BLOG_ROOT }, (err, stdout, stderr) => {
-          if (err) {
-            console.error('GIT ERROR:', stderr);
-            res.statusCode = 500;
-            return res.end('Git sync failed');
-          }
-          res.statusCode = 200;
-          res.end('Success');
+        fs.writeFileSync(filepath, frontmatter);
+        filesToPublish.push({
+          repoPath: `src/content/life/${filename}`,
+          content: Buffer.from(frontmatter, 'utf8'),
         });
 
+        const commitMsg = `docs: mobile post [${title}]`;
+        await publishFilesToGitHub(filesToPublish, commitMsg);
+        res.statusCode = 200;
+        res.end('Success');
+
       } catch (err) {
-        console.error('JSON ERROR:', err);
+        console.error('WEBHOOK ERROR:', err);
         res.statusCode = 400;
-        res.end('Error');
+        res.end(err && err.message ? err.message : 'Error');
       }
     });
   } else {

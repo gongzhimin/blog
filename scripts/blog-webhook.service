@@ -7,6 +7,9 @@ Type=simple
 User=ubuntu
 WorkingDirectory=/var/www/blog
 Environment=BLOG_WEBHOOK_TOKEN=zhimin_secret_post_2026
+Environment=BLOG_GITHUB_REPO=gongzhimin/blog
+Environment=BLOG_GITHUB_BRANCH=main
+EnvironmentFile=-/etc/blog-webhook.env
 ExecStart=/usr/bin/node /var/www/blog/scripts/webhook-receiver.cjs
 Restart=always
 
