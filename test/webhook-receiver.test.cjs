@@ -164,6 +164,58 @@ test('builds one atomic GitHub publication for markdown and embedded images', ()
   );
 });
 
+test('publishes shortcut markdown without flattening its formatting', () => {
+  const publication = buildMobilePublication({
+    data: {
+      markdown: [
+        '# 格式测试',
+        '',
+        '这是 **粗体** 和 *斜体*。',
+        '',
+        '> 这是一段引用。',
+        '',
+        '- 第一项',
+        '- 第二项',
+      ].join('\n'),
+    },
+    repositoryState: {
+      posts: [],
+    },
+    date: '2026-06-20',
+    randomSuffix: 321,
+  });
+
+  assert.equal(publication.commitMessage, 'docs: mobile post [格式测试]');
+  assert.equal(
+    publication.files[0].repoPath,
+    'src/content/life/2026-06-20-post-321.md'
+  );
+  const content = publication.files[0].content.toString('utf8');
+  assert.doesNotMatch(content, /^# 格式测试$/m);
+  assert.match(content, /这是 \*\*粗体\*\* 和 \*斜体\*。/);
+  assert.match(content, /^> 这是一段引用。$/m);
+  assert.match(content, /^- 第一项$/m);
+  assert.match(content, /^- 第二项$/m);
+});
+
+test('uses the first markdown text line as title when there is no heading', () => {
+  const publication = buildMobilePublication({
+    data: {
+      markdown: '普通标题\n\n正文第一段\n\n正文第二段',
+    },
+    repositoryState: {
+      posts: [],
+    },
+    date: '2026-06-20',
+    randomSuffix: 654,
+  });
+
+  assert.equal(publication.commitMessage, 'docs: mobile post [普通标题]');
+  const content = publication.files[0].content.toString('utf8');
+  assert.doesNotMatch(content, /^普通标题$/m);
+  assert.match(content, /正文第一段\n\n正文第二段/);
+});
+
 test('does not submit deletion entries for paths missing from the GitHub tree', async () => {
   const requests = [];
   const request = async (method, pathname, body) => {

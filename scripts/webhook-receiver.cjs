@@ -52,6 +52,49 @@ function extractFrontmatterDate(content) {
   return extractFrontmatterField(content, 'date');
 }
 
+function cleanMarkdownTitle(value) {
+  return value
+    .trim()
+    .replace(/^#{1,6}\s+/, '')
+    .replace(/\s+#+$/, '')
+    .replace(/^\*\*(.+)\*\*$/, '$1')
+    .replace(/^__(.+)__$/, '$1')
+    .replace(/^\*(.+)\*$/, '$1')
+    .replace(/^_(.+)_$/, '$1')
+    .replace(/^`(.+)`$/, '$1')
+    .trim();
+}
+
+function parseShortcutMarkdown(markdown, explicitTitle) {
+  const normalized = String(markdown || '')
+    .replace(/\r\n?/g, '\n')
+    .trim();
+  if (!normalized) {
+    throw new Error('Missing markdown content');
+  }
+
+  const lines = normalized.split('\n');
+  const firstContentIndex = lines.findIndex((line) => line.trim());
+  const firstLine = lines[firstContentIndex].trim();
+  const headingMatch = firstLine.match(/^#\s+(.+?)\s*#*$/);
+  const title = cleanMarkdownTitle(
+    String(explicitTitle || '').trim() ||
+      (headingMatch ? headingMatch[1] : firstLine)
+  );
+  if (!title) {
+    throw new Error('Missing article title');
+  }
+
+  if (!explicitTitle || headingMatch) {
+    lines.splice(firstContentIndex, 1);
+  }
+
+  return {
+    title,
+    markdown: lines.join('\n').trim(),
+  };
+}
+
 function buildGitHubLifePostPlan({
   posts,
   title,
@@ -198,9 +241,14 @@ function buildMobilePublication({
   imageTimestamp = Date.now(),
 }) {
   let htmlContent = '';
-  let title = 'Untitled Post';
+  let title = String(data.title || '').trim();
+  let markdown = '';
 
-  if (data.raw) {
+  if (data.markdown) {
+    const parsed = parseShortcutMarkdown(data.markdown, title);
+    title = parsed.title;
+    markdown = parsed.markdown;
+  } else if (data.raw) {
     const lines = data.raw
       .split('\n')
       .map((line) => line.trim())
@@ -216,46 +264,60 @@ function buildMobilePublication({
     htmlContent = data.html;
   }
 
-  if (!htmlContent) {
+  if (!markdown && !htmlContent) {
     throw new Error('Missing content');
   }
 
-  const dom = new JSDOM(htmlContent);
-  const document = dom.window.document;
   const files = [];
-  const images = document.querySelectorAll('img');
-  let imageIndex = 0;
+  if (htmlContent) {
+    const dom = new JSDOM(htmlContent);
+    const document = dom.window.document;
+    const images = document.querySelectorAll('img');
+    let imageIndex = 0;
 
-  for (const image of images) {
-    const src = image.getAttribute('src');
-    if (!src || !src.startsWith('data:image/')) {
-      continue;
+    for (const image of images) {
+      const src = image.getAttribute('src');
+      if (!src || !src.startsWith('data:image/')) {
+        continue;
+      }
+
+      const match = src.match(/^data:image\/([\w.+-]+);base64,(.+)$/);
+      if (!match) {
+        continue;
+      }
+
+      const extension = match[1];
+      const base64Data = match[2];
+      const imageSuffix = (randomSuffix + imageIndex) % 1000;
+      const fileName = `img-${imageTimestamp}-${imageSuffix}.${extension}`;
+      imageIndex += 1;
+      image.setAttribute('src', `/images/mobile/${fileName}`);
+      files.push({
+        repoPath: `public/images/mobile/${fileName}`,
+        content: Buffer.from(base64Data, 'base64'),
+      });
     }
 
-    const match = src.match(/^data:image\/([\w.+-]+);base64,(.+)$/);
-    if (!match) {
-      continue;
+    const h1 = document.querySelector('h1');
+    if (h1) {
+      title = h1.textContent.trim() || title;
+      h1.remove();
     }
 
-    const extension = match[1];
-    const base64Data = match[2];
-    const imageSuffix = (randomSuffix + imageIndex) % 1000;
-    const fileName = `img-${imageTimestamp}-${imageSuffix}.${extension}`;
-    imageIndex += 1;
-    image.setAttribute('src', `/images/mobile/${fileName}`);
-    files.push({
-      repoPath: `public/images/mobile/${fileName}`,
-      content: Buffer.from(base64Data, 'base64'),
-    });
+    if (!title) {
+      const firstBlock = document.querySelector(
+        'h2, h3, h4, h5, h6, p, li, blockquote'
+      );
+      title = firstBlock?.textContent.trim() || '';
+      firstBlock?.remove();
+    }
+    if (!title) {
+      throw new Error('Missing article title');
+    }
+
+    markdown = turndownService.turndown(document.body.innerHTML);
   }
 
-  const h1 = document.querySelector('h1');
-  if (h1) {
-    title = h1.textContent.trim() || title;
-    h1.remove();
-  }
-
-  const markdown = turndownService.turndown(document.body.innerHTML);
   const plan = buildGitHubLifePostPlan({
     posts: repositoryState.posts,
     title,
@@ -386,10 +448,12 @@ if (require.main === module) {
 module.exports = {
   buildGitHubLifePostPlan,
   buildMobilePublication,
+  cleanMarkdownTitle,
   extractFrontmatterDate,
   extractFrontmatterTitle,
   loadGitHubRepositoryState,
   normalizeTitleToSlug,
+  parseShortcutMarkdown,
   publishFilesToGitHub,
   toBase64,
 };
