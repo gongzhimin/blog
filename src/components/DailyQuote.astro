@@ -13,7 +13,9 @@ const { english, chinese, author, year } = Astro.props;
   <div class="daily-quote__text">
     <p class="daily-quote__english">“{english}”</p>
     <p class="daily-quote__chinese">{chinese}</p>
-    {author && <p class="daily-quote__author">— {author}</p>}
   </div>
-  <p class="daily-quote__copyright">© {year} ZHIMIN</p>
+  <div class="daily-quote__meta">
+    {author && <p class="daily-quote__author">— {author}</p>}
+    <p class="daily-quote__copyright">© {year} ZHIMIN</p>
+  </div>
 </footer>

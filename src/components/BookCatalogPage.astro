@@ -9,21 +9,34 @@ type Entry = {
 
 type Props = {
   section: "life" | "technical";
-  title: string;
+  runningLabel: "CONTENTS" | "NOTES";
+  partLabel: "Part I · Life" | "Part II · Technology";
   entries: Entry[];
   archiveHref: string;
   archiveLabel: string;
 };
 
-const { section, title, entries, archiveHref, archiveLabel } = Astro.props;
+const {
+  section,
+  runningLabel,
+  partLabel,
+  entries,
+  archiveHref,
+  archiveLabel,
+} = Astro.props;
 ---
 
 <section
   class="book-page"
   data-section={section}
-  aria-labelledby={`${section}-title`}
+  aria-label={partLabel}
 >
-  <h2 id={`${section}-title`} class="book-page__title">{title}</h2>
+  <header class="book-page__running-head">
+    <strong>ZHIMIN</strong>
+    <span>{runningLabel}</span>
+  </header>
+
+  <p class="book-page__part">{partLabel}</p>
 
   <ol class="catalog-list">
     {
@@ -49,5 +62,5 @@ const { section, title, entries, archiveHref, archiveLabel } = Astro.props;
     }
   </ol>
 
-  <a class="book-page__archive" href={archiveHref}>{archiveLabel} →</a>
+  <a class="book-page__archive" href={archiveHref}>{archiveLabel}</a>
 </section>

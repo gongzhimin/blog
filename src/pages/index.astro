@@ -41,24 +41,40 @@ const currentYear = new Date().getFullYear();
       <main class="home-page">
         <header class="home-hero">
           <h1>写技术，也记录技术之外的生活。</h1>
-          <p>软件、工具、思考与日常。</p>
         </header>
 
-        <section class="home-book" aria-label="最新文章目录">
-          <BookCatalogPage
-            section="life"
-            title="生活随笔"
-            entries={lifeEntries}
-            archiveHref="/life"
-            archiveLabel="全部生活文章"
-          />
-          <BookCatalogPage
-            section="technical"
-            title="技术笔记"
-            entries={technicalEntries}
-            archiveHref="/blog"
-            archiveLabel="全部技术文章"
-          />
+        <section class="home-book-frame" aria-label="最新文章目录">
+          <div class="home-book-cover" aria-hidden="true"></div>
+          <div class="home-book-binding" aria-hidden="true"></div>
+          <div
+            class="home-book-edge home-book-edge--left"
+            aria-hidden="true"
+          ></div>
+          <div
+            class="home-book-edge home-book-edge--right"
+            aria-hidden="true"
+          ></div>
+
+          <div class="home-book">
+            <BookCatalogPage
+              section="life"
+              runningLabel="CONTENTS"
+              partLabel="Part I · Life"
+              entries={lifeEntries}
+              archiveHref="/life"
+              archiveLabel="全部生活文章"
+            />
+            <BookCatalogPage
+              section="technical"
+              runningLabel="NOTES"
+              partLabel="Part II · Technology"
+              entries={technicalEntries}
+              archiveHref="/blog"
+              archiveLabel="全部技术文章"
+            />
+          </div>
+
+          <div class="home-book-gutter" aria-hidden="true"></div>
         </section>
       </main>
 
