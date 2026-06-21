@@ -8,6 +8,7 @@ test-results/
 # dependencies
 node_modules/
 .worktrees/
+.superpowers/
 
 # logs
 npm-debug.log*
