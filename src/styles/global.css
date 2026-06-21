@@ -18,6 +18,19 @@ html[data-theme="light"] {
   --compact-width: 38rem;
 }
 
+html[data-theme="dark"] {
+  --color-bg: 31, 31, 29;
+  --color-bg-alt: 38, 37, 34;
+  --color-paper: 44, 42, 38;
+  --color-text-primary: 235, 231, 223;
+  --color-text-secondary: 190, 184, 174;
+  --color-text-muted: 151, 143, 132;
+  --color-border: 82, 78, 71;
+  --color-accent: 194, 154, 112;
+  --color-code-bg: 49, 47, 43;
+  color-scheme: dark;
+}
+
 html {
   background:
     radial-gradient(circle at top, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0) 34rem),
@@ -672,5 +685,16 @@ img {
   .about-page__profile {
     grid-template-columns: 1fr;
     align-items: start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
   }
 }

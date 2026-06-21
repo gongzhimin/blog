@@ -6,6 +6,9 @@ import tailwindcss from '@tailwindcss/vite';
 // https://astro.build/config
 export default defineConfig({
   site: 'https://zhimin.ink',
+  devToolbar: {
+    enabled: false
+  },
   integrations: [
     icon({
       include: {
