@@ -6,7 +6,14 @@ import SiteNavigation from "../components/SiteNavigation.astro";
 import BookCatalogPage from "../components/BookCatalogPage.astro";
 import DailyQuote from "../components/DailyQuote.astro";
 import quote from "../data/daily-quote.json";
+import homepageConfig from "../data/homepage-config.json";
+import {
+  buildHomepageCssVariables,
+  validateHomepageConfig,
+} from "../lib/homepage-config.mjs";
 import { buildCatalogEntries } from "../lib/homepage.mjs";
+
+validateHomepageConfig(homepageConfig);
 
 const lifeEntries = buildCatalogEntries(await getCollection("life"), "/life");
 const technicalEntries = buildCatalogEntries(
@@ -14,6 +21,7 @@ const technicalEntries = buildCatalogEntries(
   "/blog",
 );
 const currentYear = new Date().getFullYear();
+const homepageStyle = buildHomepageCssVariables(homepageConfig);
 ---
 
 <!doctype html>
@@ -25,7 +33,7 @@ const currentYear = new Date().getFullYear();
       name="description"
       content="写技术，也记录技术之外的生活。"
     />
-    <title>Zhimin</title>
+    <title>{homepageConfig.content.siteName}</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link
       rel="alternate"
@@ -34,13 +42,13 @@ const currentYear = new Date().getFullYear();
       href="/rss.xml"
     />
   </head>
-  <body class="home-body">
+  <body class="home-body" style={homepageStyle}>
     <SiteNavigation />
 
     <div class="home-shell">
       <main class="home-page">
         <header class="home-hero">
-          <h1>写技术，也记录技术之外的生活。</h1>
+          <h1>{homepageConfig.content.heroTitle}</h1>
         </header>
 
         <section class="home-book-frame" aria-label="最新文章目录">
@@ -58,19 +66,21 @@ const currentYear = new Date().getFullYear();
           <div class="home-book">
             <BookCatalogPage
               section="life"
-              runningLabel="CONTENTS"
-              partLabel="Part I · Life"
+              siteName={homepageConfig.content.siteName}
+              runningLabel={homepageConfig.content.life.runningLabel}
+              partLabel={homepageConfig.content.life.partLabel}
               entries={lifeEntries}
               archiveHref="/life"
-              archiveLabel="全部生活文章"
+              archiveLabel={homepageConfig.content.life.archiveLabel}
             />
             <BookCatalogPage
               section="technical"
-              runningLabel="NOTES"
-              partLabel="Part II · Technology"
+              siteName={homepageConfig.content.siteName}
+              runningLabel={homepageConfig.content.technical.runningLabel}
+              partLabel={homepageConfig.content.technical.partLabel}
               entries={technicalEntries}
               archiveHref="/blog"
-              archiveLabel="全部技术文章"
+              archiveLabel={homepageConfig.content.technical.archiveLabel}
             />
           </div>
 

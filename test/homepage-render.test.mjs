@@ -21,16 +21,34 @@ async function loadDailyQuote() {
   );
 }
 
+async function loadHomepageConfig() {
+  return JSON.parse(
+    await readFile(
+      new URL("../src/data/homepage-config.json", import.meta.url),
+      "utf8",
+    ),
+  );
+}
+
 test("homepage renders the approved linear structure", async () => {
   const document = await loadHomepage();
+  const config = await loadHomepageConfig();
   const bodyChildren = [...document.body.children];
 
   assert.equal(bodyChildren[0].classList.contains("home-navigation"), true);
   assert.ok(document.querySelector(".home-hero"));
+  assert.equal(
+    document.querySelector(".home-hero h1").textContent.trim(),
+    config.content.heroTitle,
+  );
   assert.equal(document.querySelector(".home-hero p"), null);
   assert.ok(document.querySelector(".home-book-frame"));
   assert.ok(document.querySelector(".home-book"));
   assert.ok(document.querySelector(".daily-quote"));
+  assert.match(
+    document.body.getAttribute("style"),
+    /--home-desktop-book-width:68%/,
+  );
 
   for (const selector of [
     ".home-book-cover",
@@ -45,6 +63,7 @@ test("homepage renders the approved linear structure", async () => {
 
 test("homepage renders life first, technical second, and required navigation links", async () => {
   const document = await loadHomepage();
+  const config = await loadHomepageConfig();
   const pages = [...document.querySelectorAll(".book-page")];
 
   assert.equal(pages.length, 2);
@@ -55,7 +74,7 @@ test("homepage renders life first, technical second, and required navigation lin
     [...document.querySelectorAll(".book-page__part")].map((node) =>
       node.textContent.trim(),
     ),
-    ["Part I · Life", "Part II · Technology"],
+    [config.content.life.partLabel, config.content.technical.partLabel],
   );
   assert.deepEqual(
     [...document.querySelectorAll(".book-page__archive")].map((node) => ({
@@ -63,8 +82,24 @@ test("homepage renders life first, technical second, and required navigation lin
       href: node.getAttribute("href"),
     })),
     [
-      { text: "全部生活文章", href: "/life" },
-      { text: "全部技术文章", href: "/blog" },
+      { text: config.content.life.archiveLabel, href: "/life" },
+      { text: config.content.technical.archiveLabel, href: "/blog" },
+    ],
+  );
+  assert.deepEqual(
+    [...document.querySelectorAll(".book-page__running-head")].map((node) => ({
+      site: node.querySelector("strong").textContent.trim(),
+      label: node.querySelector("span").textContent.trim(),
+    })),
+    [
+      {
+        site: config.content.siteName,
+        label: config.content.life.runningLabel,
+      },
+      {
+        site: config.content.siteName,
+        label: config.content.technical.runningLabel,
+      },
     ],
   );
   assert.equal(document.querySelector(".book-page__folio"), null);

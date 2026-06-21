@@ -9,6 +9,7 @@ type Entry = {
 
 type Props = {
   section: "life" | "technical";
+  siteName: string;
   runningLabel: "CONTENTS" | "NOTES";
   partLabel: "Part I · Life" | "Part II · Technology";
   entries: Entry[];
@@ -18,6 +19,7 @@ type Props = {
 
 const {
   section,
+  siteName,
   runningLabel,
   partLabel,
   entries,
@@ -32,7 +34,7 @@ const {
   aria-label={partLabel}
 >
   <header class="book-page__running-head">
-    <strong>ZHIMIN</strong>
+    <strong>{siteName}</strong>
     <span>{runningLabel}</span>
   </header>
 
