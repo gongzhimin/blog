@@ -1,0 +1,102 @@
+{
+  "$schema": "./homepage-config.schema.json",
+  "content": {
+    "siteName": "ZHIMIN",
+    "heroTitle": "写技术，也记录技术之外的生活。",
+    "life": {
+      "runningLabel": "CONTENTS",
+      "partLabel": "Part I · Life",
+      "archiveLabel": "全部生活文章"
+    },
+    "technical": {
+      "runningLabel": "NOTES",
+      "partLabel": "Part II · Technology",
+      "archiveLabel": "全部技术文章"
+    }
+  },
+  "desktop": {
+    "regions": {
+      "navigationHeight": "6svh",
+      "heroHeight": "7svh",
+      "bookRegionHeight": "71svh",
+      "footerHeight": "16svh",
+      "siteWidth": "90%"
+    },
+    "book": {
+      "width": "68%",
+      "aspectRatio": "1.8 / 1",
+      "perspective": "112.5rem",
+      "rotateX": "0.2deg",
+      "shadowOffsetY": "0.85rem",
+      "shadowBlur": "0.72rem",
+      "coverInsetTop": "-3.4%",
+      "coverInsetInline": "-2.2%",
+      "coverInsetBottom": "-4%",
+      "coverRadius": "4px",
+      "bindingWidth": "5.2%",
+      "edgeWidth": "2%",
+      "gutterWidth": "1px",
+      "pagePaddingTop": "6.5%",
+      "pagePaddingInline": "7.5%",
+      "pagePaddingBottom": "6%",
+      "partMarginTop": "9%",
+      "partMarginBottom": "7%",
+      "partPaddingTop": "3.6%",
+      "catalogGap": "0.7em",
+      "catalogColumnGap": "0.46em",
+      "archiveBottom": "10%"
+    },
+    "typography": {
+      "navigationFontSize": "0.4rem",
+      "heroTitleFontSize": "0.5rem",
+      "runningHeadFontSize": "0.2rem",
+      "partLabelFontSize": "0.2rem",
+      "catalogFontSize": "0.2rem",
+      "dateFontSize": "0.2rem",
+      "archiveFontSize": "0.2rem",
+      "quoteFontSize": "0.35rem",
+      "footerFontSize": "0.3rem"
+    }
+  },
+  "mobile": {
+    "layout": {
+      "navigationHeight": "3.5rem",
+      "siteInlinePadding": "0.75rem",
+      "heroMinHeight": "7rem",
+      "bookGap": "1.5rem",
+      "pageMinHeight": "22rem",
+      "pagePaddingTop": "1.5rem",
+      "pagePaddingInline": "1.25rem",
+      "pagePaddingBottom": "1.25rem",
+      "partMarginTop": "1.25rem",
+      "partMarginBottom": "1rem",
+      "partPaddingTop": "0.85rem",
+      "catalogGap": "0.7rem"
+    },
+    "typography": {
+      "brandFontSize": "0.82rem",
+      "navigationFontSize": "0.78rem",
+      "heroTitleFontSize": "1.65rem",
+      "runningHeadFontSize": "0.75rem",
+      "partLabelFontSize": "0.75rem",
+      "catalogFontSize": "1rem",
+      "dateFontSize": "0.76rem",
+      "archiveFontSize": "0.78rem",
+      "quoteFontSize": "0.98rem",
+      "translationFontSize": "0.84rem",
+      "footerFontSize": "0.72rem"
+    }
+  },
+  "materials": {
+    "paperColor": "#ffffff",
+    "coverColor": "#f0f0f0",
+    "bindingColor": "#737373",
+    "pageEdgeColor": "#efeeeb",
+    "gutterColor": "rgba(62, 58, 53, 0.42)",
+    "pageTextColor": "#282522",
+    "pageMutedColor": "#858079",
+    "pageAccentColor": "#755a43",
+    "bookShadowColor": "rgba(42, 37, 31, 0.2)",
+    "paperTextureOpacity": 0.1
+  }
+}
