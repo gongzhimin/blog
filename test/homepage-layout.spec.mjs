@@ -1,11 +1,26 @@
 import { test, expect } from "@playwright/test";
 
-test("desktop renders a complete side-by-side book", async ({ page }) => {
+test("desktop renders the calibrated hardcover book in one viewport", async ({
+  page,
+}) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
 
   const pages = page.locator(".book-page");
   await expect(pages).toHaveCount(2);
+  for (const selector of [
+    ".home-navigation",
+    ".home-hero",
+    ".home-book-frame",
+    ".daily-quote",
+    ".home-book-cover",
+    ".home-book-binding",
+    ".home-book-edge--left",
+    ".home-book-edge--right",
+    ".home-book-gutter",
+  ]) {
+    await expect(page.locator(selector)).toBeVisible();
+  }
 
   const left = await pages.nth(0).boundingBox();
   const right = await pages.nth(1).boundingBox();
@@ -26,31 +41,49 @@ test("desktop renders a complete side-by-side book", async ({ page }) => {
   expect(dimensions.scrollHeight).toBeLessThanOrEqual(dimensions.innerHeight + 1);
   expect(dimensions.scrollWidth).toBeLessThanOrEqual(dimensions.innerWidth);
 
-  const bookDepth = await page.locator(".home-book").evaluate((book) => {
-    const bookStyle = getComputedStyle(book);
-    const pageStyles = [...book.querySelectorAll(".book-page")].map((paper) => {
-      const style = getComputedStyle(paper);
-      return {
-        transform: style.transform,
-        borderRadius: style.borderRadius,
-      };
-    });
+  const frame = await page.locator(".home-book-frame").boundingBox();
+  expect(frame).not.toBeNull();
+  expect(frame.width / dimensions.innerWidth).toBeCloseTo(0.612, 2);
+  expect(frame.width / frame.height).toBeCloseTo(1.8, 1);
 
+  const physicalStyles = await page.evaluate(() => {
+    const read = (selector) => getComputedStyle(document.querySelector(selector));
     return {
-      perspective: bookStyle.perspective,
-      filter: bookStyle.filter,
-      transform: bookStyle.transform,
-      pageStyles,
+      cover: read(".home-book-cover").backgroundColor,
+      binding: read(".home-book-binding").backgroundColor,
+      gutterWidth: read(".home-book-gutter").width,
+      paper: read(".book-page").backgroundColor,
     };
   });
 
-  expect(bookDepth.perspective).not.toBe("none");
-  expect(bookDepth.filter).not.toBe("none");
-  expect(bookDepth.transform).not.toBe("none");
-  expect(bookDepth.pageStyles[0].transform).not.toBe("none");
-  expect(bookDepth.pageStyles[1].transform).not.toBe("none");
-  expect(bookDepth.pageStyles[0].borderRadius).not.toBe("0px");
-  expect(bookDepth.pageStyles[1].borderRadius).not.toBe("0px");
+  expect(physicalStyles.cover).toBe("rgb(240, 240, 240)");
+  expect(physicalStyles.binding).toBe("rgb(115, 115, 115)");
+  expect(physicalStyles.gutterWidth).toBe("1px");
+  expect(physicalStyles.paper).toBe("rgb(255, 255, 255)");
+
+  for (const paper of [pages.nth(0), pages.nth(1)]) {
+    const paperBox = await paper.boundingBox();
+    const archiveBox = await paper.locator(".book-page__archive").boundingBox();
+
+    expect(paperBox).not.toBeNull();
+    expect(archiveBox).not.toBeNull();
+    expect(
+      Math.abs(
+        archiveBox.x + archiveBox.width / 2 -
+          (paperBox.x + paperBox.width / 2),
+      ),
+    ).toBeLessThanOrEqual(2);
+  }
+
+  const copyright = await page
+    .locator(".daily-quote__copyright")
+    .boundingBox();
+  expect(copyright).not.toBeNull();
+  expect(
+    Math.abs(
+      copyright.x + copyright.width / 2 - dimensions.innerWidth / 2,
+    ),
+  ).toBeLessThanOrEqual(2);
 
   await page.screenshot({
     path: "test-results/homepage-desktop.png",
@@ -98,23 +131,51 @@ test("mobile stacks two complete paper pages and keeps content contained", async
   }
 
   const mobileBookDepth = await page.locator(".home-book").evaluate((book) => {
-    const bookStyle = getComputedStyle(book);
-    const pageTransforms = [...book.querySelectorAll(".book-page")].map(
-      (paper) => getComputedStyle(paper).transform,
-    );
+    const frame = book.closest(".home-book-frame");
+    const pageStyles = [...book.querySelectorAll(".book-page")].map((paper) => {
+      const style = getComputedStyle(paper);
+      return {
+        transform: style.transform,
+        fontSize: Number.parseFloat(style.fontSize),
+      };
+    });
 
     return {
-      perspective: bookStyle.perspective,
-      filter: bookStyle.filter,
-      transform: bookStyle.transform,
-      pageTransforms,
+      frameAspectRatio: getComputedStyle(frame).aspectRatio,
+      frameFilter: getComputedStyle(frame).filter,
+      frameTransform: getComputedStyle(frame).transform,
+      pageStyles,
     };
   });
 
-  expect(mobileBookDepth.perspective).toBe("none");
-  expect(mobileBookDepth.filter).toBe("none");
-  expect(mobileBookDepth.transform).toBe("none");
-  expect(mobileBookDepth.pageTransforms).toEqual(["none", "none"]);
+  expect(mobileBookDepth.frameAspectRatio).toBe("auto");
+  expect(mobileBookDepth.frameFilter).toBe("none");
+  expect(mobileBookDepth.frameTransform).toBe("none");
+  expect(mobileBookDepth.pageStyles.map((style) => style.transform)).toEqual([
+    "none",
+    "none",
+  ]);
+
+  for (const selector of [
+    ".home-book-cover",
+    ".home-book-binding",
+    ".home-book-edge--left",
+    ".home-book-edge--right",
+    ".home-book-gutter",
+  ]) {
+    await expect(page.locator(selector)).toBeHidden();
+  }
+
+  const mobileCatalogFont = await page
+    .locator(".catalog-entry a")
+    .first()
+    .evaluate((element) => Number.parseFloat(getComputedStyle(element).fontSize));
+  expect(mobileCatalogFont).toBeGreaterThanOrEqual(12);
+
+  const mobileCopyrightPosition = await page
+    .locator(".daily-quote__copyright")
+    .evaluate((element) => getComputedStyle(element).position);
+  expect(mobileCopyrightPosition).toBe("static");
 
   const hasHorizontalOverflow = await page.evaluate(
     () => document.documentElement.scrollWidth > window.innerWidth,
