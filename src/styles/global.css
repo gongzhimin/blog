@@ -386,6 +386,19 @@ img {
   border-top: 1px solid rgba(var(--color-border), 0.72);
 }
 
+.archive-page__folio {
+  margin: 3rem 0 0;
+  color: var(--home-text-folio-light-color);
+  font-family: var(--home-text-folio-font-family);
+  font-size: var(--home-text-folio-desktop-size);
+  line-height: 1;
+  text-align: center;
+}
+
+html[data-theme="dark"] .archive-page__folio {
+  color: var(--home-text-folio-dark-color);
+}
+
 .archive-row {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -672,6 +685,10 @@ img {
   .archive-row {
     grid-template-columns: 1fr;
     gap: 0.35rem;
+  }
+
+  .archive-page__folio {
+    font-size: var(--home-text-folio-mobile-size);
   }
 
   .article-hero {

@@ -1,6 +1,11 @@
 ---
 import '../../styles/global.css';
 import { getCollection } from 'astro:content';
+import homepageConfig from '../../data/homepage-config.json';
+import {
+  buildHomepageCssVariables,
+  validateHomepageConfig,
+} from '../../lib/homepage-config.mjs';
 
 const blogPosts = await getCollection('blog');
 const sortedPosts = blogPosts.sort((a, b) => {
@@ -8,6 +13,8 @@ const sortedPosts = blogPosts.sort((a, b) => {
   const dateB = b.data.pubDatetime;
   return dateB.valueOf() - dateA.valueOf();
 });
+validateHomepageConfig(homepageConfig);
+const homepageStyle = buildHomepageCssVariables(homepageConfig);
 ---
 
 <!DOCTYPE html>
@@ -18,8 +25,8 @@ const sortedPosts = blogPosts.sort((a, b) => {
     <title>Technical Archive · Zhimin</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   </head>
-  <body>
-    <main class="site-shell site-shell--narrow">
+  <body style={homepageStyle}>
+    <main class="site-shell site-shell--narrow archive-page">
       <a href="/" class="article-page__back">← Back</a>
 
       <header class="archive-page__intro">
@@ -43,6 +50,10 @@ const sortedPosts = blogPosts.sort((a, b) => {
           );
         })}
       </div>
+
+      <p class="archive-page__folio">
+        {homepageConfig.content.technical.directoryFolio}
+      </p>
     </main>
   </body>
 </html>
