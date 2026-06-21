@@ -35,7 +35,7 @@ test("homepage renders life first, technical second, and required navigation lin
   }
 });
 
-test("homepage quote contains only the bilingual quote and copyright", async () => {
+test("homepage quote contains the bilingual quote, author, and copyright", async () => {
   const document = await loadHomepage();
   const footer = document.querySelector(".daily-quote");
   const currentYear = new Date().getFullYear();
@@ -46,5 +46,8 @@ test("homepage quote contains only the bilingual quote and copyright", async () 
     footer.querySelector(".daily-quote__copyright").textContent.trim(),
     `© ${currentYear} ZHIMIN`,
   );
-  assert.equal(footer.querySelector(".daily-quote__author"), null);
+  assert.equal(
+    footer.querySelector(".daily-quote__author").textContent.trim(),
+    "— Ram Dass",
+  );
 });

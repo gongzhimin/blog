@@ -2,16 +2,18 @@
 type Props = {
   english: string;
   chinese: string;
+  author?: string;
   year: number;
 };
 
-const { english, chinese, year } = Astro.props;
+const { english, chinese, author, year } = Astro.props;
 ---
 
 <footer class="daily-quote">
   <div class="daily-quote__text">
     <p class="daily-quote__english">“{english}”</p>
     <p class="daily-quote__chinese">{chinese}</p>
+    {author && <p class="daily-quote__author">— {author}</p>}
   </div>
   <p class="daily-quote__copyright">© {year} ZHIMIN</p>
 </footer>

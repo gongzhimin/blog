@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   fetchDailyQuote,
+  formatShanghaiDate,
   isValidQuote,
   parseShanbay,
   parseYoudao,
@@ -160,4 +161,11 @@ test("fetchDailyQuote preserves the previous quote when both sources fail", asyn
   });
 
   assert.deepEqual(quote, previous);
+});
+
+test("formatShanghaiDate uses the next calendar day after 22:00 UTC", () => {
+  assert.equal(
+    formatShanghaiDate(new Date("2026-06-20T22:15:00Z")),
+    "2026-06-21",
+  );
 });
