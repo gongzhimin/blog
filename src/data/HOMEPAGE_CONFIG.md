@@ -18,13 +18,45 @@ src/data/homepage-config.json
 
 ## 参数分组
 
-- `content`：首页标题、站点名、两张书页的页眉和链接文字。
-- `desktop.regions`：桌面导航、头部、书本区、页脚高度和站点宽度。
+- `content`：导航标题、站点名、导航入口、版权、书页页眉、链接和页码。
+- `desktop.regions`：桌面导航、书本区、页脚高度和站点宽度。
 - `desktop.book`：书本宽度、比例、封面、纸页间距和目录位置。
-- `desktop.typography`：桌面端所有字号。
 - `mobile.layout`：手机端纸页尺寸和间距。
-- `mobile.typography`：手机端可读字号。
+- `textStyles`：每一种文字角色独立使用的字体、桌面字号、移动字号和明暗模式颜色。
 - `materials`：纸张、封面、装订布、中缝和文字颜色。
+
+## 独立文字角色
+
+首页不会在不同位置之间共享文字样式字段。即使两个位置当前取值相同，也分别保留配置：
+
+- `navigationBrand`：导航品牌。
+- `navigationTitle`：导航中间标题。
+- `navigationLinks`：生活、技术、关于、RSS。
+- `runningOuter`：书页外缘页眉。
+- `runningInner`：书页内缘 `CONTENTS`。
+- `partLink`：可点击的 Part 链接。
+- `catalogTitle`：文章目录标题。
+- `catalogDate`：文章日期。
+- `archiveLink`：`View all ...` 入口。
+- `folio`：首页和子目录罗马数字页码。
+- `quoteEnglish`：每日一句英文。
+- `quoteTranslation`：每日一句译文。
+- `quoteAuthor`：作者。
+- `copyright`：版权。
+
+每个角色的结构如下：
+
+```json
+"navigationTitle": {
+  "fontFamily": "sans",
+  "desktopSize": "0.4rem",
+  "mobileSize": "0.62rem",
+  "lightColor": "#504b46",
+  "darkColor": "#beb8ae"
+}
+```
+
+`fontFamily` 可使用 `serif`、`sans`、`monospace`。
 
 ## 常用单位
 
@@ -39,7 +71,7 @@ src/data/homepage-config.json
 ```json
 "width": "68%",
 "navigationHeight": "6svh",
-"catalogFontSize": "0.2rem"
+"desktopSize": "0.2rem"
 ```
 
 ## 修改后验证

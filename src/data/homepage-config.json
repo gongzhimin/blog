@@ -2,23 +2,35 @@
   "$schema": "./homepage-config.schema.json",
   "content": {
     "siteName": "ZHIMIN",
-    "heroTitle": "写技术，也记录技术之外的生活。",
+    "navigationTitle": "写技术，也记录技术之外的生活。",
+    "copyrightLabel": "Zhimin 的博客书",
+    "navigation": {
+      "lifeLabel": "生活",
+      "technicalLabel": "技术",
+      "aboutLabel": "关于",
+      "rssLabel": "RSS"
+    },
     "life": {
-      "runningLabel": "CONTENTS",
+      "outerRunningLabel": "ESSAYS",
+      "innerRunningLabel": "CONTENTS",
       "partLabel": "Part I · Life",
-      "archiveLabel": "全部生活文章"
+      "archiveLabel": "View all essays",
+      "homepageFolio": "i",
+      "directoryFolio": "i"
     },
     "technical": {
-      "runningLabel": "NOTES",
+      "outerRunningLabel": "TECHNICAL NOTES",
+      "innerRunningLabel": "CONTENTS",
       "partLabel": "Part II · Technology",
-      "archiveLabel": "全部技术文章"
+      "archiveLabel": "View all technical notes",
+      "homepageFolio": "ii",
+      "directoryFolio": "i"
     }
   },
   "desktop": {
     "regions": {
       "navigationHeight": "6svh",
-      "heroHeight": "7svh",
-      "bookRegionHeight": "71svh",
+      "bookRegionHeight": "78svh",
       "footerHeight": "16svh",
       "siteWidth": "90%"
     },
@@ -44,25 +56,14 @@
       "partPaddingTop": "3.6%",
       "catalogGap": "0.7em",
       "catalogColumnGap": "0.46em",
-      "archiveBottom": "10%"
-    },
-    "typography": {
-      "navigationFontSize": "0.4rem",
-      "heroTitleFontSize": "0.5rem",
-      "runningHeadFontSize": "0.2rem",
-      "partLabelFontSize": "0.2rem",
-      "catalogFontSize": "0.2rem",
-      "dateFontSize": "0.2rem",
-      "archiveFontSize": "0.2rem",
-      "quoteFontSize": "0.35rem",
-      "footerFontSize": "0.3rem"
+      "archiveBottom": "10%",
+      "folioBottom": "3.25%"
     }
   },
   "mobile": {
     "layout": {
       "navigationHeight": "3.5rem",
       "siteInlinePadding": "0.75rem",
-      "heroMinHeight": "7rem",
       "bookGap": "1.5rem",
       "pageMinHeight": "22rem",
       "pagePaddingTop": "1.5rem",
@@ -72,19 +73,106 @@
       "partMarginBottom": "1rem",
       "partPaddingTop": "0.85rem",
       "catalogGap": "0.7rem"
+    }
+  },
+  "textStyles": {
+    "navigationBrand": {
+      "fontFamily": "sans",
+      "desktopSize": "0.4rem",
+      "mobileSize": "0.72rem",
+      "lightColor": "#2a2a2a",
+      "darkColor": "#ebe7df"
     },
-    "typography": {
-      "brandFontSize": "0.82rem",
-      "navigationFontSize": "0.78rem",
-      "heroTitleFontSize": "1.65rem",
-      "runningHeadFontSize": "0.75rem",
-      "partLabelFontSize": "0.75rem",
-      "catalogFontSize": "1rem",
-      "dateFontSize": "0.76rem",
-      "archiveFontSize": "0.78rem",
-      "quoteFontSize": "0.98rem",
-      "translationFontSize": "0.84rem",
-      "footerFontSize": "0.72rem"
+    "navigationTitle": {
+      "fontFamily": "sans",
+      "desktopSize": "0.4rem",
+      "mobileSize": "0.62rem",
+      "lightColor": "#504b46",
+      "darkColor": "#beb8ae"
+    },
+    "navigationLinks": {
+      "fontFamily": "sans",
+      "desktopSize": "0.4rem",
+      "mobileSize": "0.62rem",
+      "lightColor": "#2a2a2a",
+      "darkColor": "#ebe7df"
+    },
+    "runningOuter": {
+      "fontFamily": "sans",
+      "desktopSize": "0.2rem",
+      "mobileSize": "0.75rem",
+      "lightColor": "#32302d",
+      "darkColor": "#ebe7df"
+    },
+    "runningInner": {
+      "fontFamily": "sans",
+      "desktopSize": "0.2rem",
+      "mobileSize": "0.75rem",
+      "lightColor": "#858079",
+      "darkColor": "#978f84"
+    },
+    "partLink": {
+      "fontFamily": "sans",
+      "desktopSize": "0.2rem",
+      "mobileSize": "0.75rem",
+      "lightColor": "#755a43",
+      "darkColor": "#c29a70"
+    },
+    "catalogTitle": {
+      "fontFamily": "serif",
+      "desktopSize": "0.2rem",
+      "mobileSize": "1rem",
+      "lightColor": "#282522",
+      "darkColor": "#ebe7df"
+    },
+    "catalogDate": {
+      "fontFamily": "sans",
+      "desktopSize": "0.2rem",
+      "mobileSize": "0.76rem",
+      "lightColor": "#858079",
+      "darkColor": "#978f84"
+    },
+    "archiveLink": {
+      "fontFamily": "sans",
+      "desktopSize": "0.2rem",
+      "mobileSize": "0.78rem",
+      "lightColor": "#716b64",
+      "darkColor": "#978f84"
+    },
+    "folio": {
+      "fontFamily": "serif",
+      "desktopSize": "0.2rem",
+      "mobileSize": "0.78rem",
+      "lightColor": "#858079",
+      "darkColor": "#978f84"
+    },
+    "quoteEnglish": {
+      "fontFamily": "serif",
+      "desktopSize": "0.35rem",
+      "mobileSize": "0.98rem",
+      "lightColor": "#2a2a2a",
+      "darkColor": "#ebe7df"
+    },
+    "quoteTranslation": {
+      "fontFamily": "serif",
+      "desktopSize": "0.3rem",
+      "mobileSize": "0.84rem",
+      "lightColor": "#504b46",
+      "darkColor": "#beb8ae"
+    },
+    "quoteAuthor": {
+      "fontFamily": "sans",
+      "desktopSize": "0.3rem",
+      "mobileSize": "0.72rem",
+      "lightColor": "#786753",
+      "darkColor": "#978f84"
+    },
+    "copyright": {
+      "fontFamily": "sans",
+      "desktopSize": "0.3rem",
+      "mobileSize": "0.72rem",
+      "lightColor": "#786753",
+      "darkColor": "#978f84"
     }
   },
   "materials": {

@@ -2,10 +2,10 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "homepage-config.schema.json",
   "title": "首页配置",
-  "description": "首页文案、桌面/移动端尺寸、字体和书本材质配置。修改后构建会自动校验。",
+  "description": "首页文案、布局、独立文字角色和书本材质配置。修改后构建会自动校验。",
   "type": "object",
   "additionalProperties": false,
-  "required": ["content", "desktop", "mobile", "materials"],
+  "required": ["content", "desktop", "mobile", "textStyles", "materials"],
   "properties": {
     "$schema": {
       "type": "string",
@@ -13,25 +13,40 @@
     },
     "content": {
       "type": "object",
-      "description": "首页直接展示的文字。",
+      "description": "首页、导航、书页和版权直接展示的文字。",
       "additionalProperties": false,
-      "required": ["siteName", "heroTitle", "life", "technical"],
+      "required": [
+        "siteName",
+        "navigationTitle",
+        "copyrightLabel",
+        "navigation",
+        "life",
+        "technical"
+      ],
       "properties": {
         "siteName": {
           "$ref": "#/$defs/text",
-          "description": "站点名称，同时显示在导航和书页页眉。"
+          "description": "导航栏左侧的站点名称。"
         },
-        "heroTitle": {
+        "navigationTitle": {
           "$ref": "#/$defs/text",
-          "description": "首页头部的主标题。"
+          "description": "导航栏中间的首页标题；空间不足时省略或隐藏。"
+        },
+        "copyrightLabel": {
+          "$ref": "#/$defs/text",
+          "description": "版权年份和分隔点之后的文字，不包含 © 和年份。"
+        },
+        "navigation": {
+          "$ref": "#/$defs/navigationLabels",
+          "description": "导航栏四个文字入口。"
         },
         "life": {
           "$ref": "#/$defs/bookSection",
-          "description": "生活文章左页的文字。"
+          "description": "生活文章左页及生活目录页的文字。"
         },
         "technical": {
           "$ref": "#/$defs/bookSection",
-          "description": "技术文章右页的文字。"
+          "description": "技术文章右页及技术目录页的文字。"
         }
       }
     },
@@ -39,7 +54,7 @@
       "type": "object",
       "description": "宽度大于 720px 时使用的桌面参数。",
       "additionalProperties": false,
-      "required": ["regions", "book", "typography"],
+      "required": ["regions", "book"],
       "properties": {
         "regions": {
           "type": "object",
@@ -47,7 +62,6 @@
           "additionalProperties": false,
           "required": [
             "navigationHeight",
-            "heroHeight",
             "bookRegionHeight",
             "footerHeight",
             "siteWidth"
@@ -57,27 +71,23 @@
               "$ref": "#/$defs/length",
               "description": "导航栏高度，建议使用 svh。"
             },
-            "heroHeight": {
-              "$ref": "#/$defs/length",
-              "description": "首页标题区域高度，建议使用 svh。"
-            },
             "bookRegionHeight": {
               "$ref": "#/$defs/length",
-              "description": "书本所在内容区高度，建议使用 svh。"
+              "description": "删除独立头部区后的书本内容区高度。"
             },
             "footerHeight": {
               "$ref": "#/$defs/length",
-              "description": "每日一句页脚高度，建议使用 svh。"
+              "description": "每日一句和版权区域高度。"
             },
             "siteWidth": {
               "$ref": "#/$defs/length",
-              "description": "导航、头部和页脚共用的内容宽度。"
+              "description": "导航、书本内容区和页脚共用的页面宽度。"
             }
           }
         },
         "book": {
           "type": "object",
-          "description": "桌面精装书的尺寸、比例与页内间距。",
+          "description": "桌面精装书的尺寸、比例和页内间距。",
           "additionalProperties": false,
           "required": [
             "width",
@@ -101,7 +111,8 @@
             "partPaddingTop",
             "catalogGap",
             "catalogColumnGap",
-            "archiveBottom"
+            "archiveBottom",
+            "folioBottom"
           ],
           "properties": {
             "width": {
@@ -110,7 +121,7 @@
             },
             "aspectRatio": {
               "$ref": "#/$defs/ratio",
-              "description": "书本宽高比，例如 1.8 / 1；数值越大，书本越扁宽。"
+              "description": "书本宽高比；数值越大，书本越扁宽。"
             },
             "perspective": {
               "$ref": "#/$defs/length",
@@ -130,7 +141,7 @@
             },
             "coverInsetTop": {
               "$ref": "#/$defs/length",
-              "description": "硬壳封面超出纸页顶部的距离，通常为负百分比。"
+              "description": "硬壳封面超出纸页顶部的距离。"
             },
             "coverInsetInline": {
               "$ref": "#/$defs/length",
@@ -154,7 +165,7 @@
             },
             "gutterWidth": {
               "$ref": "#/$defs/length",
-              "description": "两页中央中缝实体线宽度，当前为 1px。"
+              "description": "两页中央中缝实体线宽度。"
             },
             "pagePaddingTop": {
               "$ref": "#/$defs/length",
@@ -170,15 +181,15 @@
             },
             "partMarginTop": {
               "$ref": "#/$defs/length",
-              "description": "Part I / Part II 标签上方间距。"
+              "description": "Part 链接上方间距。"
             },
             "partMarginBottom": {
               "$ref": "#/$defs/length",
-              "description": "Part I / Part II 标签下方间距。"
+              "description": "Part 链接下方间距。"
             },
             "partPaddingTop": {
               "$ref": "#/$defs/length",
-              "description": "分部标签上边线与文字的间距。"
+              "description": "Part 链接上边线与文字的间距。"
             },
             "catalogGap": {
               "$ref": "#/$defs/length",
@@ -190,61 +201,11 @@
             },
             "archiveBottom": {
               "$ref": "#/$defs/length",
-              "description": "全部文章链接距离纸页底部的位置。"
-            }
-          }
-        },
-        "typography": {
-          "type": "object",
-          "description": "桌面首页字体大小。",
-          "additionalProperties": false,
-          "required": [
-            "navigationFontSize",
-            "heroTitleFontSize",
-            "runningHeadFontSize",
-            "partLabelFontSize",
-            "catalogFontSize",
-            "dateFontSize",
-            "archiveFontSize",
-            "quoteFontSize",
-            "footerFontSize"
-          ],
-          "properties": {
-            "navigationFontSize": {
-              "$ref": "#/$defs/length",
-              "description": "桌面导航字号。"
+              "description": "View all 入口距离纸页底部的位置。"
             },
-            "heroTitleFontSize": {
+            "folioBottom": {
               "$ref": "#/$defs/length",
-              "description": "桌面首页标题字号。"
-            },
-            "runningHeadFontSize": {
-              "$ref": "#/$defs/length",
-              "description": "书页顶部 ZHIMIN / CONTENTS / NOTES 的字号。"
-            },
-            "partLabelFontSize": {
-              "$ref": "#/$defs/length",
-              "description": "Part I · Life / Part II · Technology 的字号。"
-            },
-            "catalogFontSize": {
-              "$ref": "#/$defs/length",
-              "description": "书内文章目录标题字号。"
-            },
-            "dateFontSize": {
-              "$ref": "#/$defs/length",
-              "description": "书内文章日期字号。"
-            },
-            "archiveFontSize": {
-              "$ref": "#/$defs/length",
-              "description": "全部生活文章 / 全部技术文章链接字号。"
-            },
-            "quoteFontSize": {
-              "$ref": "#/$defs/length",
-              "description": "桌面英文每日一句字号。"
-            },
-            "footerFontSize": {
-              "$ref": "#/$defs/length",
-              "description": "桌面翻译、作者和版权字号。"
+              "description": "罗马数字页码距离纸页底部的位置。"
             }
           }
         }
@@ -254,7 +215,7 @@
       "type": "object",
       "description": "宽度不超过 720px 时使用的移动端参数。",
       "additionalProperties": false,
-      "required": ["layout", "typography"],
+      "required": ["layout"],
       "properties": {
         "layout": {
           "type": "object",
@@ -263,7 +224,6 @@
           "required": [
             "navigationHeight",
             "siteInlinePadding",
-            "heroMinHeight",
             "bookGap",
             "pageMinHeight",
             "pagePaddingTop",
@@ -282,10 +242,6 @@
             "siteInlinePadding": {
               "$ref": "#/$defs/length",
               "description": "移动端页面左右留白，每侧各使用一次。"
-            },
-            "heroMinHeight": {
-              "$ref": "#/$defs/length",
-              "description": "移动端头部区最小高度。"
             },
             "bookGap": {
               "$ref": "#/$defs/length",
@@ -309,85 +265,100 @@
             },
             "partMarginTop": {
               "$ref": "#/$defs/length",
-              "description": "移动端分部标签上方间距。"
+              "description": "移动端 Part 链接上方间距。"
             },
             "partMarginBottom": {
               "$ref": "#/$defs/length",
-              "description": "移动端分部标签下方间距。"
+              "description": "移动端 Part 链接下方间距。"
             },
             "partPaddingTop": {
               "$ref": "#/$defs/length",
-              "description": "移动端分部标签上边线与文字的间距。"
+              "description": "移动端 Part 链接上边线与文字的间距。"
             },
             "catalogGap": {
               "$ref": "#/$defs/length",
               "description": "移动端目录文章之间的距离。"
             }
           }
+        }
+      }
+    },
+    "textStyles": {
+      "type": "object",
+      "description": "首页每种文字角色的独立字体、字号和明暗模式颜色。",
+      "additionalProperties": false,
+      "required": [
+        "navigationBrand",
+        "navigationTitle",
+        "navigationLinks",
+        "runningOuter",
+        "runningInner",
+        "partLink",
+        "catalogTitle",
+        "catalogDate",
+        "archiveLink",
+        "folio",
+        "quoteEnglish",
+        "quoteTranslation",
+        "quoteAuthor",
+        "copyright"
+      ],
+      "properties": {
+        "navigationBrand": {
+          "$ref": "#/$defs/textStyle",
+          "description": "导航左侧品牌文字。"
         },
-        "typography": {
-          "type": "object",
-          "description": "移动端可读字号，不受桌面极小字号影响。",
-          "additionalProperties": false,
-          "required": [
-            "brandFontSize",
-            "navigationFontSize",
-            "heroTitleFontSize",
-            "runningHeadFontSize",
-            "partLabelFontSize",
-            "catalogFontSize",
-            "dateFontSize",
-            "archiveFontSize",
-            "quoteFontSize",
-            "translationFontSize",
-            "footerFontSize"
-          ],
-          "properties": {
-            "brandFontSize": {
-              "$ref": "#/$defs/length",
-              "description": "移动端 ZHIMIN 品牌字号。"
-            },
-            "navigationFontSize": {
-              "$ref": "#/$defs/length",
-              "description": "移动端导航字号。"
-            },
-            "heroTitleFontSize": {
-              "$ref": "#/$defs/length",
-              "description": "移动端首页标题字号。"
-            },
-            "runningHeadFontSize": {
-              "$ref": "#/$defs/length",
-              "description": "移动端书页页眉字号。"
-            },
-            "partLabelFontSize": {
-              "$ref": "#/$defs/length",
-              "description": "移动端 Part 标签字号。"
-            },
-            "catalogFontSize": {
-              "$ref": "#/$defs/length",
-              "description": "移动端文章目录字号。"
-            },
-            "dateFontSize": {
-              "$ref": "#/$defs/length",
-              "description": "移动端文章日期字号。"
-            },
-            "archiveFontSize": {
-              "$ref": "#/$defs/length",
-              "description": "移动端全部文章链接字号。"
-            },
-            "quoteFontSize": {
-              "$ref": "#/$defs/length",
-              "description": "移动端英文每日一句字号。"
-            },
-            "translationFontSize": {
-              "$ref": "#/$defs/length",
-              "description": "移动端每日一句翻译字号。"
-            },
-            "footerFontSize": {
-              "$ref": "#/$defs/length",
-              "description": "移动端作者和版权字号。"
-            }
-          }
+        "navigationTitle": {
+          "$ref": "#/$defs/textStyle",
+          "description": "导航标题文字，独立于品牌和导航链接。"
+        },
+        "navigationLinks": {
+          "$ref": "#/$defs/textStyle",
+          "description": "生活、技术、关于、RSS 导航链接。"
+        },
+        "runningOuter": {
+          "$ref": "#/$defs/textStyle",
+          "description": "书页靠外缘的 ESSAYS / TECHNICAL NOTES 页眉。"
+        },
+        "runningInner": {
+          "$ref": "#/$defs/textStyle",
+          "description": "书页靠中缝的 CONTENTS 页眉。"
+        },
+        "partLink": {
+          "$ref": "#/$defs/textStyle",
+          "description": "可点击的 PART I / PART II 链接。"
+        },
+        "catalogTitle": {
+          "$ref": "#/$defs/textStyle",
+          "description": "书内文章目录标题。"
+        },
+        "catalogDate": {
+          "$ref": "#/$defs/textStyle",
+          "description": "书内文章日期。"
+        },
+        "archiveLink": {
+          "$ref": "#/$defs/textStyle",
+          "description": "View all essays / technical notes 入口。"
+        },
+        "folio": {
+          "$ref": "#/$defs/textStyle",
+          "description": "首页书页和子目录页的罗马数字页码。"
+        },
+        "quoteEnglish": {
+          "$ref": "#/$defs/textStyle",
+          "description": "每日一句英文原文。"
+        },
+        "quoteTranslation": {
+          "$ref": "#/$defs/textStyle",
+          "description": "每日一句中文译文。"
+        },
+        "quoteAuthor": {
+          "$ref": "#/$defs/textStyle",
+          "description": "每日一句作者。"
+        },
+        "copyright": {
+          "$ref": "#/$defs/textStyle",
+          "description": "独立版权文字。"
         }
       }
     },
@@ -426,19 +397,19 @@
         },
         "gutterColor": {
           "$ref": "#/$defs/color",
-          "description": "中央 1px 中缝颜色。"
+          "description": "中央中缝颜色。"
         },
         "pageTextColor": {
           "$ref": "#/$defs/color",
-          "description": "桌面书页正文颜色。"
+          "description": "桌面书页基础正文颜色。"
         },
         "pageMutedColor": {
           "$ref": "#/$defs/color",
-          "description": "书页日期和次要文字颜色。"
+          "description": "书页基础次要文字颜色。"
         },
         "pageAccentColor": {
           "$ref": "#/$defs/color",
-          "description": "Part 标签的强调色。"
+          "description": "书页基础强调色。"
         },
         "bookShadowColor": {
           "$ref": "#/$defs/color",
@@ -474,22 +445,103 @@
       "type": "string",
       "pattern": "^(?:#[\\da-fA-F]{3,8}|rgba?\\(\\s*[\\d.%\\s,/-]+\\))$"
     },
+    "navigationLabels": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "lifeLabel",
+        "technicalLabel",
+        "aboutLabel",
+        "rssLabel"
+      ],
+      "properties": {
+        "lifeLabel": {
+          "$ref": "#/$defs/text",
+          "description": "生活目录导航文字。"
+        },
+        "technicalLabel": {
+          "$ref": "#/$defs/text",
+          "description": "技术目录导航文字。"
+        },
+        "aboutLabel": {
+          "$ref": "#/$defs/text",
+          "description": "关于页面导航文字。"
+        },
+        "rssLabel": {
+          "$ref": "#/$defs/text",
+          "description": "RSS 导航文字。"
+        }
+      }
+    },
     "bookSection": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["runningLabel", "partLabel", "archiveLabel"],
+      "required": [
+        "outerRunningLabel",
+        "innerRunningLabel",
+        "partLabel",
+        "archiveLabel",
+        "homepageFolio",
+        "directoryFolio"
+      ],
       "properties": {
-        "runningLabel": {
+        "outerRunningLabel": {
           "$ref": "#/$defs/text",
-          "description": "书页右上角的页眉文字。"
+          "description": "书页靠外缘的栏目页眉。"
+        },
+        "innerRunningLabel": {
+          "$ref": "#/$defs/text",
+          "description": "书页靠中缝的 CONTENTS 页眉。"
         },
         "partLabel": {
           "$ref": "#/$defs/text",
-          "description": "书页目录上方的 Part 标签。"
+          "description": "可点击的 Part 链接文字。"
         },
         "archiveLabel": {
           "$ref": "#/$defs/text",
-          "description": "纸页底部进入全部文章列表的链接文字。"
+          "description": "纸页底部进入全部文章目录的英文链接。"
+        },
+        "homepageFolio": {
+          "$ref": "#/$defs/text",
+          "description": "首页该书页的罗马数字页码。"
+        },
+        "directoryFolio": {
+          "$ref": "#/$defs/text",
+          "description": "对应子目录页独立使用的罗马数字页码。"
+        }
+      }
+    },
+    "textStyle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fontFamily",
+        "desktopSize",
+        "mobileSize",
+        "lightColor",
+        "darkColor"
+      ],
+      "properties": {
+        "fontFamily": {
+          "type": "string",
+          "enum": ["serif", "sans", "monospace"],
+          "description": "该文字角色独立使用的字体族标记。"
+        },
+        "desktopSize": {
+          "$ref": "#/$defs/length",
+          "description": "该文字角色的桌面字号。"
+        },
+        "mobileSize": {
+          "$ref": "#/$defs/length",
+          "description": "该文字角色的移动端字号。"
+        },
+        "lightColor": {
+          "$ref": "#/$defs/color",
+          "description": "该文字角色在亮色模式中的颜色。"
+        },
+        "darkColor": {
+          "$ref": "#/$defs/color",
+          "description": "该文字角色在暗色模式中的颜色。"
         }
       }
     }

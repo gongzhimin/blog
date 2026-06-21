@@ -20,10 +20,29 @@ test("current homepage config is valid and produces CSS variables", () => {
 
   const css = buildHomepageCssVariables(config);
 
+  assert.equal(
+    config.content.navigationTitle,
+    "写技术，也记录技术之外的生活。",
+  );
+  assert.equal(config.content.copyrightLabel, "Zhimin 的博客书");
+  assert.equal(config.content.life.outerRunningLabel, "ESSAYS");
+  assert.equal(config.content.technical.outerRunningLabel, "TECHNICAL NOTES");
+  assert.equal(config.content.life.homepageFolio, "i");
+  assert.equal(config.content.technical.homepageFolio, "ii");
+  assert.equal(config.content.life.directoryFolio, "i");
+  assert.equal(config.content.technical.directoryFolio, "i");
+  assert.equal(config.textStyles.navigationBrand.fontFamily, "sans");
+  assert.equal(config.textStyles.navigationTitle.desktopSize, "0.4rem");
+
   assert.match(css, /--home-desktop-book-width:68%/);
   assert.match(css, /--home-desktop-book-ratio:1\.8 \/ 1/);
   assert.match(css, /--home-material-paper-color:#ffffff/);
-  assert.match(css, /--home-mobile-catalog-font-size:1rem/);
+  assert.match(
+    css,
+    /--home-text-navigation-brand-font-family:var\(--font-sans\)/,
+  );
+  assert.match(css, /--home-text-navigation-title-desktop-size:0\.4rem/);
+  assert.match(css, /--home-text-copyright-dark-color:/);
 });
 
 test("homepage config reports a missing field with its full path", () => {
@@ -66,15 +85,24 @@ test("homepage config rejects texture opacity outside zero to one", () => {
   );
 });
 
+test("homepage config rejects unsupported font family tokens", () => {
+  const invalid = structuredClone(config);
+  invalid.textStyles.navigationBrand.fontFamily = "comic";
+
+  assert.throws(
+    () => validateHomepageConfig(invalid),
+    /textStyles\.navigationBrand\.fontFamily must be one of serif, sans, monospace/,
+  );
+});
+
 test("homepage schema documents the parameters users edit most often", () => {
   assert.match(
     schema.properties.desktop.properties.book.properties.width.description,
     /书本/,
   );
   assert.match(
-    schema.properties.desktop.properties.typography.properties.catalogFontSize
-      .description,
-    /目录/,
+    schema.properties.textStyles.properties.catalogTitle.description,
+    /目录标题/,
   );
   assert.match(
     schema.properties.materials.properties.bindingColor.description,
@@ -84,6 +112,10 @@ test("homepage schema documents the parameters users edit most often", () => {
     schema.properties.mobile.properties.layout.properties.pageMinHeight
       .description,
     /移动端/,
+  );
+  assert.match(
+    schema.properties.textStyles.properties.navigationTitle.description,
+    /导航标题/,
   );
 });
 
