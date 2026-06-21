@@ -29,6 +29,7 @@
     "typescript": "^5.9.3"
   },
   "devDependencies": {
-    "@iconify-json/lucide": "^1.2.114"
+    "@iconify-json/lucide": "^1.2.114",
+    "@playwright/test": "^1.61.0"
   }
 }
