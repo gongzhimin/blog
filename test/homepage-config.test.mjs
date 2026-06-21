@@ -132,11 +132,11 @@ test("homepage CSS consumes desktop and mobile configuration variables", async (
   assert.match(css, /width: var\(--home-desktop-book-width\)/);
   assert.match(
     css,
-    /font-size: var\(--home-desktop-catalog-font-size\)/,
+    /font-size: var\(--home-text-catalog-title-desktop-size\)/,
   );
   assert.match(
     css,
-    /font-size: var\(--home-mobile-catalog-font-size\)/,
+    /font-size: var\(--home-text-catalog-title-mobile-size\)/,
   );
   assert.match(css, /background-color: var\(--home-material-paper-color\)/);
 });

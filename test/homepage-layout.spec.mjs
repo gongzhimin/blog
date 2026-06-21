@@ -10,7 +10,7 @@ test("desktop renders the calibrated hardcover book in one viewport", async ({
   await expect(pages).toHaveCount(2);
   for (const selector of [
     ".home-navigation",
-    ".home-hero",
+    ".home-navigation__title",
     ".home-book-frame",
     ".daily-quote",
     ".home-book-cover",
@@ -21,6 +21,9 @@ test("desktop renders the calibrated hardcover book in one viewport", async ({
   ]) {
     await expect(page.locator(selector)).toBeVisible();
   }
+  await expect(page.locator(".home-hero")).toHaveCount(0);
+  await expect(page.locator(".home-navigation__links a")).toHaveCount(4);
+  await expect(page.locator(".book-page__folio")).toHaveCount(2);
 
   const left = await pages.nth(0).boundingBox();
   const right = await pages.nth(1).boundingBox();
@@ -40,6 +43,20 @@ test("desktop renders the calibrated hardcover book in one viewport", async ({
 
   expect(dimensions.scrollHeight).toBeLessThanOrEqual(dimensions.innerHeight + 1);
   expect(dimensions.scrollWidth).toBeLessThanOrEqual(dimensions.innerWidth);
+
+  const navigation = await page.locator(".home-navigation__inner").boundingBox();
+  const navigationTitle = await page
+    .locator(".home-navigation__title")
+    .boundingBox();
+  expect(navigation).not.toBeNull();
+  expect(navigationTitle).not.toBeNull();
+  expect(
+    Math.abs(
+      navigationTitle.x +
+        navigationTitle.width / 2 -
+        (navigation.x + navigation.width / 2),
+    ),
+  ).toBeLessThanOrEqual(2);
 
   const frame = await page.locator(".home-book-frame").boundingBox();
   expect(frame).not.toBeNull();
@@ -64,15 +81,18 @@ test("desktop renders the calibrated hardcover book in one viewport", async ({
   for (const paper of [pages.nth(0), pages.nth(1)]) {
     const paperBox = await paper.boundingBox();
     const archiveBox = await paper.locator(".book-page__archive").boundingBox();
+    const folioBox = await paper.locator(".book-page__folio").boundingBox();
 
     expect(paperBox).not.toBeNull();
     expect(archiveBox).not.toBeNull();
+    expect(folioBox).not.toBeNull();
     expect(
       Math.abs(
         archiveBox.x + archiveBox.width / 2 -
           (paperBox.x + paperBox.width / 2),
       ),
     ).toBeLessThanOrEqual(2);
+    expect(archiveBox.y + archiveBox.height).toBeLessThan(folioBox.y);
   }
 
   const copyright = await page
@@ -104,6 +124,9 @@ test("mobile stacks two complete paper pages and keeps content contained", async
   expect(life).not.toBeNull();
   expect(technical).not.toBeNull();
   expect(technical.y).toBeGreaterThanOrEqual(life.y + life.height + 20);
+  await expect(page.locator(".home-navigation__title")).toBeHidden();
+  await expect(page.locator(".home-navigation__links a:visible")).toHaveCount(4);
+  await expect(page.locator(".theme-toggle:visible")).toHaveCount(1);
 
   for (const paper of [pages.nth(0), pages.nth(1)]) {
     const totalEntries = await paper.locator(".catalog-entry").count();
@@ -111,6 +134,7 @@ test("mobile stacks two complete paper pages and keeps content contained", async
       Math.min(3, totalEntries),
     );
     await expect(paper.locator(".book-page__archive")).toBeVisible();
+    await expect(paper.locator(".book-page__folio")).toBeVisible();
 
     const paperStyle = await paper.evaluate((element) => {
       const style = getComputedStyle(element);
@@ -209,8 +233,7 @@ test("navigation remains sticky and theme choice persists", async ({ page }) => 
     fullPage: true,
   });
 
-  await page.locator(".mobile-menu summary").click();
-  await expect(page.locator(".mobile-menu__panel")).toBeVisible();
+  await expect(page.locator(".home-navigation__links a:visible")).toHaveCount(4);
 });
 
 for (const viewport of [
@@ -232,7 +255,6 @@ for (const viewport of [
 
     for (const selector of [
       ".home-navigation",
-      ".home-hero",
       ".home-book",
       ".daily-quote",
     ]) {
