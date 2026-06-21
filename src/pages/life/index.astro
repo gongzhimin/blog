@@ -4,8 +4,8 @@ import { getCollection } from 'astro:content';
 
 const lifePosts = await getCollection('life');
 const sortedPosts = lifePosts.sort((a, b) => {
-  const dateA = a.data.pubDatetime || a.data.date;
-  const dateB = b.data.pubDatetime || b.data.date;
+  const dateA = a.data.date;
+  const dateB = b.data.date;
   return dateB.valueOf() - dateA.valueOf();
 });
 ---
@@ -30,7 +30,7 @@ const sortedPosts = lifePosts.sort((a, b) => {
 
       <div class="archive-list">
         {sortedPosts.map((post) => {
-          const date = post.data.pubDatetime || post.data.date;
+          const date = post.data.date;
           return (
             <article class="archive-row">
               <a href={`/life/${post.id}`} class="archive-row__title">

@@ -1,0 +1,35 @@
+---
+import { Icon } from "astro-icon/components";
+import ThemeToggle from "./ThemeToggle.astro";
+
+const links = [
+  { href: "/blog", label: "技术" },
+  { href: "/life", label: "生活" },
+  { href: "/about", label: "关于" },
+];
+---
+
+<header class="home-navigation">
+  <nav class="home-navigation__inner" aria-label="主要导航">
+    <a class="home-navigation__brand" href="/" aria-current="page">ZHIMIN</a>
+
+    <div class="home-navigation__desktop">
+      {links.map((link) => <a href={link.href}>{link.label}</a>)}
+      <a href="/rss.xml">RSS</a>
+      <ThemeToggle />
+    </div>
+
+    <div class="home-navigation__mobile">
+      <a href="/rss.xml">RSS</a>
+      <ThemeToggle />
+      <details class="mobile-menu">
+        <summary aria-label="打开导航菜单" title="打开导航菜单">
+          <Icon name="lucide:menu" />
+        </summary>
+        <div class="mobile-menu__panel">
+          {links.map((link) => <a href={link.href}>{link.label}</a>)}
+        </div>
+      </details>
+    </div>
+  </nav>
+</header>

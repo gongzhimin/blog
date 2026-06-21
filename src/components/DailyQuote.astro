@@ -1,0 +1,17 @@
+---
+type Props = {
+  english: string;
+  chinese: string;
+  year: number;
+};
+
+const { english, chinese, year } = Astro.props;
+---
+
+<footer class="daily-quote">
+  <div class="daily-quote__text">
+    <p class="daily-quote__english">“{english}”</p>
+    <p class="daily-quote__chinese">{chinese}</p>
+  </div>
+  <p class="daily-quote__copyright">© {year} ZHIMIN</p>
+</footer>

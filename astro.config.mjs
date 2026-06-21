@@ -1,11 +1,21 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
-
+import icon from 'astro-icon';
 import tailwindcss from '@tailwindcss/vite';
 
 // https://astro.build/config
 export default defineConfig({
   site: 'https://zhimin.ink',
+  devToolbar: {
+    enabled: false
+  },
+  integrations: [
+    icon({
+      include: {
+        lucide: ['menu', 'moon', 'sun']
+      }
+    })
+  ],
   vite: {
     plugins: [tailwindcss()]
   }

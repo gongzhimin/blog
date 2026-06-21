@@ -1,82 +1,72 @@
 ---
-import '../styles/global.css';
-import { getCollection } from 'astro:content';
+import "../styles/global.css";
+import "../styles/home.css";
+import { getCollection } from "astro:content";
+import SiteNavigation from "../components/SiteNavigation.astro";
+import BookCatalogPage from "../components/BookCatalogPage.astro";
+import DailyQuote from "../components/DailyQuote.astro";
+import quote from "../data/daily-quote.json";
+import { buildCatalogEntries } from "../lib/homepage.mjs";
 
-const lifePosts = await getCollection('life');
-const topLife = lifePosts.sort((a, b) => {
-  const dateA = a.data.pubDatetime || a.data.date;
-  const dateB = b.data.pubDatetime || b.data.date;
-  return dateB.valueOf() - dateA.valueOf();
-}).slice(0, 5);
-
-const blogPosts = await getCollection('blog');
-const topBlog = blogPosts.sort((a, b) => {
-  const dateA = a.data.pubDatetime || a.data.date;
-  const dateB = b.data.pubDatetime || b.data.date;
-  return dateB.valueOf() - dateA.valueOf();
-}).slice(0, 5);
+const lifeEntries = buildCatalogEntries(await getCollection("life"), "/life");
+const technicalEntries = buildCatalogEntries(
+  await getCollection("blog"),
+  "/blog",
+);
+const currentYear = new Date().getFullYear();
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="写技术，也记录技术之外的生活。"
+    />
     <title>Zhimin</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="alternate" type="application/rss+xml" title="RSS Feed" href="/rss.xml" />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title="RSS Feed"
+      href="/rss.xml"
+    />
   </head>
-  <body>
-    <main class="site-shell">
-      <header class="site-topbar">
-        <a href="/" class="site-brand">
-          <img src="/logo.svg" alt="Zhimin" class="site-brand__mark" />
-          <span class="site-brand__name">Zhimin</span>
-        </a>
-        <a href="/about" class="editorial-note">About</a>
-      </header>
+  <body class="home-body">
+    <SiteNavigation />
 
-      <section class="site-intro">
-        <p class="site-eyebrow">Editorial notes</p>
-        <h1>Writing down moments worth keeping.</h1>
-        <p>一个以文字为主的个人博客，记录生活随笔、技术笔记，以及一些值得被保存下来的片段。</p>
-      </section>
+    <div class="home-shell">
+      <main class="home-page">
+        <header class="home-hero">
+          <h1>写技术，也记录技术之外的生活。</h1>
+          <p>软件、工具、思考与日常。</p>
+        </header>
 
-      <div class="home-grid">
-        <section class="home-column">
-          <h2 class="section-title">Essays</h2>
-          <div class="story-list">
-            {topLife.map((post) => (
-              <article class="story-list__item">
-                <a href={`/life/${post.id}`} class="story-list__title">
-                  {post.data.title}
-                </a>
-              </article>
-            ))}
-          </div>
-          <a href="/life" class="archive-link">View all essays →</a>
+        <section class="home-book" aria-label="最新文章目录">
+          <BookCatalogPage
+            section="life"
+            title="生活随笔"
+            entries={lifeEntries}
+            archiveHref="/life"
+            archiveLabel="全部生活文章"
+          />
+          <BookCatalogPage
+            section="technical"
+            title="技术笔记"
+            entries={technicalEntries}
+            archiveHref="/blog"
+            archiveLabel="全部技术文章"
+          />
         </section>
+      </main>
 
-        <section class="home-column">
-          <h2 class="section-title">Technical</h2>
-          <div class="story-list">
-            {topBlog.map((post) => (
-              <article class="story-list__item">
-                <a href={`/blog/${post.id}`} class="story-list__title">
-                  {post.data.title}
-                </a>
-              </article>
-            ))}
-          </div>
-          <a href="/blog" class="archive-link">View all technical →</a>
-        </section>
-      </div>
-
-      <footer class="functional-text site-footer">
-        <a href="/about">About</a>
-        <span>·</span>
-        <a href="/rss.xml">RSS</a>
-      </footer>
-    </main>
+      <DailyQuote
+        english={quote.english}
+        chinese={quote.chinese}
+        year={currentYear}
+      />
+    </div>
   </body>
 </html>
