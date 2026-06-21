@@ -31,7 +31,7 @@ const homepageStyle = buildHomepageCssVariables(homepageConfig);
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content={homepageConfig.content.heroTitle}
+      content={homepageConfig.content.navigationTitle}
     />
     <title>{homepageConfig.content.siteName}</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -43,14 +43,17 @@ const homepageStyle = buildHomepageCssVariables(homepageConfig);
     />
   </head>
   <body class="home-body" style={homepageStyle}>
-    <SiteNavigation siteName={homepageConfig.content.siteName} />
+    <SiteNavigation
+      siteName={homepageConfig.content.siteName}
+      title={homepageConfig.content.navigationTitle}
+      lifeLabel={homepageConfig.content.navigation.lifeLabel}
+      technicalLabel={homepageConfig.content.navigation.technicalLabel}
+      aboutLabel={homepageConfig.content.navigation.aboutLabel}
+      rssLabel={homepageConfig.content.navigation.rssLabel}
+    />
 
     <div class="home-shell">
       <main class="home-page">
-        <header class="home-hero">
-          <h1>{homepageConfig.content.heroTitle}</h1>
-        </header>
-
         <section class="home-book-frame" aria-label="最新文章目录">
           <div class="home-book-cover" aria-hidden="true"></div>
           <div class="home-book-binding" aria-hidden="true"></div>
@@ -66,21 +69,27 @@ const homepageStyle = buildHomepageCssVariables(homepageConfig);
           <div class="home-book">
             <BookCatalogPage
               section="life"
-              siteName={homepageConfig.content.siteName}
-              runningLabel={homepageConfig.content.life.runningLabel}
+              side="left"
+              outerRunningLabel={homepageConfig.content.life.outerRunningLabel}
+              innerRunningLabel={homepageConfig.content.life.innerRunningLabel}
               partLabel={homepageConfig.content.life.partLabel}
+              partHref="/life"
               entries={lifeEntries}
               archiveHref="/life"
               archiveLabel={homepageConfig.content.life.archiveLabel}
+              folio={homepageConfig.content.life.homepageFolio}
             />
             <BookCatalogPage
               section="technical"
-              siteName={homepageConfig.content.siteName}
-              runningLabel={homepageConfig.content.technical.runningLabel}
+              side="right"
+              outerRunningLabel={homepageConfig.content.technical.outerRunningLabel}
+              innerRunningLabel={homepageConfig.content.technical.innerRunningLabel}
               partLabel={homepageConfig.content.technical.partLabel}
+              partHref="/blog"
               entries={technicalEntries}
               archiveHref="/blog"
               archiveLabel={homepageConfig.content.technical.archiveLabel}
+              folio={homepageConfig.content.technical.homepageFolio}
             />
           </div>
 
@@ -93,7 +102,7 @@ const homepageStyle = buildHomepageCssVariables(homepageConfig);
         chinese={quote.chinese}
         author={quote.author}
         year={currentYear}
-        siteName={homepageConfig.content.siteName}
+        copyrightLabel={homepageConfig.content.copyrightLabel}
       />
     </div>
   </body>

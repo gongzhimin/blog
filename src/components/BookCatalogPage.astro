@@ -9,22 +9,28 @@ type Entry = {
 
 type Props = {
   section: "life" | "technical";
-  siteName: string;
-  runningLabel: string;
+  side: "left" | "right";
+  outerRunningLabel: string;
+  innerRunningLabel: string;
   partLabel: string;
+  partHref: string;
   entries: Entry[];
   archiveHref: string;
   archiveLabel: string;
+  folio: string;
 };
 
 const {
   section,
-  siteName,
-  runningLabel,
+  side,
+  outerRunningLabel,
+  innerRunningLabel,
   partLabel,
+  partHref,
   entries,
   archiveHref,
   archiveLabel,
+  folio,
 } = Astro.props;
 ---
 
@@ -34,11 +40,22 @@ const {
   aria-label={partLabel}
 >
   <header class="book-page__running-head">
-    <strong>{siteName}</strong>
-    <span>{runningLabel}</span>
+    {
+      side === "left" ? (
+        <>
+          <span class="book-page__running-outer">{outerRunningLabel}</span>
+          <span class="book-page__running-inner">{innerRunningLabel}</span>
+        </>
+      ) : (
+        <>
+          <span class="book-page__running-inner">{innerRunningLabel}</span>
+          <span class="book-page__running-outer">{outerRunningLabel}</span>
+        </>
+      )
+    }
   </header>
 
-  <p class="book-page__part">{partLabel}</p>
+  <a class="book-page__part" href={partHref}>{partLabel}</a>
 
   <ol class="catalog-list">
     {
@@ -65,4 +82,5 @@ const {
   </ol>
 
   <a class="book-page__archive" href={archiveHref}>{archiveLabel}</a>
+  <span class="book-page__folio">{folio}</span>
 </section>

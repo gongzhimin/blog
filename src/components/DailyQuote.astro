@@ -4,10 +4,10 @@ type Props = {
   chinese: string;
   author?: string;
   year: number;
-  siteName: string;
+  copyrightLabel: string;
 };
 
-const { english, chinese, author, year, siteName } = Astro.props;
+const { english, chinese, author, year, copyrightLabel } = Astro.props;
 ---
 
 <footer class="daily-quote">
@@ -17,6 +17,6 @@ const { english, chinese, author, year, siteName } = Astro.props;
   </div>
   <div class="daily-quote__meta">
     {author && <p class="daily-quote__author">— {author}</p>}
-    <p class="daily-quote__copyright">© {year} {siteName}</p>
+    <p class="daily-quote__copyright">© {year} · {copyrightLabel}</p>
   </div>
 </footer>

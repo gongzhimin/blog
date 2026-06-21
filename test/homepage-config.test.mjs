@@ -154,8 +154,15 @@ test("homepage components receive site copy from configuration", async () => {
     ),
   ]);
 
-  assert.match(page, /content=\{homepageConfig\.content\.heroTitle\}/);
-  assert.match(page, /<SiteNavigation siteName=\{homepageConfig\.content\.siteName\}/);
+  assert.match(page, /content=\{homepageConfig\.content\.navigationTitle\}/);
+  assert.match(
+    page,
+    /<SiteNavigation[\s\S]*siteName=\{homepageConfig\.content\.siteName\}/,
+  );
+  assert.match(
+    page,
+    /title=\{homepageConfig\.content\.navigationTitle\}/,
+  );
   assert.match(page, /siteName=\{homepageConfig\.content\.siteName\}/);
   assert.doesNotMatch(navigation, />ZHIMIN</);
   assert.doesNotMatch(quote, />© \{year\} ZHIMIN</);

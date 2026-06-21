@@ -36,12 +36,11 @@ test("homepage renders the approved linear structure", async () => {
   const bodyChildren = [...document.body.children];
 
   assert.equal(bodyChildren[0].classList.contains("home-navigation"), true);
-  assert.ok(document.querySelector(".home-hero"));
   assert.equal(
-    document.querySelector(".home-hero h1").textContent.trim(),
-    config.content.heroTitle,
+    document.querySelector(".home-navigation__title").textContent.trim(),
+    config.content.navigationTitle,
   );
-  assert.equal(document.querySelector(".home-hero p"), null);
+  assert.equal(document.querySelector(".home-hero"), null);
   assert.ok(document.querySelector(".home-book-frame"));
   assert.ok(document.querySelector(".home-book"));
   assert.ok(document.querySelector(".daily-quote"));
@@ -71,10 +70,14 @@ test("homepage renders life first, technical second, and required navigation lin
   assert.equal(pages[1].dataset.section, "technical");
   assert.equal(document.querySelector(".book-page__title"), null);
   assert.deepEqual(
-    [...document.querySelectorAll(".book-page__part")].map((node) =>
-      node.textContent.trim(),
-    ),
-    [config.content.life.partLabel, config.content.technical.partLabel],
+    [...document.querySelectorAll(".book-page__part")].map((node) => ({
+      text: node.textContent.trim(),
+      href: node.getAttribute("href"),
+    })),
+    [
+      { text: config.content.life.partLabel, href: "/life" },
+      { text: config.content.technical.partLabel, href: "/blog" },
+    ],
   );
   assert.deepEqual(
     [...document.querySelectorAll(".book-page__archive")].map((node) => ({
@@ -86,23 +89,33 @@ test("homepage renders life first, technical second, and required navigation lin
       { text: config.content.technical.archiveLabel, href: "/blog" },
     ],
   );
+  const runningHeads = [
+    ...document.querySelectorAll(".book-page__running-head"),
+  ];
   assert.deepEqual(
-    [...document.querySelectorAll(".book-page__running-head")].map((node) => ({
-      site: node.querySelector("strong").textContent.trim(),
-      label: node.querySelector("span").textContent.trim(),
-    })),
+    [...runningHeads[0].children].map((node) => node.textContent.trim()),
     [
-      {
-        site: config.content.siteName,
-        label: config.content.life.runningLabel,
-      },
-      {
-        site: config.content.siteName,
-        label: config.content.technical.runningLabel,
-      },
+      config.content.life.outerRunningLabel,
+      config.content.life.innerRunningLabel,
     ],
   );
-  assert.equal(document.querySelector(".book-page__folio"), null);
+  assert.deepEqual(
+    [...runningHeads[1].children].map((node) => node.textContent.trim()),
+    [
+      config.content.technical.innerRunningLabel,
+      config.content.technical.outerRunningLabel,
+    ],
+  );
+  assert.equal(document.querySelector(".book-page__running-head strong"), null);
+  assert.deepEqual(
+    [...document.querySelectorAll(".book-page__folio")].map((node) =>
+      node.textContent.trim(),
+    ),
+    [
+      config.content.life.homepageFolio,
+      config.content.technical.homepageFolio,
+    ],
+  );
 
   for (const href of ["/", "/blog", "/life", "/about", "/rss.xml"]) {
     assert.ok(document.querySelector(`.home-navigation a[href="${href}"]`));
@@ -112,6 +125,7 @@ test("homepage renders life first, technical second, and required navigation lin
 test("homepage quote contains the bilingual quote, author, and copyright", async () => {
   const document = await loadHomepage();
   const quote = await loadDailyQuote();
+  const config = await loadHomepageConfig();
   const footer = document.querySelector(".daily-quote");
   const currentYear = new Date().getFullYear();
 
@@ -120,7 +134,7 @@ test("homepage quote contains the bilingual quote, author, and copyright", async
   assert.ok(footer.querySelector(".daily-quote__meta"));
   assert.equal(
     footer.querySelector(".daily-quote__copyright").textContent.trim(),
-    `© ${currentYear} ZHIMIN`,
+    `© ${currentYear} · ${config.content.copyrightLabel}`,
   );
   assert.equal(
     footer.querySelector(".daily-quote__author").textContent.trim(),
