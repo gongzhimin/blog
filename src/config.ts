@@ -1,4 +1,4 @@
-import type { Site, SocialObjects } from "astro-paper/types";
+import type { Site, SocialObjects } from "astro-paper/src/types";
 
 export const SITE: Site = {
   website: "https://example.com",
