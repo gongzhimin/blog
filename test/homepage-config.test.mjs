@@ -86,3 +86,45 @@ test("homepage schema documents the parameters users edit most often", () => {
     /移动端/,
   );
 });
+
+test("homepage CSS consumes desktop and mobile configuration variables", async () => {
+  const css = await readFile(
+    new URL("../src/styles/home.css", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(
+    css,
+    /height: var\(--home-desktop-navigation-height\)/,
+  );
+  assert.match(css, /width: var\(--home-desktop-book-width\)/);
+  assert.match(
+    css,
+    /font-size: var\(--home-desktop-catalog-font-size\)/,
+  );
+  assert.match(
+    css,
+    /font-size: var\(--home-mobile-catalog-font-size\)/,
+  );
+  assert.match(css, /background-color: var\(--home-material-paper-color\)/);
+});
+
+test("homepage components receive site copy from configuration", async () => {
+  const [page, navigation, quote] = await Promise.all([
+    readFile(new URL("../src/pages/index.astro", import.meta.url), "utf8"),
+    readFile(
+      new URL("../src/components/SiteNavigation.astro", import.meta.url),
+      "utf8",
+    ),
+    readFile(
+      new URL("../src/components/DailyQuote.astro", import.meta.url),
+      "utf8",
+    ),
+  ]);
+
+  assert.match(page, /content=\{homepageConfig\.content\.heroTitle\}/);
+  assert.match(page, /<SiteNavigation siteName=\{homepageConfig\.content\.siteName\}/);
+  assert.match(page, /siteName=\{homepageConfig\.content\.siteName\}/);
+  assert.doesNotMatch(navigation, />ZHIMIN</);
+  assert.doesNotMatch(quote, />© \{year\} ZHIMIN</);
+});

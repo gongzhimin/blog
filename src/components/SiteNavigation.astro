@@ -2,6 +2,12 @@
 import { Icon } from "astro-icon/components";
 import ThemeToggle from "./ThemeToggle.astro";
 
+type Props = {
+  siteName: string;
+};
+
+const { siteName } = Astro.props;
+
 const links = [
   { href: "/blog", label: "技术" },
   { href: "/life", label: "生活" },
@@ -11,7 +17,7 @@ const links = [
 
 <header class="home-navigation">
   <nav class="home-navigation__inner" aria-label="主要导航">
-    <a class="home-navigation__brand" href="/" aria-current="page">ZHIMIN</a>
+    <a class="home-navigation__brand" href="/" aria-current="page">{siteName}</a>
 
     <div class="home-navigation__desktop">
       {links.map((link) => <a href={link.href}>{link.label}</a>)}

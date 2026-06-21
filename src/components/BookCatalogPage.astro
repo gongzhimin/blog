@@ -10,8 +10,8 @@ type Entry = {
 type Props = {
   section: "life" | "technical";
   siteName: string;
-  runningLabel: "CONTENTS" | "NOTES";
-  partLabel: "Part I · Life" | "Part II · Technology";
+  runningLabel: string;
+  partLabel: string;
   entries: Entry[];
   archiveHref: string;
   archiveLabel: string;

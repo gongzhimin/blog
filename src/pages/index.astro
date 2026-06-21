@@ -31,7 +31,7 @@ const homepageStyle = buildHomepageCssVariables(homepageConfig);
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="写技术，也记录技术之外的生活。"
+      content={homepageConfig.content.heroTitle}
     />
     <title>{homepageConfig.content.siteName}</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -43,7 +43,7 @@ const homepageStyle = buildHomepageCssVariables(homepageConfig);
     />
   </head>
   <body class="home-body" style={homepageStyle}>
-    <SiteNavigation />
+    <SiteNavigation siteName={homepageConfig.content.siteName} />
 
     <div class="home-shell">
       <main class="home-page">
@@ -93,6 +93,7 @@ const homepageStyle = buildHomepageCssVariables(homepageConfig);
         chinese={quote.chinese}
         author={quote.author}
         year={currentYear}
+        siteName={homepageConfig.content.siteName}
       />
     </div>
   </body>
