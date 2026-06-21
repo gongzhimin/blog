@@ -13,7 +13,7 @@ test("desktop renders a complete side-by-side book", async ({ page }) => {
   expect(left).not.toBeNull();
   expect(right).not.toBeNull();
   expect(Math.abs(left.y - right.y)).toBeLessThanOrEqual(1);
-  expect(left.x + left.width).toBeLessThanOrEqual(right.x + 1);
+  expect(Math.abs(left.x + left.width - right.x)).toBeLessThanOrEqual(2);
   expect(Math.abs(left.height - right.height)).toBeLessThanOrEqual(1);
 
   const dimensions = await page.evaluate(() => ({
@@ -25,6 +25,32 @@ test("desktop renders a complete side-by-side book", async ({ page }) => {
 
   expect(dimensions.scrollHeight).toBeLessThanOrEqual(dimensions.innerHeight + 1);
   expect(dimensions.scrollWidth).toBeLessThanOrEqual(dimensions.innerWidth);
+
+  const bookDepth = await page.locator(".home-book").evaluate((book) => {
+    const bookStyle = getComputedStyle(book);
+    const pageStyles = [...book.querySelectorAll(".book-page")].map((paper) => {
+      const style = getComputedStyle(paper);
+      return {
+        transform: style.transform,
+        borderRadius: style.borderRadius,
+      };
+    });
+
+    return {
+      perspective: bookStyle.perspective,
+      filter: bookStyle.filter,
+      transform: bookStyle.transform,
+      pageStyles,
+    };
+  });
+
+  expect(bookDepth.perspective).not.toBe("none");
+  expect(bookDepth.filter).not.toBe("none");
+  expect(bookDepth.transform).not.toBe("none");
+  expect(bookDepth.pageStyles[0].transform).not.toBe("none");
+  expect(bookDepth.pageStyles[1].transform).not.toBe("none");
+  expect(bookDepth.pageStyles[0].borderRadius).not.toBe("0px");
+  expect(bookDepth.pageStyles[1].borderRadius).not.toBe("0px");
 
   await page.screenshot({
     path: "test-results/homepage-desktop.png",
@@ -70,6 +96,25 @@ test("mobile stacks two complete paper pages and keeps content contained", async
     expect(paperStyle.borderLeftWidth).toBeGreaterThan(0);
     expect(paperStyle.minHeight).toBeGreaterThanOrEqual(320);
   }
+
+  const mobileBookDepth = await page.locator(".home-book").evaluate((book) => {
+    const bookStyle = getComputedStyle(book);
+    const pageTransforms = [...book.querySelectorAll(".book-page")].map(
+      (paper) => getComputedStyle(paper).transform,
+    );
+
+    return {
+      perspective: bookStyle.perspective,
+      filter: bookStyle.filter,
+      transform: bookStyle.transform,
+      pageTransforms,
+    };
+  });
+
+  expect(mobileBookDepth.perspective).toBe("none");
+  expect(mobileBookDepth.filter).toBe("none");
+  expect(mobileBookDepth.transform).toBe("none");
+  expect(mobileBookDepth.pageTransforms).toEqual(["none", "none"]);
 
   const hasHorizontalOverflow = await page.evaluate(
     () => document.documentElement.scrollWidth > window.innerWidth,

@@ -104,38 +104,137 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   padding-block: 1rem;
+  perspective: 87.5rem;
+  filter: drop-shadow(0 1.35rem 1.05rem rgba(36, 28, 18, 0.2));
+  transform: rotateX(0.8deg);
+  transform-origin: center 70%;
+  transform-style: preserve-3d;
+}
+
+.home-book::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  right: 0.4rem;
+  bottom: 0.52rem;
+  left: 0.4rem;
+  height: 0.78rem;
+  border: 1px solid rgba(var(--color-border), 0.5);
+  border-top: 0;
+  border-radius: 0 0 46% 46% / 0 0 100% 100%;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(113, 84, 51, 0.12),
+      transparent 9%,
+      transparent 47%,
+      rgba(74, 53, 31, 0.16) 49.5%,
+      rgba(74, 53, 31, 0.16) 50.5%,
+      transparent 53%,
+      transparent 91%,
+      rgba(113, 84, 51, 0.12)
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgba(var(--color-border), 0.35) 0 1px,
+      rgb(var(--color-paper)) 1px 2px
+    );
+  pointer-events: none;
 }
 
 .home-book::after {
   content: "";
   position: absolute;
-  top: 1rem;
-  bottom: 1rem;
+  z-index: 3;
+  top: 1.02rem;
+  bottom: 0.94rem;
   left: 50%;
-  width: 1px;
-  background: rgba(var(--color-border), 0.78);
+  width: 2.75rem;
+  transform: translateX(-50%);
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(36, 28, 18, 0.04) 24%,
+      rgba(36, 28, 18, 0.18) 48%,
+      rgba(255, 255, 255, 0.2) 51%,
+      rgba(36, 28, 18, 0.11) 56%,
+      transparent
+    ),
+    radial-gradient(
+      ellipse at center,
+      rgba(36, 28, 18, 0.13),
+      transparent 68%
+    );
   pointer-events: none;
 }
 
 .book-page {
+  position: relative;
+  z-index: 1;
   min-width: 0;
   min-height: 0;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
+  overflow: hidden;
   padding: 1.45rem 2.25rem 1.2rem;
-  background: rgb(var(--color-paper));
   border-block: 1px solid rgba(var(--color-border), 0.68);
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
 }
 
 .book-page:first-child {
   border-left: 1px solid rgba(var(--color-border), 0.68);
-  box-shadow: inset -1.25rem 0 1.75rem -1.65rem rgba(36, 28, 18, 0.36);
+  border-radius: 0.35rem 0 0 2.15rem / 0.35rem 0 0 0.72rem;
+  background:
+    radial-gradient(
+      ellipse at 103% 50%,
+      rgba(36, 28, 18, 0.16),
+      transparent 19%
+    ),
+    radial-gradient(
+      ellipse at 12% 108%,
+      rgba(153, 119, 75, 0.09),
+      transparent 34%
+    ),
+    linear-gradient(
+      90deg,
+      rgba(var(--color-border), 0.12),
+      transparent 13%
+    ),
+    rgb(var(--color-paper));
+  box-shadow:
+    inset -1.6rem 0 2rem -1.8rem rgba(36, 28, 18, 0.46),
+    inset 0 -0.6rem 1rem -1rem rgba(90, 65, 37, 0.35);
+  transform: rotateY(1.45deg) rotateZ(-0.12deg);
+  transform-origin: right center;
 }
 
 .book-page:last-child {
   border-right: 1px solid rgba(var(--color-border), 0.68);
-  background: rgb(var(--color-bg-alt));
-  box-shadow: inset 1.25rem 0 1.75rem -1.65rem rgba(36, 28, 18, 0.36);
+  border-radius: 0 0.35rem 2.15rem 0 / 0 0.35rem 0.72rem 0;
+  background:
+    radial-gradient(
+      ellipse at -3% 50%,
+      rgba(36, 28, 18, 0.16),
+      transparent 19%
+    ),
+    radial-gradient(
+      ellipse at 88% 108%,
+      rgba(153, 119, 75, 0.09),
+      transparent 34%
+    ),
+    linear-gradient(
+      270deg,
+      rgba(var(--color-border), 0.12),
+      transparent 13%
+    ),
+    rgb(var(--color-bg-alt));
+  box-shadow:
+    inset 1.6rem 0 2rem -1.8rem rgba(36, 28, 18, 0.46),
+    inset 0 -0.6rem 1rem -1rem rgba(90, 65, 37, 0.35);
+  transform: rotateY(-1.45deg) rotateZ(0.12deg);
+  transform-origin: left center;
 }
 
 .book-page__title {
@@ -244,6 +343,14 @@
   color: rgb(var(--color-text-secondary));
   font-size: 0.84rem;
   line-height: 1.42;
+}
+
+.daily-quote__author {
+  margin-top: 0.18rem !important;
+  color: rgb(var(--color-text-muted));
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  line-height: 1.4;
 }
 
 .daily-quote__copyright {
@@ -366,8 +473,13 @@ html[data-theme="dark"] .theme-toggle__dark {
     grid-template-columns: 1fr;
     gap: 1.5rem;
     padding-block: 1.5rem;
+    perspective: none;
+    filter: none;
+    transform: none;
+    transform-style: flat;
   }
 
+  .home-book::before,
   .home-book::after {
     display: none;
   }
@@ -378,8 +490,10 @@ html[data-theme="dark"] .theme-toggle__dark {
     min-height: 22rem;
     padding: 1.5rem 1.25rem 1.25rem;
     border: 1px solid rgba(var(--color-border), 0.72);
+    border-radius: 0;
     background: rgb(var(--color-paper));
     box-shadow: 0 0.9rem 2rem rgba(36, 28, 18, 0.1);
+    transform: none;
   }
 
   .catalog-entry--mobile-hidden {
