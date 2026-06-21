@@ -12,6 +12,15 @@ async function loadHomepage() {
   return new JSDOM(html).window.document;
 }
 
+async function loadDailyQuote() {
+  return JSON.parse(
+    await readFile(
+      new URL("../src/data/daily-quote.json", import.meta.url),
+      "utf8",
+    ),
+  );
+}
+
 test("homepage renders the approved linear structure", async () => {
   const document = await loadHomepage();
   const bodyChildren = [...document.body.children];
@@ -37,6 +46,7 @@ test("homepage renders life first, technical second, and required navigation lin
 
 test("homepage quote contains the bilingual quote, author, and copyright", async () => {
   const document = await loadHomepage();
+  const quote = await loadDailyQuote();
   const footer = document.querySelector(".daily-quote");
   const currentYear = new Date().getFullYear();
 
@@ -48,6 +58,6 @@ test("homepage quote contains the bilingual quote, author, and copyright", async
   );
   assert.equal(
     footer.querySelector(".daily-quote__author").textContent.trim(),
-    "— Ram Dass",
+    `— ${quote.author}`,
   );
 });
