@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import {
+  buildHomepageResponsiveStyles,
   buildHomepageCssVariables,
   validateHomepageConfig,
 } from "../src/lib/homepage-config.mjs";
@@ -31,37 +32,68 @@ test("current homepage config is valid and produces CSS variables", () => {
   assert.equal(config.content.technical.homepageFolio, "ii");
   assert.equal(config.content.life.directoryFolio, "i");
   assert.equal(config.content.technical.directoryFolio, "i");
-  assert.equal(config.textStyles.navigationBrand.fontFamily, "sans");
-  assert.equal(config.textStyles.navigationTitle.desktopSize, "0.4rem");
+  assert.equal(config.layout.navigation.inlineGapFixed, "4rem");
+  assert.equal(config.layout.bookRegion.inlineGapProportional, "8vw");
+  assert.equal(config.layout.book.aspectRatio, "1.8 / 1");
+  assert.equal(config.catalogs.life.narrowMaximumEntries, 3);
+  assert.equal(config.catalogs.technical.narrowMaximumEntries, 3);
+  assert.equal(config.textStyles.navigation.brand.fontFamily, "sans");
+  assert.equal(config.textStyles.lifePage.catalogTitle.minimumSize, "0.52rem");
+  assert.equal(
+    config.textStyles.technicalPage.catalogTitle.minimumSize,
+    "0.52rem",
+  );
 
-  assert.match(css, /--home-desktop-book-width:68%/);
-  assert.match(css, /--home-desktop-book-ratio:1\.8 \/ 1/);
+  assert.match(css, /--home-layout-book-aspect-ratio:1\.8 \/ 1/);
+  assert.match(css, /--home-layout-book-aspect-ratio-number:1\.8/);
+  assert.match(css, /--home-layout-navigation-inline-gap-fixed:4rem/);
   assert.match(css, /--home-material-paper-color:#ffffff/);
   assert.match(
     css,
     /--home-text-navigation-brand-font-family:var\(--font-sans\)/,
   );
-  assert.match(css, /--home-text-navigation-title-desktop-size:0\.4rem/);
-  assert.match(css, /--home-text-copyright-dark-color:/);
+  assert.match(css, /--home-text-life-page-catalog-title-minimum-size:/);
+  assert.match(css, /--home-text-technical-page-catalog-title-minimum-size:/);
+  assert.match(css, /--home-text-footer-copyright-dark-color:/);
+
+  const responsiveCss = buildHomepageResponsiveStyles(config);
+  assert.match(
+    responsiveCss,
+    new RegExp(
+      `@container home-navigation \\(max-width: ${config.layout.navigation.titleHideThreshold.replace(".", "\\.")}\\)`,
+    ),
+  );
+  assert.match(
+    responsiveCss,
+    new RegExp(
+      `@container home-book \\(max-width: ${config.catalogs.life.narrowBookWidth.replace(".", "\\.")}\\)`,
+    ),
+  );
+  assert.match(
+    responsiveCss,
+    new RegExp(
+      `@container home-book \\(max-width: ${config.catalogs.technical.extremeBookWidth.replace(".", "\\.")}\\)`,
+    ),
+  );
 });
 
 test("homepage config reports a missing field with its full path", () => {
   const invalid = structuredClone(config);
-  delete invalid.desktop.book.width;
+  delete invalid.layout.book.aspectRatio;
 
   assert.throws(
     () => validateHomepageConfig(invalid),
-    /desktop\.book\.width is required/,
+    /layout\.book\.aspectRatio is required/,
   );
 });
 
 test("homepage config rejects invalid CSS units", () => {
   const invalid = structuredClone(config);
-  invalid.desktop.book.width = "68";
+  invalid.textStyles.lifePage.catalogTitle.fluidSize = "1.1";
 
   assert.throws(
     () => validateHomepageConfig(invalid),
-    /desktop\.book\.width must be a CSS length, received "68"/,
+    /textStyles\.lifePage\.catalogTitle\.fluidSize must be a CSS length, received "1.1"/,
   );
 });
 
@@ -87,34 +119,48 @@ test("homepage config rejects texture opacity outside zero to one", () => {
 
 test("homepage config rejects unsupported font family tokens", () => {
   const invalid = structuredClone(config);
-  invalid.textStyles.navigationBrand.fontFamily = "comic";
+  invalid.textStyles.navigation.brand.fontFamily = "comic";
 
   assert.throws(
     () => validateHomepageConfig(invalid),
-    /textStyles\.navigationBrand\.fontFamily must be one of serif, sans, monospace/,
+    /textStyles\.navigation\.brand\.fontFamily must be one of serif, sans, monospace/,
+  );
+});
+
+test("homepage config accepts container units and rejects invalid entry counts", () => {
+  const valid = structuredClone(config);
+  valid.textStyles.lifePage.catalogTitle.fluidSize = "0.55cqw";
+  valid.textStyles.footer.quoteEnglish.fluidSize = "0.7cqw";
+
+  assert.doesNotThrow(() => validateHomepageConfig(valid));
+
+  const invalid = structuredClone(config);
+  invalid.catalogs.life.narrowMaximumEntries = 0;
+  assert.throws(
+    () => validateHomepageConfig(invalid),
+    /catalogs\.life\.narrowMaximumEntries must be a positive integer/,
   );
 });
 
 test("homepage schema documents the parameters users edit most often", () => {
   assert.match(
-    schema.properties.desktop.properties.book.properties.width.description,
+    schema.properties.layout.properties.book.properties.aspectRatio.description,
     /书本/,
   );
   assert.match(
-    schema.properties.textStyles.properties.catalogTitle.description,
+    schema.properties.textStyles.properties.lifePage.description,
     /目录标题/,
   );
   assert.match(
-    schema.properties.materials.properties.bindingColor.description,
+    schema.properties.layout.properties.book.properties.bindingWidth.description,
     /装订布/,
   );
   assert.match(
-    schema.properties.mobile.properties.layout.properties.pageMinHeight
-      .description,
-    /移动端/,
+    schema.properties.catalogs.properties.technical.description,
+    /技术/,
   );
   assert.match(
-    schema.properties.textStyles.properties.navigationTitle.description,
+    schema.properties.textStyles.properties.navigation.description,
     /导航标题/,
   );
 });
