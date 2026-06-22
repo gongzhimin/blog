@@ -8,6 +8,7 @@ import DailyQuote from "../components/DailyQuote.astro";
 import quote from "../data/daily-quote.json";
 import homepageConfig from "../data/homepage-config.json";
 import {
+  buildHomepageResponsiveStyles,
   buildHomepageCssVariables,
   validateHomepageConfig,
 } from "../lib/homepage-config.mjs";
@@ -27,6 +28,8 @@ const technicalEntries = buildCatalogEntries(
 );
 const currentYear = new Date().getFullYear();
 const homepageStyle = buildHomepageCssVariables(homepageConfig);
+const homepageResponsiveStyles =
+  buildHomepageResponsiveStyles(homepageConfig);
 ---
 
 <!doctype html>
@@ -46,6 +49,7 @@ const homepageStyle = buildHomepageCssVariables(homepageConfig);
       title="RSS Feed"
       href="/rss.xml"
     />
+    <style is:inline set:html={homepageResponsiveStyles}></style>
   </head>
   <body class="home-body" style={homepageStyle}>
     <SiteNavigation

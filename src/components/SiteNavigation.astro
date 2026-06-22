@@ -26,10 +26,12 @@ const {
     <span class="home-navigation__title" title={title}>{title}</span>
 
     <div class="home-navigation__links">
-      <a href="/life">{lifeLabel}</a>
-      <a href="/blog">{technicalLabel}</a>
-      <a href="/about">{aboutLabel}</a>
-      <a href="/rss.xml">{rssLabel}</a>
+      <a class="home-navigation__link--life" href="/life">{lifeLabel}</a>
+      <a class="home-navigation__link--technical" href="/blog">
+        {technicalLabel}
+      </a>
+      <a class="home-navigation__link--about" href="/about">{aboutLabel}</a>
+      <a class="home-navigation__link--rss" href="/rss.xml">{rssLabel}</a>
       <ThemeToggle />
     </div>
   </nav>

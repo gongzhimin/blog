@@ -46,7 +46,13 @@ test("homepage renders the approved linear structure", async () => {
   assert.ok(document.querySelector(".daily-quote"));
   assert.match(
     document.body.getAttribute("style"),
-    /--home-desktop-book-width:68%/,
+    /--home-layout-book-aspect-ratio:1\.8 \/ 1/,
+  );
+  assert.match(
+    [...document.querySelectorAll("style")]
+      .map((style) => style.textContent)
+      .join("\n"),
+    /@container home-book/,
   );
 
   for (const selector of [

@@ -60,8 +60,29 @@ test("desktop renders the calibrated hardcover book in one viewport", async ({
 
   const frame = await page.locator(".home-book-frame").boundingBox();
   expect(frame).not.toBeNull();
-  expect(frame.width / dimensions.innerWidth).toBeCloseTo(0.612, 2);
   expect(frame.width / frame.height).toBeCloseTo(1.8, 1);
+
+  const sizing = await page.evaluate(() => {
+    const stage = document.querySelector(".home-page");
+    const frame = document.querySelector(".home-book-frame");
+    const stageStyle = getComputedStyle(stage);
+    const stageBox = stage.getBoundingClientRect();
+    const frameBox = frame.getBoundingClientRect();
+    const contentWidth =
+      stageBox.width -
+      Number.parseFloat(stageStyle.paddingLeft) -
+      Number.parseFloat(stageStyle.paddingRight);
+    const contentHeight =
+      stageBox.height -
+      Number.parseFloat(stageStyle.paddingTop) -
+      Number.parseFloat(stageStyle.paddingBottom);
+
+    return {
+      actualWidth: frameBox.width,
+      expectedWidth: Math.min(contentWidth, contentHeight * 1.8),
+    };
+  });
+  expect(Math.abs(sizing.actualWidth - sizing.expectedWidth)).toBeLessThan(2);
 
   const physicalStyles = await page.evaluate(() => {
     const read = (selector) => getComputedStyle(document.querySelector(selector));
@@ -111,7 +132,7 @@ test("desktop renders the calibrated hardcover book in one viewport", async ({
   });
 });
 
-test("mobile stacks two complete paper pages and keeps content contained", async ({
+test("mobile keeps the complete book double spread and uses compact catalogs", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
@@ -123,7 +144,9 @@ test("mobile stacks two complete paper pages and keeps content contained", async
 
   expect(life).not.toBeNull();
   expect(technical).not.toBeNull();
-  expect(technical.y).toBeGreaterThanOrEqual(life.y + life.height + 20);
+  expect(Math.abs(life.y - technical.y)).toBeLessThanOrEqual(1);
+  expect(Math.abs(life.x + life.width - technical.x)).toBeLessThanOrEqual(2);
+  expect(Math.abs(life.height - technical.height)).toBeLessThanOrEqual(1);
   await expect(page.locator(".home-navigation__title")).toBeHidden();
   await expect(page.locator(".home-navigation__links a:visible")).toHaveCount(4);
   await expect(page.locator(".theme-toggle:visible")).toHaveCount(1);
@@ -136,22 +159,13 @@ test("mobile stacks two complete paper pages and keeps content contained", async
     await expect(paper.locator(".book-page__archive")).toBeVisible();
     await expect(paper.locator(".book-page__folio")).toBeVisible();
 
-    const paperStyle = await paper.evaluate((element) => {
-      const style = getComputedStyle(element);
-      return {
-        borderTopWidth: Number.parseFloat(style.borderTopWidth),
-        borderRightWidth: Number.parseFloat(style.borderRightWidth),
-        borderBottomWidth: Number.parseFloat(style.borderBottomWidth),
-        borderLeftWidth: Number.parseFloat(style.borderLeftWidth),
-        minHeight: Number.parseFloat(style.minHeight),
-      };
-    });
-
-    expect(paperStyle.borderTopWidth).toBeGreaterThan(0);
-    expect(paperStyle.borderRightWidth).toBeGreaterThan(0);
-    expect(paperStyle.borderBottomWidth).toBeGreaterThan(0);
-    expect(paperStyle.borderLeftWidth).toBeGreaterThan(0);
-    expect(paperStyle.minHeight).toBeGreaterThanOrEqual(320);
+    await expect(paper.locator(".catalog-entry__leader:visible")).toHaveCount(0);
+    await expect(
+      paper.locator(".catalog-entry__date--desktop:visible"),
+    ).toHaveCount(0);
+    await expect(
+      paper.locator(".catalog-entry__date--compact:visible"),
+    ).toHaveCount(Math.min(3, totalEntries));
   }
 
   const mobileBookDepth = await page.locator(".home-book").evaluate((book) => {
@@ -168,17 +182,17 @@ test("mobile stacks two complete paper pages and keeps content contained", async
       frameAspectRatio: getComputedStyle(frame).aspectRatio,
       frameFilter: getComputedStyle(frame).filter,
       frameTransform: getComputedStyle(frame).transform,
+      frameBox: frame.getBoundingClientRect().toJSON(),
       pageStyles,
     };
   });
 
-  expect(mobileBookDepth.frameAspectRatio).toBe("auto");
-  expect(mobileBookDepth.frameFilter).toBe("none");
-  expect(mobileBookDepth.frameTransform).toBe("none");
-  expect(mobileBookDepth.pageStyles.map((style) => style.transform)).toEqual([
-    "none",
-    "none",
-  ]);
+  expect(mobileBookDepth.frameAspectRatio).toBe("1.8 / 1");
+  expect(mobileBookDepth.frameFilter).not.toBe("none");
+  expect(mobileBookDepth.frameBox.width / mobileBookDepth.frameBox.height).toBeCloseTo(
+    1.8,
+    1,
+  );
 
   for (const selector of [
     ".home-book-cover",
@@ -187,14 +201,14 @@ test("mobile stacks two complete paper pages and keeps content contained", async
     ".home-book-edge--right",
     ".home-book-gutter",
   ]) {
-    await expect(page.locator(selector)).toBeHidden();
+    await expect(page.locator(selector)).toBeVisible();
   }
 
   const mobileCatalogFont = await page
     .locator(".catalog-entry a")
     .first()
     .evaluate((element) => Number.parseFloat(getComputedStyle(element).fontSize));
-  expect(mobileCatalogFont).toBeGreaterThanOrEqual(12);
+  expect(mobileCatalogFont).toBeGreaterThanOrEqual(8.3);
 
   const mobileCopyrightPosition = await page
     .locator(".daily-quote__copyright")
@@ -224,7 +238,15 @@ test("navigation remains sticky and theme choice persists", async ({ page }) => 
 
   await page.locator(".theme-toggle:visible").click();
   const selectedTheme = await page.locator("html").getAttribute("data-theme");
-  expect(selectedTheme).not.toBeNull();
+  expect(selectedTheme).toBe("dark");
+  await expect
+    .poll(() =>
+      page
+        .locator('.book-page[data-section="life"] .catalog-entry a')
+        .first()
+        .evaluate((element) => getComputedStyle(element).color),
+    )
+    .toBe("rgb(40, 37, 34)");
   await page.reload();
   await expect(page.locator("html")).toHaveAttribute("data-theme", selectedTheme);
   await page.evaluate(() => window.scrollTo(0, 0));
@@ -239,6 +261,7 @@ test("navigation remains sticky and theme choice persists", async ({ page }) => 
 for (const viewport of [
   { width: 1366, height: 768 },
   { width: 1280, height: 720 },
+  { width: 1600, height: 600 },
   { width: 360, height: 800 },
 ]) {
   test(`homepage remains coherent at ${viewport.width}x${viewport.height}`, async ({
@@ -260,5 +283,14 @@ for (const viewport of [
     ]) {
       await expect(page.locator(selector)).toBeVisible();
     }
+
+    const pages = page.locator(".book-page");
+    const left = await pages.nth(0).boundingBox();
+    const right = await pages.nth(1).boundingBox();
+    const frame = await page.locator(".home-book-frame").boundingBox();
+
+    expect(Math.abs(left.y - right.y)).toBeLessThanOrEqual(1);
+    expect(Math.abs(left.x + left.width - right.x)).toBeLessThanOrEqual(2);
+    expect(frame.width / frame.height).toBeCloseTo(1.8, 1);
   });
 }

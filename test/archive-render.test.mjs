@@ -33,9 +33,23 @@ test("life and technical archives use independent roman folios", async () => {
     config.content.technical.directoryFolio,
   );
 
-  for (const document of [life, technical]) {
-    const style = document.body.getAttribute("style");
-    assert.match(style, /--home-text-folio-font-family:/);
-    assert.match(style, /--home-text-folio-desktop-size:/);
-  }
+  assert.equal(life.querySelector(".archive-page").dataset.section, "life");
+  assert.equal(
+    technical.querySelector(".archive-page").dataset.section,
+    "technical",
+  );
+
+  const lifeStyle = life.body.getAttribute("style");
+  assert.match(lifeStyle, /--home-text-life-directory-folio-font-family:/);
+  assert.match(lifeStyle, /--home-text-life-directory-folio-minimum-size:/);
+
+  const technicalStyle = technical.body.getAttribute("style");
+  assert.match(
+    technicalStyle,
+    /--home-text-technical-directory-folio-font-family:/,
+  );
+  assert.match(
+    technicalStyle,
+    /--home-text-technical-directory-folio-minimum-size:/,
+  );
 });

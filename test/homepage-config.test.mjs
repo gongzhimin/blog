@@ -165,7 +165,7 @@ test("homepage schema documents the parameters users edit most often", () => {
   );
 });
 
-test("homepage CSS consumes desktop and mobile configuration variables", async () => {
+test("homepage CSS consumes every independently configured text role", async () => {
   const css = await readFile(
     new URL("../src/styles/home.css", import.meta.url),
     "utf8",
@@ -173,17 +173,48 @@ test("homepage CSS consumes desktop and mobile configuration variables", async (
 
   assert.match(
     css,
-    /height: var\(--home-desktop-navigation-height\)/,
-  );
-  assert.match(css, /width: var\(--home-desktop-book-width\)/);
-  assert.match(
-    css,
-    /font-size: var\(--home-text-catalog-title-desktop-size\)/,
+    /height:\s*clamp\(\s*var\(--home-layout-navigation-minimum-height\)/,
   );
   assert.match(
     css,
-    /font-size: var\(--home-text-catalog-title-mobile-size\)/,
+    /width:\s*min\(\s*100%,\s*calc\(100cqh \* var\(--home-layout-book-aspect-ratio-number\)\)/,
   );
+  assert.match(
+    css,
+    /font-size:\s*clamp\(\s*var\(--home-text-life-page-catalog-title-minimum-size\)/,
+  );
+  assert.match(
+    css,
+    /font-size:\s*clamp\(\s*var\(--home-text-technical-page-catalog-title-minimum-size\)/,
+  );
+  for (const role of [
+    "navigation-life-link",
+    "navigation-technical-link",
+    "navigation-about-link",
+    "navigation-rss-link",
+    "life-page-running-outer",
+    "life-page-running-inner",
+    "life-page-part-link",
+    "life-page-catalog-date",
+    "life-page-archive-link",
+    "life-page-folio",
+    "technical-page-running-outer",
+    "technical-page-running-inner",
+    "technical-page-part-link",
+    "technical-page-catalog-date",
+    "technical-page-archive-link",
+    "technical-page-folio",
+    "footer-quote-english",
+    "footer-quote-translation",
+    "footer-quote-author",
+    "footer-copyright",
+  ]) {
+    assert.match(
+      css,
+      new RegExp(`var\\(--home-text-${role}-minimum-size\\)`),
+      `${role} should consume its own minimum font size`,
+    );
+  }
   assert.match(css, /background-color: var\(--home-material-paper-color\)/);
 });
 
@@ -210,6 +241,25 @@ test("homepage components receive site copy from configuration", async () => {
     /title=\{homepageConfig\.content\.navigationTitle\}/,
   );
   assert.match(page, /siteName=\{homepageConfig\.content\.siteName\}/);
+  assert.match(page, /buildHomepageResponsiveStyles/);
+  assert.match(page, /set:html=\{homepageResponsiveStyles\}/);
   assert.doesNotMatch(navigation, />ZHIMIN</);
+  assert.match(navigation, /home-navigation__link--life/);
+  assert.match(navigation, /home-navigation__link--technical/);
+  assert.match(navigation, /home-navigation__link--about/);
+  assert.match(navigation, /home-navigation__link--rss/);
   assert.doesNotMatch(quote, />© \{year\} ZHIMIN</);
+});
+
+test("directory folios consume separate life and technical styles", async () => {
+  const [css, lifePage, technicalPage] = await Promise.all([
+    readFile(new URL("../src/styles/global.css", import.meta.url), "utf8"),
+    readFile(new URL("../src/pages/life/index.astro", import.meta.url), "utf8"),
+    readFile(new URL("../src/pages/blog/index.astro", import.meta.url), "utf8"),
+  ]);
+
+  assert.match(css, /--home-text-life-directory-folio-minimum-size/);
+  assert.match(css, /--home-text-technical-directory-folio-minimum-size/);
+  assert.match(lifePage, /data-section="life"/);
+  assert.match(technicalPage, /data-section="technical"/);
 });
