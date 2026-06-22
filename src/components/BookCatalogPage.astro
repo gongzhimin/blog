@@ -4,7 +4,7 @@ type Entry = {
   href: string;
   date: string;
   compactDate: string;
-  mobileHidden: boolean;
+  narrowHidden: boolean;
 };
 
 type Props = {
@@ -63,7 +63,7 @@ const {
         <li
           class:list={[
             "catalog-entry",
-            { "catalog-entry--mobile-hidden": entry.mobileHidden },
+            { "catalog-entry--narrow-hidden": entry.narrowHidden },
           ]}
         >
           <a href={entry.href}>
@@ -72,7 +72,7 @@ const {
             <time class="catalog-entry__date catalog-entry__date--desktop">
               {entry.date}
             </time>
-            <time class="catalog-entry__date catalog-entry__date--mobile">
+            <time class="catalog-entry__date catalog-entry__date--compact">
               {entry.compactDate}
             </time>
           </a>

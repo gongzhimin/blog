@@ -15,10 +15,15 @@ import { buildCatalogEntries } from "../lib/homepage.mjs";
 
 validateHomepageConfig(homepageConfig);
 
-const lifeEntries = buildCatalogEntries(await getCollection("life"), "/life");
+const lifeEntries = buildCatalogEntries(
+  await getCollection("life"),
+  "/life",
+  homepageConfig.catalogs.life,
+);
 const technicalEntries = buildCatalogEntries(
   await getCollection("blog"),
   "/blog",
+  homepageConfig.catalogs.technical,
 );
 const currentYear = new Date().getFullYear();
 const homepageStyle = buildHomepageCssVariables(homepageConfig);
