@@ -1,360 +1,362 @@
 {
   "$schema": "./homepage-config.schema.json",
-  "content": {
-    "siteName": "ZHIMIN",
-    "navigationTitle": "写技术，也记录技术之外的生活。",
-    "copyrightLabel": "Zhimin 的博客书",
-    "navigation": {
-      "lifeLabel": "生活",
-      "technicalLabel": "技术",
-      "aboutLabel": "关于",
-      "rssLabel": "RSS"
+  "navigation": {
+    "content": {
+      "siteName": "ZHIMIN",
+      "title": "写技术，也记录技术之外的生活。"
     },
-    "life": {
-      "outerRunningLabel": "ESSAYS",
-      "innerRunningLabel": "CONTENTS",
-      "partLabel": "Part I · Life",
-      "archiveLabel": "View all essays",
-      "homepageFolio": "i",
-      "directoryFolio": "i"
-    },
-    "technical": {
-      "outerRunningLabel": "TECHNICAL NOTES",
-      "innerRunningLabel": "CONTENTS",
-      "partLabel": "Part II · Technology",
-      "archiveLabel": "View all technical notes",
-      "homepageFolio": "ii",
-      "directoryFolio": "i"
-    }
-  },
-  "layout": {
-    "navigation": {
+    "size": {
       "minimumHeight": "3.5rem",
       "fluidHeight": "6svh",
-      "maximumHeight": "4rem",
+      "maximumHeight": "4rem"
+    },
+    "spacing": {
       "inlineGapFixed": "4rem",
       "inlineGapProportional": "5vw",
       "sectionGap": "2rem",
-      "linkGap": "1.4rem",
-      "titleMaxWidth": "38rem",
-      "titleHideThreshold": "48rem",
-      "themeToggleSize": "2.25rem",
-      "themeIconSize": "1rem"
+      "linkGap": "1.4rem"
     },
-    "bookRegion": {
-      "minimumHeight": "14rem",
-      "inlineGapFixed": "8rem",
-      "inlineGapProportional": "8vw",
-      "blockGapFixed": "2rem",
-      "blockGapProportional": "3svh"
+    "brand": {
+      "fontFamily": "sans",
+      "minimumSize": "0.4rem",
+      "fluidSize": "12cqh",
+      "maximumSize": "0.72rem",
+      "lightColor": "#2a2a2a",
+      "darkColor": "#ebe7df"
     },
-    "book": {
-      "aspectRatio": "1.8 / 1",
-      "referenceMinimumWidth": "36rem",
-      "referenceMinimumHeight": "20rem",
-      "perspective": "112.5rem",
-      "rotateX": "0.2deg",
-      "shadowOffsetY": "0.85rem",
-      "shadowBlur": "0.72rem",
-      "coverInsetTop": "-3.4%",
-      "coverInsetInline": "-2.2%",
-      "coverInsetBottom": "-4%",
-      "coverRadius": "4px",
-      "bindingWidth": "5.2%",
-      "edgeWidth": "2%",
-      "gutterWidth": "1px"
+    "title": {
+      "maximumWidth": "38rem",
+      "hideThreshold": "48rem",
+      "fontFamily": "sans",
+      "minimumSize": "0.4rem",
+      "fluidSize": "12cqh",
+      "maximumSize": "0.72rem",
+      "lightColor": "#504b46",
+      "darkColor": "#beb8ae"
     },
-    "lifePage": {
-      "paddingTop": "6.5%",
-      "paddingInline": "7.5%",
-      "paddingBottom": "6%",
-      "partMarginTop": "9%",
-      "partMarginBottom": "7%",
-      "partPaddingTop": "3.6%",
-      "catalogGap": "0.7em",
-      "catalogColumnGap": "0.46em",
-      "archiveBottom": "10%",
-      "folioBottom": "3.25%"
+    "links": {
+      "life": {
+        "label": "生活",
+        "href": "/life",
+        "fontFamily": "sans",
+        "minimumSize": "0.4rem",
+        "fluidSize": "12cqh",
+        "maximumSize": "0.7rem",
+        "lightColor": "#2a2a2a",
+        "darkColor": "#ebe7df"
+      },
+      "technical": {
+        "label": "技术",
+        "href": "/blog",
+        "fontFamily": "sans",
+        "minimumSize": "0.4rem",
+        "fluidSize": "12cqh",
+        "maximumSize": "0.7rem",
+        "lightColor": "#2a2a2a",
+        "darkColor": "#ebe7df"
+      },
+      "about": {
+        "label": "关于",
+        "href": "/about",
+        "fontFamily": "sans",
+        "minimumSize": "0.4rem",
+        "fluidSize": "12cqh",
+        "maximumSize": "0.7rem",
+        "lightColor": "#2a2a2a",
+        "darkColor": "#ebe7df"
+      },
+      "rss": {
+        "label": "RSS",
+        "href": "/rss.xml",
+        "fontFamily": "sans",
+        "minimumSize": "0.4rem",
+        "fluidSize": "12cqh",
+        "maximumSize": "0.7rem",
+        "lightColor": "#2a2a2a",
+        "darkColor": "#ebe7df"
+      }
     },
-    "technicalPage": {
-      "paddingTop": "6.5%",
-      "paddingInline": "7.5%",
-      "paddingBottom": "6%",
-      "partMarginTop": "9%",
-      "partMarginBottom": "7%",
-      "partPaddingTop": "3.6%",
-      "catalogGap": "0.7em",
-      "catalogColumnGap": "0.46em",
-      "archiveBottom": "10%",
-      "folioBottom": "3.25%"
+    "themeToggle": {
+      "size": "2.25rem",
+      "iconSize": "1rem"
+    }
+  },
+  "book": {
+    "size": {
+      "viewportWidth": "72vw",
+      "minimumWidth": "36rem",
+      "aspectRatio": "1.8 / 1"
     },
-    "footer": {
-      "minimumHeight": "8rem",
-      "fluidHeight": "16svh",
-      "maximumHeight": "12rem",
+    "stage": {
       "inlineGapFixed": "4rem",
       "inlineGapProportional": "5vw",
-      "paddingTop": "1rem",
-      "paddingBottom": "1rem",
+      "paddingTop": "3rem",
+      "paddingBottom": "4rem"
+    },
+    "perspective": {
+      "distance": "112.5rem",
+      "rotateX": "0.2deg"
+    },
+    "shadow": {
+      "offsetY": "0.85rem",
+      "blur": "0.72rem",
+      "color": "rgba(42, 37, 31, 0.2)"
+    },
+    "cover": {
+      "insetTop": "-3.4%",
+      "insetInline": "-2.2%",
+      "insetBottom": "-4%",
+      "radius": "4px",
+      "color": "#f0f0f0"
+    },
+    "pageEdges": {
+      "width": "2%",
+      "color": "#efeeeb"
+    },
+    "innerSpine": {
+      "width": "5.2%",
+      "color": "#737373",
+      "centerColor": "#33342f",
+      "seamWidth": "1px",
+      "seamColor": "rgba(45, 42, 38, 0.72)",
+      "seamShadowBlur": "1rem",
+      "seamShadowColor": "rgba(30, 27, 24, 0.2)",
+      "capWidth": "7.8%",
+      "capHeight": "6%",
+      "capRadius": "50%"
+    },
+    "paper": {
+      "color": "#ffffff",
+      "textColor": "#282522",
+      "mutedColor": "#858079",
+      "accentColor": "#755a43",
+      "textureOpacity": 0.1
+    },
+    "pages": {
+      "shared": {
+        "rotationY": "2deg",
+        "innerShadowWidth": "8%",
+        "innerShadowColor": "rgba(30, 27, 23, 0.24)"
+      },
+      "life": {
+        "content": {
+          "outerRunningLabel": "ESSAYS",
+          "innerRunningLabel": "CONTENTS",
+          "partLabel": "Part I · Life",
+          "partHref": "/life",
+          "archiveLabel": "View all essays",
+          "archiveHref": "/life",
+          "homepageFolio": "i"
+        },
+        "layout": {
+          "paddingTop": "6.5%",
+          "paddingInline": "7.5%",
+          "paddingBottom": "6%",
+          "partMarginTop": "9%",
+          "partMarginBottom": "7%",
+          "partPaddingTop": "3.6%",
+          "catalogGap": "0.7em",
+          "catalogColumnGap": "0.46em",
+          "archiveBottom": "10%",
+          "folioBottom": "3.25%"
+        },
+        "catalog": {
+          "wideMaximumEntries": 6,
+          "narrowMaximumEntries": 3,
+          "narrowBookWidth": "42rem",
+          "extremeBookWidth": "28rem",
+          "titleMaximumLines": 2,
+          "wideDateFormat": "YYYY.MM.DD",
+          "compactDateFormat": "MM.DD",
+          "narrowRowGap": "0.18em"
+        },
+        "runningOuter": {
+          "fontFamily": "sans",
+          "fontSize": "0.35cqw",
+          "lightColor": "#32302d",
+          "darkColor": "#32302d"
+        },
+        "runningInner": {
+          "fontFamily": "sans",
+          "fontSize": "0.35cqw",
+          "lightColor": "#858079",
+          "darkColor": "#858079"
+        },
+        "partLink": {
+          "fontFamily": "sans",
+          "fontSize": "0.4cqw",
+          "lightColor": "#755a43",
+          "darkColor": "#755a43"
+        },
+        "catalogTitle": {
+          "fontFamily": "serif",
+          "fontSize": "0.55cqw",
+          "lightColor": "#282522",
+          "darkColor": "#282522"
+        },
+        "catalogDate": {
+          "fontFamily": "sans",
+          "fontSize": "0.42cqw",
+          "lightColor": "#858079",
+          "darkColor": "#858079"
+        },
+        "archiveLink": {
+          "fontFamily": "sans",
+          "fontSize": "0.4cqw",
+          "lightColor": "#716b64",
+          "darkColor": "#716b64"
+        },
+        "folio": {
+          "fontFamily": "serif",
+          "fontSize": "0.42cqw",
+          "lightColor": "#858079",
+          "darkColor": "#858079"
+        }
+      },
+      "technical": {
+        "content": {
+          "outerRunningLabel": "TECHNICAL NOTES",
+          "innerRunningLabel": "CONTENTS",
+          "partLabel": "Part II · Technology",
+          "partHref": "/blog",
+          "archiveLabel": "View all technical notes",
+          "archiveHref": "/blog",
+          "homepageFolio": "ii"
+        },
+        "layout": {
+          "paddingTop": "6.5%",
+          "paddingInline": "7.5%",
+          "paddingBottom": "6%",
+          "partMarginTop": "9%",
+          "partMarginBottom": "7%",
+          "partPaddingTop": "3.6%",
+          "catalogGap": "0.7em",
+          "catalogColumnGap": "0.46em",
+          "archiveBottom": "10%",
+          "folioBottom": "3.25%"
+        },
+        "catalog": {
+          "wideMaximumEntries": 6,
+          "narrowMaximumEntries": 3,
+          "narrowBookWidth": "42rem",
+          "extremeBookWidth": "28rem",
+          "titleMaximumLines": 2,
+          "wideDateFormat": "YYYY.MM.DD",
+          "compactDateFormat": "MM.DD",
+          "narrowRowGap": "0.18em"
+        },
+        "runningOuter": {
+          "fontFamily": "sans",
+          "fontSize": "0.35cqw",
+          "lightColor": "#32302d",
+          "darkColor": "#32302d"
+        },
+        "runningInner": {
+          "fontFamily": "sans",
+          "fontSize": "0.35cqw",
+          "lightColor": "#858079",
+          "darkColor": "#858079"
+        },
+        "partLink": {
+          "fontFamily": "sans",
+          "fontSize": "0.4cqw",
+          "lightColor": "#755a43",
+          "darkColor": "#755a43"
+        },
+        "catalogTitle": {
+          "fontFamily": "serif",
+          "fontSize": "0.55cqw",
+          "lightColor": "#282522",
+          "darkColor": "#282522"
+        },
+        "catalogDate": {
+          "fontFamily": "sans",
+          "fontSize": "0.42cqw",
+          "lightColor": "#858079",
+          "darkColor": "#858079"
+        },
+        "archiveLink": {
+          "fontFamily": "sans",
+          "fontSize": "0.4cqw",
+          "lightColor": "#716b64",
+          "darkColor": "#716b64"
+        },
+        "folio": {
+          "fontFamily": "serif",
+          "fontSize": "0.42cqw",
+          "lightColor": "#858079",
+          "darkColor": "#858079"
+        }
+      }
+    }
+  },
+  "footer": {
+    "content": {
+      "copyrightLabel": "Zhimin 的博客书"
+    },
+    "size": {
+      "minimumHeight": "8rem"
+    },
+    "spacing": {
+      "inlineGapFixed": "4rem",
+      "inlineGapProportional": "5vw",
+      "paddingTop": "1.5rem",
+      "paddingBottom": "2rem",
       "englishTranslationGap": "0.38em",
       "translationMetaGap": "0.38em",
       "authorCopyrightGap": "0.55rem"
+    },
+    "quoteEnglish": {
+      "fontFamily": "serif",
+      "minimumSize": "0.55rem",
+      "fluidSize": "0.7cqw",
+      "maximumSize": "1rem",
+      "lightColor": "#2a2a2a",
+      "darkColor": "#ebe7df"
+    },
+    "quoteTranslation": {
+      "fontFamily": "serif",
+      "minimumSize": "0.48rem",
+      "fluidSize": "0.58cqw",
+      "maximumSize": "0.86rem",
+      "lightColor": "#504b46",
+      "darkColor": "#beb8ae"
+    },
+    "quoteAuthor": {
+      "fontFamily": "sans",
+      "minimumSize": "0.42rem",
+      "fluidSize": "0.5cqw",
+      "maximumSize": "0.76rem",
+      "lightColor": "#786753",
+      "darkColor": "#978f84"
+    },
+    "copyright": {
+      "fontFamily": "sans",
+      "minimumSize": "0.42rem",
+      "fluidSize": "0.5cqw",
+      "maximumSize": "0.76rem",
+      "lightColor": "#786753",
+      "darkColor": "#978f84"
     }
   },
-  "catalogs": {
+  "directories": {
     "life": {
-      "wideMaximumEntries": 6,
-      "narrowMaximumEntries": 3,
-      "narrowBookWidth": "42rem",
-      "extremeBookWidth": "28rem",
-      "titleMaximumLines": 2,
-      "wideDateFormat": "YYYY.MM.DD",
-      "compactDateFormat": "MM.DD",
-      "narrowRowGap": "0.18em"
+      "folio": {
+        "content": "i",
+        "fontFamily": "serif",
+        "fontSize": "0.85rem",
+        "lightColor": "#858079",
+        "darkColor": "#978f84"
+      }
     },
     "technical": {
-      "wideMaximumEntries": 6,
-      "narrowMaximumEntries": 3,
-      "narrowBookWidth": "42rem",
-      "extremeBookWidth": "28rem",
-      "titleMaximumLines": 2,
-      "wideDateFormat": "YYYY.MM.DD",
-      "compactDateFormat": "MM.DD",
-      "narrowRowGap": "0.18em"
-    }
-  },
-  "textStyles": {
-    "navigation": {
-      "brand": {
-        "fontFamily": "sans",
-        "minimumSize": "0.4rem",
-        "fluidSize": "12cqh",
-        "maximumSize": "0.72rem",
-        "lightColor": "#2a2a2a",
-        "darkColor": "#ebe7df"
-      },
-      "title": {
-        "fontFamily": "sans",
-        "minimumSize": "0.4rem",
-        "fluidSize": "12cqh",
-        "maximumSize": "0.72rem",
-        "lightColor": "#504b46",
-        "darkColor": "#beb8ae"
-      },
-      "lifeLink": {
-        "fontFamily": "sans",
-        "minimumSize": "0.4rem",
-        "fluidSize": "12cqh",
-        "maximumSize": "0.7rem",
-        "lightColor": "#2a2a2a",
-        "darkColor": "#ebe7df"
-      },
-      "technicalLink": {
-        "fontFamily": "sans",
-        "minimumSize": "0.4rem",
-        "fluidSize": "12cqh",
-        "maximumSize": "0.7rem",
-        "lightColor": "#2a2a2a",
-        "darkColor": "#ebe7df"
-      },
-      "aboutLink": {
-        "fontFamily": "sans",
-        "minimumSize": "0.4rem",
-        "fluidSize": "12cqh",
-        "maximumSize": "0.7rem",
-        "lightColor": "#2a2a2a",
-        "darkColor": "#ebe7df"
-      },
-      "rssLink": {
-        "fontFamily": "sans",
-        "minimumSize": "0.4rem",
-        "fluidSize": "12cqh",
-        "maximumSize": "0.7rem",
-        "lightColor": "#2a2a2a",
-        "darkColor": "#ebe7df"
-      }
-    },
-    "lifePage": {
-      "runningOuter": {
-        "fontFamily": "sans",
-        "minimumSize": "0.28rem",
-        "fluidSize": "0.35cqw",
-        "maximumSize": "0.75rem",
-        "lightColor": "#32302d",
-        "darkColor": "#32302d"
-      },
-      "runningInner": {
-        "fontFamily": "sans",
-        "minimumSize": "0.28rem",
-        "fluidSize": "0.35cqw",
-        "maximumSize": "0.75rem",
-        "lightColor": "#858079",
-        "darkColor": "#858079"
-      },
-      "partLink": {
-        "fontFamily": "sans",
-        "minimumSize": "0.3rem",
-        "fluidSize": "0.4cqw",
-        "maximumSize": "0.8rem",
-        "lightColor": "#755a43",
-        "darkColor": "#755a43"
-      },
-      "catalogTitle": {
-        "fontFamily": "serif",
-        "minimumSize": "0.52rem",
-        "fluidSize": "0.55cqw",
-        "maximumSize": "1rem",
-        "lightColor": "#282522",
-        "darkColor": "#282522"
-      },
-      "catalogDate": {
-        "fontFamily": "sans",
-        "minimumSize": "0.4rem",
-        "fluidSize": "0.42cqw",
-        "maximumSize": "0.78rem",
-        "lightColor": "#858079",
-        "darkColor": "#858079"
-      },
-      "archiveLink": {
-        "fontFamily": "sans",
-        "minimumSize": "0.38rem",
-        "fluidSize": "0.4cqw",
-        "maximumSize": "0.78rem",
-        "lightColor": "#716b64",
-        "darkColor": "#716b64"
-      },
       "folio": {
+        "content": "i",
         "fontFamily": "serif",
-        "minimumSize": "0.4rem",
-        "fluidSize": "0.42cqw",
-        "maximumSize": "0.78rem",
-        "lightColor": "#858079",
-        "darkColor": "#858079"
-      }
-    },
-    "technicalPage": {
-      "runningOuter": {
-        "fontFamily": "sans",
-        "minimumSize": "0.28rem",
-        "fluidSize": "0.35cqw",
-        "maximumSize": "0.75rem",
-        "lightColor": "#32302d",
-        "darkColor": "#32302d"
-      },
-      "runningInner": {
-        "fontFamily": "sans",
-        "minimumSize": "0.28rem",
-        "fluidSize": "0.35cqw",
-        "maximumSize": "0.75rem",
-        "lightColor": "#858079",
-        "darkColor": "#858079"
-      },
-      "partLink": {
-        "fontFamily": "sans",
-        "minimumSize": "0.3rem",
-        "fluidSize": "0.4cqw",
-        "maximumSize": "0.8rem",
-        "lightColor": "#755a43",
-        "darkColor": "#755a43"
-      },
-      "catalogTitle": {
-        "fontFamily": "serif",
-        "minimumSize": "0.52rem",
-        "fluidSize": "0.55cqw",
-        "maximumSize": "1rem",
-        "lightColor": "#282522",
-        "darkColor": "#282522"
-      },
-      "catalogDate": {
-        "fontFamily": "sans",
-        "minimumSize": "0.4rem",
-        "fluidSize": "0.42cqw",
-        "maximumSize": "0.78rem",
-        "lightColor": "#858079",
-        "darkColor": "#858079"
-      },
-      "archiveLink": {
-        "fontFamily": "sans",
-        "minimumSize": "0.38rem",
-        "fluidSize": "0.4cqw",
-        "maximumSize": "0.78rem",
-        "lightColor": "#716b64",
-        "darkColor": "#716b64"
-      },
-      "folio": {
-        "fontFamily": "serif",
-        "minimumSize": "0.4rem",
-        "fluidSize": "0.42cqw",
-        "maximumSize": "0.78rem",
-        "lightColor": "#858079",
-        "darkColor": "#858079"
-      }
-    },
-    "footer": {
-      "quoteEnglish": {
-        "fontFamily": "serif",
-        "minimumSize": "0.55rem",
-        "fluidSize": "0.7cqw",
-        "maximumSize": "1rem",
-        "lightColor": "#2a2a2a",
-        "darkColor": "#ebe7df"
-      },
-      "quoteTranslation": {
-        "fontFamily": "serif",
-        "minimumSize": "0.48rem",
-        "fluidSize": "0.58cqw",
-        "maximumSize": "0.86rem",
-        "lightColor": "#504b46",
-        "darkColor": "#beb8ae"
-      },
-      "quoteAuthor": {
-        "fontFamily": "sans",
-        "minimumSize": "0.42rem",
-        "fluidSize": "0.5cqw",
-        "maximumSize": "0.76rem",
-        "lightColor": "#786753",
-        "darkColor": "#978f84"
-      },
-      "copyright": {
-        "fontFamily": "sans",
-        "minimumSize": "0.42rem",
-        "fluidSize": "0.5cqw",
-        "maximumSize": "0.76rem",
-        "lightColor": "#786753",
-        "darkColor": "#978f84"
-      }
-    },
-    "lifeDirectory": {
-      "folio": {
-        "fontFamily": "serif",
-        "minimumSize": "0.5rem",
-        "fluidSize": "1vw",
-        "maximumSize": "0.85rem",
-        "lightColor": "#858079",
-        "darkColor": "#978f84"
-      }
-    },
-    "technicalDirectory": {
-      "folio": {
-        "fontFamily": "serif",
-        "minimumSize": "0.5rem",
-        "fluidSize": "1vw",
-        "maximumSize": "0.85rem",
+        "fontSize": "0.85rem",
         "lightColor": "#858079",
         "darkColor": "#978f84"
       }
     }
-  },
-  "materials": {
-    "paperColor": "#ffffff",
-    "coverColor": "#f0f0f0",
-    "bindingColor": "#737373",
-    "pageEdgeColor": "#efeeeb",
-    "gutterColor": "rgba(62, 58, 53, 0.42)",
-    "pageTextColor": "#282522",
-    "pageMutedColor": "#858079",
-    "pageAccentColor": "#755a43",
-    "bookShadowColor": "rgba(42, 37, 31, 0.2)",
-    "paperTextureOpacity": 0.1
   }
 }

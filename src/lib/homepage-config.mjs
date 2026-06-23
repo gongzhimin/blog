@@ -14,180 +14,264 @@ const FONT_FAMILIES = {
   monospace: '"SFMono-Regular", Consolas, "Liberation Mono", monospace',
 };
 
-const textStyleDescriptors = [
-  ["navigation.brand", "navigation-brand"],
-  ["navigation.title", "navigation-title"],
-  ["navigation.lifeLink", "navigation-life-link"],
-  ["navigation.technicalLink", "navigation-technical-link"],
-  ["navigation.aboutLink", "navigation-about-link"],
-  ["navigation.rssLink", "navigation-rss-link"],
-  ["lifePage.runningOuter", "life-page-running-outer"],
-  ["lifePage.runningInner", "life-page-running-inner"],
-  ["lifePage.partLink", "life-page-part-link"],
-  ["lifePage.catalogTitle", "life-page-catalog-title"],
-  ["lifePage.catalogDate", "life-page-catalog-date"],
-  ["lifePage.archiveLink", "life-page-archive-link"],
-  ["lifePage.folio", "life-page-folio"],
-  ["technicalPage.runningOuter", "technical-page-running-outer"],
-  ["technicalPage.runningInner", "technical-page-running-inner"],
-  ["technicalPage.partLink", "technical-page-part-link"],
-  ["technicalPage.catalogTitle", "technical-page-catalog-title"],
-  ["technicalPage.catalogDate", "technical-page-catalog-date"],
-  ["technicalPage.archiveLink", "technical-page-archive-link"],
-  ["technicalPage.folio", "technical-page-folio"],
-  ["footer.quoteEnglish", "footer-quote-english"],
-  ["footer.quoteTranslation", "footer-quote-translation"],
-  ["footer.quoteAuthor", "footer-quote-author"],
-  ["footer.copyright", "footer-copyright"],
-  ["lifeDirectory.folio", "life-directory-folio"],
-  ["technicalDirectory.folio", "technical-directory-folio"],
-];
+function clampedTextFields(path, cssName) {
+  return [
+    [`${path}.fontFamily`, "font", `${cssName}-font-family`],
+    [`${path}.minimumSize`, "length", `${cssName}-minimum-size`],
+    [`${path}.fluidSize`, "length", `${cssName}-fluid-size`],
+    [`${path}.maximumSize`, "length", `${cssName}-maximum-size`],
+    [`${path}.lightColor`, "color", `${cssName}-light-color`],
+    [`${path}.darkColor`, "color", `${cssName}-dark-color`],
+  ];
+}
 
-const baseFields = [
-  ["content.siteName", "text"],
-  ["content.navigationTitle", "text"],
-  ["content.copyrightLabel", "text"],
-  ["content.navigation.lifeLabel", "text"],
-  ["content.navigation.technicalLabel", "text"],
-  ["content.navigation.aboutLabel", "text"],
-  ["content.navigation.rssLabel", "text"],
-  ["content.life.outerRunningLabel", "text"],
-  ["content.life.innerRunningLabel", "text"],
-  ["content.life.partLabel", "text"],
-  ["content.life.archiveLabel", "text"],
-  ["content.life.homepageFolio", "text"],
-  ["content.life.directoryFolio", "text"],
-  ["content.technical.outerRunningLabel", "text"],
-  ["content.technical.innerRunningLabel", "text"],
-  ["content.technical.partLabel", "text"],
-  ["content.technical.archiveLabel", "text"],
-  ["content.technical.homepageFolio", "text"],
-  ["content.technical.directoryFolio", "text"],
+function bookTextFields(path, cssName) {
+  return [
+    [`${path}.fontFamily`, "font", `${cssName}-font-family`],
+    [`${path}.fontSize`, "bookFontSize", `${cssName}-font-size`],
+    [`${path}.lightColor`, "color", `${cssName}-light-color`],
+    [`${path}.darkColor`, "color", `${cssName}-dark-color`],
+  ];
+}
 
-  ["layout.navigation.minimumHeight", "length", "layout-navigation-minimum-height"],
-  ["layout.navigation.fluidHeight", "length", "layout-navigation-fluid-height"],
-  ["layout.navigation.maximumHeight", "length", "layout-navigation-maximum-height"],
-  ["layout.navigation.inlineGapFixed", "length", "layout-navigation-inline-gap-fixed"],
+const fields = [
+  ["navigation.content.siteName", "text"],
+  ["navigation.content.title", "text"],
+  ["navigation.size.minimumHeight", "length", "navigation-size-minimum-height"],
+  ["navigation.size.fluidHeight", "length", "navigation-size-fluid-height"],
+  ["navigation.size.maximumHeight", "length", "navigation-size-maximum-height"],
   [
-    "layout.navigation.inlineGapProportional",
+    "navigation.spacing.inlineGapFixed",
     "length",
-    "layout-navigation-inline-gap-proportional",
+    "navigation-spacing-inline-gap-fixed",
   ],
-  ["layout.navigation.sectionGap", "length", "layout-navigation-section-gap"],
-  ["layout.navigation.linkGap", "length", "layout-navigation-link-gap"],
-  ["layout.navigation.titleMaxWidth", "length", "layout-navigation-title-max-width"],
-  ["layout.navigation.titleHideThreshold", "length"],
-  ["layout.navigation.themeToggleSize", "length", "layout-navigation-theme-toggle-size"],
-  ["layout.navigation.themeIconSize", "length", "layout-navigation-theme-icon-size"],
-
-  ["layout.bookRegion.minimumHeight", "length", "layout-book-region-minimum-height"],
-  ["layout.bookRegion.inlineGapFixed", "length", "layout-book-region-inline-gap-fixed"],
   [
-    "layout.bookRegion.inlineGapProportional",
+    "navigation.spacing.inlineGapProportional",
     "length",
-    "layout-book-region-inline-gap-proportional",
+    "navigation-spacing-inline-gap-proportional",
   ],
-  ["layout.bookRegion.blockGapFixed", "length", "layout-book-region-block-gap-fixed"],
+  ["navigation.spacing.sectionGap", "length", "navigation-spacing-section-gap"],
+  ["navigation.spacing.linkGap", "length", "navigation-spacing-link-gap"],
+  ...clampedTextFields("navigation.brand", "navigation-brand"),
+  ["navigation.title.maximumWidth", "length", "navigation-title-maximum-width"],
+  ["navigation.title.hideThreshold", "length"],
+  ...clampedTextFields("navigation.title", "navigation-title"),
+  ...["life", "technical", "about", "rss"].flatMap((link) => [
+    [`navigation.links.${link}.label`, "text"],
+    [`navigation.links.${link}.href`, "text"],
+    ...clampedTextFields(
+      `navigation.links.${link}`,
+      `navigation-links-${link}`,
+    ),
+  ]),
+  ["navigation.themeToggle.size", "length", "navigation-theme-toggle-size"],
   [
-    "layout.bookRegion.blockGapProportional",
+    "navigation.themeToggle.iconSize",
     "length",
-    "layout-book-region-block-gap-proportional",
+    "navigation-theme-toggle-icon-size",
   ],
 
-  ["layout.book.aspectRatio", "ratio", "layout-book-aspect-ratio"],
-  ["layout.book.referenceMinimumWidth", "length", "layout-book-reference-minimum-width"],
-  ["layout.book.referenceMinimumHeight", "length", "layout-book-reference-minimum-height"],
-  ["layout.book.perspective", "length", "layout-book-perspective"],
-  ["layout.book.rotateX", "angle", "layout-book-rotate-x"],
-  ["layout.book.shadowOffsetY", "length", "layout-book-shadow-offset-y"],
-  ["layout.book.shadowBlur", "length", "layout-book-shadow-blur"],
-  ["layout.book.coverInsetTop", "length", "layout-book-cover-inset-top"],
-  ["layout.book.coverInsetInline", "length", "layout-book-cover-inset-inline"],
-  ["layout.book.coverInsetBottom", "length", "layout-book-cover-inset-bottom"],
-  ["layout.book.coverRadius", "length", "layout-book-cover-radius"],
-  ["layout.book.bindingWidth", "length", "layout-book-binding-width"],
-  ["layout.book.edgeWidth", "length", "layout-book-edge-width"],
-  ["layout.book.gutterWidth", "length", "layout-book-gutter-width"],
+  ["book.size.viewportWidth", "length", "book-size-viewport-width"],
+  ["book.size.minimumWidth", "length", "book-size-minimum-width"],
+  ["book.size.aspectRatio", "ratio", "book-size-aspect-ratio"],
+  ["book.stage.inlineGapFixed", "length", "book-stage-inline-gap-fixed"],
+  [
+    "book.stage.inlineGapProportional",
+    "length",
+    "book-stage-inline-gap-proportional",
+  ],
+  ["book.stage.paddingTop", "length", "book-stage-padding-top"],
+  ["book.stage.paddingBottom", "length", "book-stage-padding-bottom"],
+  ["book.perspective.distance", "length", "book-perspective-distance"],
+  ["book.perspective.rotateX", "angle", "book-perspective-rotate-x"],
+  ["book.shadow.offsetY", "length", "book-shadow-offset-y"],
+  ["book.shadow.blur", "length", "book-shadow-blur"],
+  ["book.shadow.color", "color", "book-shadow-color"],
+  ["book.cover.insetTop", "length", "book-cover-inset-top"],
+  ["book.cover.insetInline", "length", "book-cover-inset-inline"],
+  ["book.cover.insetBottom", "length", "book-cover-inset-bottom"],
+  ["book.cover.radius", "length", "book-cover-radius"],
+  ["book.cover.color", "color", "book-cover-color"],
+  ["book.pageEdges.width", "length", "book-page-edges-width"],
+  ["book.pageEdges.color", "color", "book-page-edges-color"],
+  ["book.innerSpine.width", "length", "book-inner-spine-width"],
+  ["book.innerSpine.color", "color", "book-inner-spine-color"],
+  [
+    "book.innerSpine.centerColor",
+    "color",
+    "book-inner-spine-center-color",
+  ],
+  ["book.innerSpine.seamWidth", "length", "book-inner-spine-seam-width"],
+  ["book.innerSpine.seamColor", "color", "book-inner-spine-seam-color"],
+  [
+    "book.innerSpine.seamShadowBlur",
+    "length",
+    "book-inner-spine-seam-shadow-blur",
+  ],
+  [
+    "book.innerSpine.seamShadowColor",
+    "color",
+    "book-inner-spine-seam-shadow-color",
+  ],
+  ["book.innerSpine.capWidth", "length", "book-inner-spine-cap-width"],
+  ["book.innerSpine.capHeight", "length", "book-inner-spine-cap-height"],
+  ["book.innerSpine.capRadius", "length", "book-inner-spine-cap-radius"],
+  ["book.paper.color", "color", "book-paper-color"],
+  ["book.paper.textColor", "color", "book-paper-text-color"],
+  ["book.paper.mutedColor", "color", "book-paper-muted-color"],
+  ["book.paper.accentColor", "color", "book-paper-accent-color"],
+  ["book.paper.textureOpacity", "opacity", "book-paper-texture-opacity"],
+  ["book.pages.shared.rotationY", "angle", "book-pages-shared-rotation-y"],
+  [
+    "book.pages.shared.innerShadowWidth",
+    "length",
+    "book-pages-shared-inner-shadow-width",
+  ],
+  [
+    "book.pages.shared.innerShadowColor",
+    "color",
+    "book-pages-shared-inner-shadow-color",
+  ],
 
-  ...["lifePage", "technicalPage"].flatMap((page) => {
-    const cssPage = page === "lifePage" ? "life-page" : "technical-page";
+  ...["life", "technical"].flatMap((page) => {
+    const root = `book.pages.${page}`;
+    const cssRoot = `book-pages-${page}`;
     return [
-      [`layout.${page}.paddingTop`, "length", `layout-${cssPage}-padding-top`],
-      [`layout.${page}.paddingInline`, "length", `layout-${cssPage}-padding-inline`],
-      [`layout.${page}.paddingBottom`, "length", `layout-${cssPage}-padding-bottom`],
-      [`layout.${page}.partMarginTop`, "length", `layout-${cssPage}-part-margin-top`],
+      [`${root}.content.outerRunningLabel`, "text"],
+      [`${root}.content.innerRunningLabel`, "text"],
+      [`${root}.content.partLabel`, "text"],
+      [`${root}.content.partHref`, "text"],
+      [`${root}.content.archiveLabel`, "text"],
+      [`${root}.content.archiveHref`, "text"],
+      [`${root}.content.homepageFolio`, "text"],
+      [`${root}.layout.paddingTop`, "length", `${cssRoot}-layout-padding-top`],
       [
-        `layout.${page}.partMarginBottom`,
+        `${root}.layout.paddingInline`,
         "length",
-        `layout-${cssPage}-part-margin-bottom`,
+        `${cssRoot}-layout-padding-inline`,
       ],
-      [`layout.${page}.partPaddingTop`, "length", `layout-${cssPage}-part-padding-top`],
-      [`layout.${page}.catalogGap`, "length", `layout-${cssPage}-catalog-gap`],
       [
-        `layout.${page}.catalogColumnGap`,
+        `${root}.layout.paddingBottom`,
         "length",
-        `layout-${cssPage}-catalog-column-gap`,
+        `${cssRoot}-layout-padding-bottom`,
       ],
-      [`layout.${page}.archiveBottom`, "length", `layout-${cssPage}-archive-bottom`],
-      [`layout.${page}.folioBottom`, "length", `layout-${cssPage}-folio-bottom`],
+      [
+        `${root}.layout.partMarginTop`,
+        "length",
+        `${cssRoot}-layout-part-margin-top`,
+      ],
+      [
+        `${root}.layout.partMarginBottom`,
+        "length",
+        `${cssRoot}-layout-part-margin-bottom`,
+      ],
+      [
+        `${root}.layout.partPaddingTop`,
+        "length",
+        `${cssRoot}-layout-part-padding-top`,
+      ],
+      [`${root}.layout.catalogGap`, "length", `${cssRoot}-layout-catalog-gap`],
+      [
+        `${root}.layout.catalogColumnGap`,
+        "length",
+        `${cssRoot}-layout-catalog-column-gap`,
+      ],
+      [
+        `${root}.layout.archiveBottom`,
+        "length",
+        `${cssRoot}-layout-archive-bottom`,
+      ],
+      [
+        `${root}.layout.folioBottom`,
+        "length",
+        `${cssRoot}-layout-folio-bottom`,
+      ],
+      [`${root}.catalog.wideMaximumEntries`, "positiveInteger"],
+      [`${root}.catalog.narrowMaximumEntries`, "positiveInteger"],
+      [`${root}.catalog.narrowBookWidth`, "length"],
+      [`${root}.catalog.extremeBookWidth`, "length"],
+      [
+        `${root}.catalog.titleMaximumLines`,
+        "positiveInteger",
+        `${cssRoot}-catalog-title-maximum-lines`,
+      ],
+      [`${root}.catalog.wideDateFormat`, "dateFormat"],
+      [`${root}.catalog.compactDateFormat`, "dateFormat"],
+      [
+        `${root}.catalog.narrowRowGap`,
+        "length",
+        `${cssRoot}-catalog-narrow-row-gap`,
+      ],
+      ...bookTextFields(`${root}.runningOuter`, `${cssRoot}-running-outer`),
+      ...bookTextFields(`${root}.runningInner`, `${cssRoot}-running-inner`),
+      ...bookTextFields(`${root}.partLink`, `${cssRoot}-part-link`),
+      ...bookTextFields(`${root}.catalogTitle`, `${cssRoot}-catalog-title`),
+      ...bookTextFields(`${root}.catalogDate`, `${cssRoot}-catalog-date`),
+      ...bookTextFields(`${root}.archiveLink`, `${cssRoot}-archive-link`),
+      ...bookTextFields(`${root}.folio`, `${cssRoot}-folio`),
     ];
   }),
 
-  ["layout.footer.minimumHeight", "length", "layout-footer-minimum-height"],
-  ["layout.footer.fluidHeight", "length", "layout-footer-fluid-height"],
-  ["layout.footer.maximumHeight", "length", "layout-footer-maximum-height"],
-  ["layout.footer.inlineGapFixed", "length", "layout-footer-inline-gap-fixed"],
+  ["footer.content.copyrightLabel", "text"],
+  ["footer.size.minimumHeight", "length", "footer-size-minimum-height"],
   [
-    "layout.footer.inlineGapProportional",
+    "footer.spacing.inlineGapFixed",
     "length",
-    "layout-footer-inline-gap-proportional",
+    "footer-spacing-inline-gap-fixed",
   ],
-  ["layout.footer.paddingTop", "length", "layout-footer-padding-top"],
-  ["layout.footer.paddingBottom", "length", "layout-footer-padding-bottom"],
   [
-    "layout.footer.englishTranslationGap",
+    "footer.spacing.inlineGapProportional",
     "length",
-    "layout-footer-english-translation-gap",
+    "footer-spacing-inline-gap-proportional",
   ],
-  ["layout.footer.translationMetaGap", "length", "layout-footer-translation-meta-gap"],
-  ["layout.footer.authorCopyrightGap", "length", "layout-footer-author-copyright-gap"],
+  ["footer.spacing.paddingTop", "length", "footer-spacing-padding-top"],
+  ["footer.spacing.paddingBottom", "length", "footer-spacing-padding-bottom"],
+  [
+    "footer.spacing.englishTranslationGap",
+    "length",
+    "footer-spacing-english-translation-gap",
+  ],
+  [
+    "footer.spacing.translationMetaGap",
+    "length",
+    "footer-spacing-translation-meta-gap",
+  ],
+  [
+    "footer.spacing.authorCopyrightGap",
+    "length",
+    "footer-spacing-author-copyright-gap",
+  ],
+  ...clampedTextFields("footer.quoteEnglish", "footer-quote-english"),
+  ...clampedTextFields("footer.quoteTranslation", "footer-quote-translation"),
+  ...clampedTextFields("footer.quoteAuthor", "footer-quote-author"),
+  ...clampedTextFields("footer.copyright", "footer-copyright"),
 
-  ...["life", "technical"].flatMap((catalog) => [
-    [`catalogs.${catalog}.wideMaximumEntries`, "positiveInteger"],
-    [`catalogs.${catalog}.narrowMaximumEntries`, "positiveInteger"],
-    [`catalogs.${catalog}.narrowBookWidth`, "length"],
-    [`catalogs.${catalog}.extremeBookWidth`, "length"],
-    [`catalogs.${catalog}.titleMaximumLines`, "positiveInteger"],
-    [`catalogs.${catalog}.wideDateFormat`, "dateFormat"],
-    [`catalogs.${catalog}.compactDateFormat`, "dateFormat"],
-    [`catalogs.${catalog}.narrowRowGap`, "length", `catalog-${catalog}-narrow-row-gap`],
+  ...["life", "technical"].flatMap((directory) => [
+    [`directories.${directory}.folio.content`, "text"],
+    [
+      `directories.${directory}.folio.fontFamily`,
+      "font",
+      `directories-${directory}-folio-font-family`,
+    ],
+    [
+      `directories.${directory}.folio.fontSize`,
+      "length",
+      `directories-${directory}-folio-font-size`,
+    ],
+    [
+      `directories.${directory}.folio.lightColor`,
+      "color",
+      `directories-${directory}-folio-light-color`,
+    ],
+    [
+      `directories.${directory}.folio.darkColor`,
+      "color",
+      `directories-${directory}-folio-dark-color`,
+    ],
   ]),
-
-  ["materials.paperColor", "color", "material-paper-color"],
-  ["materials.coverColor", "color", "material-cover-color"],
-  ["materials.bindingColor", "color", "material-binding-color"],
-  ["materials.pageEdgeColor", "color", "material-page-edge-color"],
-  ["materials.gutterColor", "color", "material-gutter-color"],
-  ["materials.pageTextColor", "color", "material-page-text-color"],
-  ["materials.pageMutedColor", "color", "material-page-muted-color"],
-  ["materials.pageAccentColor", "color", "material-page-accent-color"],
-  ["materials.bookShadowColor", "color", "material-book-shadow-color"],
-  ["materials.paperTextureOpacity", "opacity", "material-paper-texture-opacity"],
 ];
 
-const textStyleFields = textStyleDescriptors.flatMap(([path, cssName]) => {
-  const basePath = `textStyles.${path}`;
-  return [
-    [`${basePath}.fontFamily`, "font", `text-${cssName}-font-family`],
-    [`${basePath}.minimumSize`, "length", `text-${cssName}-minimum-size`],
-    [`${basePath}.fluidSize`, "length", `text-${cssName}-fluid-size`],
-    [`${basePath}.maximumSize`, "length", `text-${cssName}-maximum-size`],
-    [`${basePath}.lightColor`, "color", `text-${cssName}-light-color`],
-    [`${basePath}.darkColor`, "color", `text-${cssName}-dark-color`],
-  ];
-});
-
-const fields = [...baseFields, ...textStyleFields];
+export const FIELDS = fields;
 
 function readPath(object, path) {
   return path.split(".").reduce((value, key) => value?.[key], object);
@@ -198,57 +282,50 @@ function fail(path, message) {
 }
 
 function validateField(path, type, value) {
-  if (value === undefined || value === null) {
-    fail(path, "is required");
-  }
+  if (value === undefined || value === null) fail(path, "is required");
 
   if (type === "text" && (typeof value !== "string" || !value.trim())) {
     fail(path, "must be a non-empty string");
   }
-
   if (
-    type === "length" &&
+    (type === "length" || type === "bookFontSize") &&
     (typeof value !== "string" || !CSS_LENGTH_PATTERN.test(value))
   ) {
     fail(path, `must be a CSS length, received ${JSON.stringify(value)}`);
   }
-
+  if (type === "bookFontSize" && !value.endsWith("cqw")) {
+    fail(path, "must use cqw");
+  }
   if (
     type === "angle" &&
     (typeof value !== "string" || !CSS_ANGLE_PATTERN.test(value))
   ) {
     fail(path, `must be a CSS angle, received ${JSON.stringify(value)}`);
   }
-
   if (
     type === "ratio" &&
     (typeof value !== "string" || !CSS_RATIO_PATTERN.test(value))
   ) {
     fail(path, `must be a CSS aspect ratio, received ${JSON.stringify(value)}`);
   }
-
   if (
     type === "color" &&
     (typeof value !== "string" || !CSS_COLOR_PATTERN.test(value))
   ) {
-    fail(path, `must be a CSS color, received ${JSON.stringify(value)}`);
+    fail(path, "must be a CSS color");
   }
-
   if (
     type === "opacity" &&
     (typeof value !== "number" || value < 0 || value > 1)
   ) {
     fail(path, "must be between 0 and 1");
   }
-
   if (type === "font" && !Object.hasOwn(FONT_FAMILIES, value)) {
     fail(path, "must be one of serif, sans, monospace");
   }
-
   if (type === "positiveInteger" && (!Number.isInteger(value) || value < 1)) {
     fail(path, "must be a positive integer");
   }
-
   if (
     type === "dateFormat" &&
     (typeof value !== "string" || !DATE_FORMAT_PATTERN.test(value))
@@ -260,11 +337,9 @@ function validateField(path, type, value) {
 function parseAspectRatio(value) {
   const match = CSS_RATIO_PATTERN.exec(value);
   if (!match) return null;
-
   const width = Number(match.groups.width);
   const height = Number(match.groups.height);
   if (width <= 0 || height <= 0) return null;
-
   return width / height;
 }
 
@@ -273,22 +348,19 @@ export function validateHomepageConfig(config) {
     validateField(path, type, readPath(config, path));
   }
 
-  if (!parseAspectRatio(config.layout.book.aspectRatio)) {
-    fail("layout.book.aspectRatio", "must contain positive values");
+  if (!parseAspectRatio(config.book.size.aspectRatio)) {
+    fail("book.size.aspectRatio", "must contain positive values");
   }
 
-  for (const catalog of ["life", "technical"]) {
-    if (
-      config.catalogs[catalog].narrowMaximumEntries >
-      config.catalogs[catalog].wideMaximumEntries
-    ) {
+  for (const page of ["life", "technical"]) {
+    const catalog = config.book.pages[page].catalog;
+    if (catalog.narrowMaximumEntries > catalog.wideMaximumEntries) {
       fail(
-        `catalogs.${catalog}.narrowMaximumEntries`,
+        `book.pages.${page}.catalog.narrowMaximumEntries`,
         "must not exceed wideMaximumEntries",
       );
     }
   }
-
   return config;
 }
 
@@ -299,22 +371,16 @@ export function buildHomepageCssVariables(config) {
     .filter(([, , cssName]) => cssName)
     .map(([path, type, cssName]) => {
       const value = readPath(config, path);
-      const cssValue = type === "font" ? FONT_FAMILIES[value] : value;
-      return `--home-${cssName}:${cssValue}`;
+      return `--home-${cssName}:${
+        type === "font" ? FONT_FAMILIES[value] : value
+      }`;
     });
 
   variables.push(
-    `--home-layout-book-aspect-ratio-number:${parseAspectRatio(
-      config.layout.book.aspectRatio,
+    `--home-book-size-aspect-ratio-number:${parseAspectRatio(
+      config.book.size.aspectRatio,
     )}`,
   );
-
-  for (const catalog of ["life", "technical"]) {
-    variables.push(
-      `--home-catalog-${catalog}-title-maximum-lines:${config.catalogs[catalog].titleMaximumLines}`,
-    );
-  }
-
   return variables.join(";");
 }
 
@@ -330,7 +396,7 @@ function buildCatalogResponsiveStyles(section, catalog) {
     grid-template-areas:
       "title title"
       ". date";
-    row-gap: var(--home-catalog-${section}-narrow-row-gap);
+    row-gap: var(--home-book-pages-${section}-catalog-narrow-row-gap);
   }
 
   [data-section="${section}"] .catalog-entry__title {
@@ -368,7 +434,7 @@ export function buildHomepageResponsiveStyles(config) {
   validateHomepageConfig(config);
 
   return `
-@container home-navigation (max-width: ${config.layout.navigation.titleHideThreshold}) {
+@container home-navigation (max-width: ${config.navigation.title.hideThreshold}) {
   .home-navigation__title {
     display: none;
   }
@@ -377,7 +443,10 @@ export function buildHomepageResponsiveStyles(config) {
     grid-template-columns: minmax(0, 1fr) auto;
   }
 }
-${buildCatalogResponsiveStyles("life", config.catalogs.life)}
-${buildCatalogResponsiveStyles("technical", config.catalogs.technical)}
+${buildCatalogResponsiveStyles("life", config.book.pages.life.catalog)}
+${buildCatalogResponsiveStyles(
+  "technical",
+  config.book.pages.technical.catalog,
+)}
 `.trim();
 }

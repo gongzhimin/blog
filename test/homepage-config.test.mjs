@@ -2,170 +2,149 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import {
+  FIELDS,
   buildHomepageResponsiveStyles,
   buildHomepageCssVariables,
   validateHomepageConfig,
 } from "../src/lib/homepage-config.mjs";
 
 async function readJson(path) {
-  return JSON.parse(
-    await readFile(new URL(path, import.meta.url), "utf8"),
-  );
+  return JSON.parse(await readFile(new URL(path, import.meta.url), "utf8"));
 }
 
 const config = await readJson("../src/data/homepage-config.json");
 const schema = await readJson("../src/data/homepage-config.schema.json");
 
-test("current homepage config is valid and produces CSS variables", () => {
+test("homepage config is grouped by component and produces component variables", () => {
+  assert.deepEqual(
+    Object.keys(config).filter((key) => key !== "$schema").sort(),
+    ["book", "directories", "footer", "navigation"],
+  );
+  assert.equal("content" in config, false);
+  assert.equal("layout" in config, false);
+  assert.equal("catalogs" in config, false);
+  assert.equal("textStyles" in config, false);
+  assert.equal("materials" in config, false);
+
   assert.doesNotThrow(() => validateHomepageConfig(config));
+  assert.equal(config.navigation.content.siteName, "ZHIMIN");
+  assert.equal(config.footer.content.copyrightLabel, "Zhimin 的博客书");
+  assert.equal(config.book.size.viewportWidth, "72vw");
+  assert.equal(config.book.size.minimumWidth, "36rem");
+  assert.equal(config.book.size.aspectRatio, "1.8 / 1");
+  assert.equal(config.book.pageEdges.width, "2%");
+  assert.equal(config.book.innerSpine.seamWidth, "1px");
+  assert.equal(config.book.pages.life.catalog.narrowMaximumEntries, 3);
+  assert.equal(config.book.pages.technical.catalog.narrowMaximumEntries, 3);
+  assert.equal(config.book.pages.life.catalogTitle.fontSize, "0.55cqw");
+  assert.equal(config.book.pages.technical.catalogTitle.fontSize, "0.55cqw");
+  assert.equal("minimumSize" in config.book.pages.life.catalogTitle, false);
 
   const css = buildHomepageCssVariables(config);
-
-  assert.equal(
-    config.content.navigationTitle,
-    "写技术，也记录技术之外的生活。",
-  );
-  assert.equal(config.content.copyrightLabel, "Zhimin 的博客书");
-  assert.equal(config.content.life.outerRunningLabel, "ESSAYS");
-  assert.equal(config.content.technical.outerRunningLabel, "TECHNICAL NOTES");
-  assert.equal(config.content.life.homepageFolio, "i");
-  assert.equal(config.content.technical.homepageFolio, "ii");
-  assert.equal(config.content.life.directoryFolio, "i");
-  assert.equal(config.content.technical.directoryFolio, "i");
-  assert.equal(config.layout.navigation.inlineGapFixed, "4rem");
-  assert.equal(config.layout.bookRegion.inlineGapProportional, "8vw");
-  assert.equal(config.layout.book.aspectRatio, "1.8 / 1");
-  assert.equal(config.catalogs.life.narrowMaximumEntries, 3);
-  assert.equal(config.catalogs.technical.narrowMaximumEntries, 3);
-  assert.equal(config.textStyles.navigation.brand.fontFamily, "sans");
-  assert.equal(config.textStyles.lifePage.catalogTitle.minimumSize, "0.52rem");
-  assert.equal(
-    config.textStyles.technicalPage.catalogTitle.minimumSize,
-    "0.52rem",
-  );
-
-  assert.match(css, /--home-layout-book-aspect-ratio:1\.8 \/ 1/);
-  assert.match(css, /--home-layout-book-aspect-ratio-number:1\.8/);
-  assert.match(css, /--home-layout-navigation-inline-gap-fixed:4rem/);
-  assert.match(css, /--home-material-paper-color:#ffffff/);
+  assert.match(css, /--home-book-size-viewport-width:72vw/);
+  assert.match(css, /--home-book-size-minimum-width:36rem/);
+  assert.match(css, /--home-book-size-aspect-ratio:1\.8 \/ 1/);
+  assert.match(css, /--home-book-size-aspect-ratio-number:1\.8/);
+  assert.match(css, /--home-book-inner-spine-seam-width:1px/);
+  assert.match(css, /--home-book-pages-life-catalog-title-font-size:0\.55cqw/);
   assert.match(
     css,
-    /--home-text-navigation-brand-font-family:var\(--font-sans\)/,
+    /--home-book-pages-technical-catalog-title-font-size:0\.55cqw/,
   );
-  assert.match(css, /--home-text-life-page-catalog-title-minimum-size:/);
-  assert.match(css, /--home-text-technical-page-catalog-title-minimum-size:/);
-  assert.match(css, /--home-text-footer-copyright-dark-color:/);
+  assert.match(css, /--home-book-cover-color:#f0f0f0/);
 
   const responsiveCss = buildHomepageResponsiveStyles(config);
   assert.match(
     responsiveCss,
     new RegExp(
-      `@container home-navigation \\(max-width: ${config.layout.navigation.titleHideThreshold.replace(".", "\\.")}\\)`,
+      `@container home-navigation \\(max-width: ${config.navigation.title.hideThreshold.replace(".", "\\.")}\\)`,
     ),
   );
   assert.match(
     responsiveCss,
     new RegExp(
-      `@container home-book \\(max-width: ${config.catalogs.life.narrowBookWidth.replace(".", "\\.")}\\)`,
-    ),
-  );
-  assert.match(
-    responsiveCss,
-    new RegExp(
-      `@container home-book \\(max-width: ${config.catalogs.technical.extremeBookWidth.replace(".", "\\.")}\\)`,
+      `@container home-book \\(max-width: ${config.book.pages.life.catalog.narrowBookWidth.replace(".", "\\.")}\\)`,
     ),
   );
 });
 
-test("homepage config reports a missing field with its full path", () => {
+test("homepage config reports component paths for missing values", () => {
   const invalid = structuredClone(config);
-  delete invalid.layout.book.aspectRatio;
+  delete invalid.book.size.aspectRatio;
 
   assert.throws(
     () => validateHomepageConfig(invalid),
-    /layout\.book\.aspectRatio is required/,
+    /book\.size\.aspectRatio is required/,
   );
 });
 
-test("homepage config rejects invalid CSS units", () => {
+test("book text sizes must use cqw only", () => {
   const invalid = structuredClone(config);
-  invalid.textStyles.lifePage.catalogTitle.fluidSize = "1.1";
+  invalid.book.pages.life.catalogTitle.fontSize = "0.8rem";
 
   assert.throws(
     () => validateHomepageConfig(invalid),
-    /textStyles\.lifePage\.catalogTitle\.fluidSize must be a CSS length, received "1.1"/,
+    /book\.pages\.life\.catalogTitle\.fontSize must use cqw/,
   );
 });
 
-test("homepage config rejects invalid colors", () => {
-  const invalid = structuredClone(config);
-  invalid.materials.paperColor = "white-ish";
-
+test("homepage config rejects invalid colors and opacity", () => {
+  const invalidColor = structuredClone(config);
+  invalidColor.book.paper.color = "white-ish";
   assert.throws(
-    () => validateHomepageConfig(invalid),
-    /materials\.paperColor must be a CSS color/,
+    () => validateHomepageConfig(invalidColor),
+    /book\.paper\.color must be a CSS color/,
   );
-});
 
-test("homepage config rejects texture opacity outside zero to one", () => {
-  const invalid = structuredClone(config);
-  invalid.materials.paperTextureOpacity = 1.2;
-
+  const invalidOpacity = structuredClone(config);
+  invalidOpacity.book.paper.textureOpacity = 1.2;
   assert.throws(
-    () => validateHomepageConfig(invalid),
-    /materials\.paperTextureOpacity must be between 0 and 1/,
+    () => validateHomepageConfig(invalidOpacity),
+    /book\.paper\.textureOpacity must be between 0 and 1/,
   );
 });
 
-test("homepage config rejects unsupported font family tokens", () => {
-  const invalid = structuredClone(config);
-  invalid.textStyles.navigation.brand.fontFamily = "comic";
-
+test("homepage config rejects unsupported font families and entry counts", () => {
+  const invalidFont = structuredClone(config);
+  invalidFont.navigation.brand.fontFamily = "comic";
   assert.throws(
-    () => validateHomepageConfig(invalid),
-    /textStyles\.navigation\.brand\.fontFamily must be one of serif, sans, monospace/,
+    () => validateHomepageConfig(invalidFont),
+    /navigation\.brand\.fontFamily must be one of serif, sans, monospace/,
   );
-});
 
-test("homepage config accepts container units and rejects invalid entry counts", () => {
-  const valid = structuredClone(config);
-  valid.textStyles.lifePage.catalogTitle.fluidSize = "0.55cqw";
-  valid.textStyles.footer.quoteEnglish.fluidSize = "0.7cqw";
-
-  assert.doesNotThrow(() => validateHomepageConfig(valid));
-
-  const invalid = structuredClone(config);
-  invalid.catalogs.life.narrowMaximumEntries = 0;
+  const invalidCount = structuredClone(config);
+  invalidCount.book.pages.life.catalog.narrowMaximumEntries = 0;
   assert.throws(
-    () => validateHomepageConfig(invalid),
-    /catalogs\.life\.narrowMaximumEntries must be a positive integer/,
+    () => validateHomepageConfig(invalidCount),
+    /book\.pages\.life\.catalog\.narrowMaximumEntries must be a positive integer/,
   );
 });
 
-test("homepage schema documents the parameters users edit most often", () => {
+test("schema and tuning fields expose component groups", () => {
+  assert.deepEqual(schema.required, [
+    "navigation",
+    "book",
+    "footer",
+    "directories",
+  ]);
   assert.match(
-    schema.properties.layout.properties.book.properties.aspectRatio.description,
-    /书本/,
+    schema.properties.book.properties.innerSpine.description,
+    /书内脊/,
   );
   assert.match(
-    schema.properties.textStyles.properties.lifePage.description,
-    /目录标题/,
+    schema.properties.book.properties.pages.properties.life.description,
+    /生活/,
   );
-  assert.match(
-    schema.properties.layout.properties.book.properties.bindingWidth.description,
-    /装订布/,
+  assert.ok(FIELDS.some(([path]) => path === "book.size.viewportWidth"));
+  assert.ok(
+    FIELDS.some(
+      ([path]) => path === "book.pages.life.catalogTitle.fontSize",
+    ),
   );
-  assert.match(
-    schema.properties.catalogs.properties.technical.description,
-    /技术/,
-  );
-  assert.match(
-    schema.properties.textStyles.properties.navigation.description,
-    /导航标题/,
-  );
+  assert.equal(FIELDS.some(([path]) => path.startsWith("textStyles.")), false);
 });
 
-test("homepage CSS consumes every independently configured text role", async () => {
+test("homepage CSS consumes component variables and direct book font sizes", async () => {
   const css = await readFile(
     new URL("../src/styles/home.css", import.meta.url),
     "utf8",
@@ -173,93 +152,44 @@ test("homepage CSS consumes every independently configured text role", async () 
 
   assert.match(
     css,
-    /height:\s*clamp\(\s*var\(--home-layout-navigation-minimum-height\)/,
+    /width:\s*max\(\s*var\(--home-book-size-viewport-width\),\s*var\(--home-book-size-minimum-width\)/,
   );
   assert.match(
     css,
-    /width:\s*min\(\s*100%,\s*calc\(100cqh \* var\(--home-layout-book-aspect-ratio-number\)\)/,
+    /font-size:\s*var\(--home-book-pages-life-catalog-title-font-size\)/,
   );
   assert.match(
     css,
-    /font-size:\s*clamp\(\s*var\(--home-text-life-page-catalog-title-minimum-size\)/,
+    /font-size:\s*var\(--home-book-pages-technical-catalog-title-font-size\)/,
   );
-  assert.match(
+  assert.doesNotMatch(
     css,
-    /font-size:\s*clamp\(\s*var\(--home-text-technical-page-catalog-title-minimum-size\)/,
+    /clamp\(\s*var\(--home-book-pages-life-catalog-title/,
   );
-  for (const role of [
-    "navigation-life-link",
-    "navigation-technical-link",
-    "navigation-about-link",
-    "navigation-rss-link",
-    "life-page-running-outer",
-    "life-page-running-inner",
-    "life-page-part-link",
-    "life-page-catalog-date",
-    "life-page-archive-link",
-    "life-page-folio",
-    "technical-page-running-outer",
-    "technical-page-running-inner",
-    "technical-page-part-link",
-    "technical-page-catalog-date",
-    "technical-page-archive-link",
-    "technical-page-folio",
-    "footer-quote-english",
-    "footer-quote-translation",
-    "footer-quote-author",
-    "footer-copyright",
-  ]) {
-    assert.match(
-      css,
-      new RegExp(`var\\(--home-text-${role}-minimum-size\\)`),
-      `${role} should consume its own minimum font size`,
-    );
-  }
-  assert.match(css, /background-color: var\(--home-material-paper-color\)/);
+  assert.match(css, /width:\s*var\(--home-book-inner-spine-seam-width\)/);
+  assert.match(css, /\.home-book-binding::before/);
+  assert.match(css, /\.home-book-binding::after/);
 });
 
-test("homepage components receive site copy from configuration", async () => {
-  const [page, navigation, quote] = await Promise.all([
+test("homepage and tuning page consume component copy", async () => {
+  const [page, tune] = await Promise.all([
     readFile(new URL("../src/pages/index.astro", import.meta.url), "utf8"),
-    readFile(
-      new URL("../src/components/SiteNavigation.astro", import.meta.url),
-      "utf8",
-    ),
-    readFile(
-      new URL("../src/components/DailyQuote.astro", import.meta.url),
-      "utf8",
-    ),
+    readFile(new URL("../src/pages/tune.astro", import.meta.url), "utf8"),
   ]);
 
-  assert.match(page, /content=\{homepageConfig\.content\.navigationTitle\}/);
-  assert.match(
-    page,
-    /<SiteNavigation[\s\S]*siteName=\{homepageConfig\.content\.siteName\}/,
-  );
-  assert.match(
-    page,
-    /title=\{homepageConfig\.content\.navigationTitle\}/,
-  );
-  assert.match(page, /siteName=\{homepageConfig\.content\.siteName\}/);
-  assert.match(page, /buildHomepageResponsiveStyles/);
-  assert.match(page, /set:html=\{homepageResponsiveStyles\}/);
-  assert.doesNotMatch(navigation, />ZHIMIN</);
-  assert.match(navigation, /home-navigation__link--life/);
-  assert.match(navigation, /home-navigation__link--technical/);
-  assert.match(navigation, /home-navigation__link--about/);
-  assert.match(navigation, /home-navigation__link--rss/);
-  assert.doesNotMatch(quote, />© \{year\} ZHIMIN</);
+  for (const source of [page, tune]) {
+    assert.match(source, /homepageConfig\.navigation\.content\.siteName/);
+    assert.match(source, /homepageConfig\.book\.pages\.life\.content/);
+    assert.match(source, /homepageConfig\.footer\.content\.copyrightLabel/);
+  }
 });
 
-test("directory folios consume separate life and technical styles", async () => {
-  const [css, lifePage, technicalPage] = await Promise.all([
-    readFile(new URL("../src/styles/global.css", import.meta.url), "utf8"),
-    readFile(new URL("../src/pages/life/index.astro", import.meta.url), "utf8"),
-    readFile(new URL("../src/pages/blog/index.astro", import.meta.url), "utf8"),
-  ]);
+test("directory folios consume separate component styles", async () => {
+  const css = await readFile(
+    new URL("../src/styles/global.css", import.meta.url),
+    "utf8",
+  );
 
-  assert.match(css, /--home-text-life-directory-folio-minimum-size/);
-  assert.match(css, /--home-text-technical-directory-folio-minimum-size/);
-  assert.match(lifePage, /data-section="life"/);
-  assert.match(technicalPage, /data-section="technical"/);
+  assert.match(css, /--home-directories-life-folio-font-size/);
+  assert.match(css, /--home-directories-technical-folio-font-size/);
 });

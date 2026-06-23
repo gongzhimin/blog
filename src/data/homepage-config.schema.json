@@ -1,515 +1,378 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "homepage-config.schema.json",
-  "title": "首页流式双开书配置",
-  "description": "首页文案、独立区域布局、生活与技术目录、位置级文字样式和书本材质配置。",
+  "title": "Zhimin 首页组件配置",
   "type": "object",
   "additionalProperties": false,
   "required": [
-    "content",
-    "layout",
-    "catalogs",
-    "textStyles",
-    "materials"
+    "navigation",
+    "book",
+    "footer",
+    "directories"
   ],
   "properties": {
     "$schema": {
-      "type": "string",
-      "description": "关联本 Schema，为编辑器提供中文说明和自动补全。"
+      "type": "string"
     },
-    "content": {
-      "$ref": "#/$defs/content"
-    },
-    "layout": {
+    "navigation": {
       "type": "object",
-      "description": "每个页面区域独立管理的尺寸和间距。",
-      "additionalProperties": false,
+      "description": "导航组件：文案、尺寸、间距、各链接文字和主题按钮。",
       "required": [
-        "navigation",
-        "bookRegion",
-        "book",
-        "lifePage",
-        "technicalPage",
-        "footer"
+        "content",
+        "size",
+        "spacing",
+        "brand",
+        "title",
+        "links",
+        "themeToggle"
       ],
       "properties": {
-        "navigation": {
+        "content": {
           "type": "object",
-          "description": "导航栏独立的高度、留白、间距和标题隐藏阈值。",
-          "additionalProperties": false,
+          "description": "导航中的站点名称和居中标题。",
+          "required": ["siteName", "title"],
+          "properties": {
+            "siteName": { "type": "string", "minLength": 1 },
+            "title": { "type": "string", "minLength": 1 }
+          }
+        },
+        "size": {
+          "$ref": "#/$defs/clampedHeight",
+          "description": "导航组件自身的最小、流式和最大高度。"
+        },
+        "spacing": {
+          "type": "object",
+          "description": "导航左右留白以及品牌、标题、链接之间的间距。",
           "required": [
-            "minimumHeight",
-            "fluidHeight",
-            "maximumHeight",
             "inlineGapFixed",
             "inlineGapProportional",
             "sectionGap",
-            "linkGap",
-            "titleMaxWidth",
-            "titleHideThreshold",
-            "themeToggleSize",
-            "themeIconSize"
+            "linkGap"
           ],
-          "properties": {
-            "minimumHeight": {
-              "$ref": "#/$defs/length",
-              "description": "导航栏最小高度。"
-            },
-            "fluidHeight": {
-              "$ref": "#/$defs/length",
-              "description": "导航栏随视口变化的流式高度。"
-            },
-            "maximumHeight": {
-              "$ref": "#/$defs/length",
-              "description": "导航栏最大高度。"
-            },
-            "inlineGapFixed": {
-              "$ref": "#/$defs/length",
-              "description": "导航内容左右固定留白。"
-            },
-            "inlineGapProportional": {
-              "$ref": "#/$defs/length",
-              "description": "导航内容左右比例留白；实际取固定值与比例值中较小者。"
-            },
-            "sectionGap": {
-              "$ref": "#/$defs/length",
-              "description": "品牌、标题和链接区之间的距离。"
-            },
-            "linkGap": {
-              "$ref": "#/$defs/length",
-              "description": "导航链接之间的距离。"
-            },
-            "titleMaxWidth": {
-              "$ref": "#/$defs/length",
-              "description": "导航中间标题的最大宽度。"
-            },
-            "titleHideThreshold": {
-              "$ref": "#/$defs/length",
-              "description": "导航容器低于此宽度时隐藏中间标题。"
-            },
-            "themeToggleSize": {
-              "$ref": "#/$defs/length",
-              "description": "主题切换按钮尺寸。"
-            },
-            "themeIconSize": {
-              "$ref": "#/$defs/length",
-              "description": "主题图标尺寸。"
+          "additionalProperties": { "$ref": "#/$defs/cssLength" }
+        },
+        "brand": {
+          "$ref": "#/$defs/clampedText",
+          "description": "站点品牌文字。"
+        },
+        "title": {
+          "allOf": [
+            { "$ref": "#/$defs/clampedText" },
+            {
+              "type": "object",
+              "required": ["maximumWidth", "hideThreshold"],
+              "properties": {
+                "maximumWidth": { "$ref": "#/$defs/cssLength" },
+                "hideThreshold": { "$ref": "#/$defs/cssLength" }
+              }
             }
+          ],
+          "description": "导航中央标题及其隐藏阈值。"
+        },
+        "links": {
+          "type": "object",
+          "description": "生活、技术、关于和 RSS 四个独立导航链接。",
+          "required": ["life", "technical", "about", "rss"],
+          "additionalProperties": { "$ref": "#/$defs/navigationLink" }
+        },
+        "themeToggle": {
+          "type": "object",
+          "description": "明暗主题按钮尺寸。",
+          "required": ["size", "iconSize"],
+          "properties": {
+            "size": { "$ref": "#/$defs/cssLength" },
+            "iconSize": { "$ref": "#/$defs/cssLength" }
+          }
+        }
+      }
+    },
+    "book": {
+      "type": "object",
+      "description": "首页双开书组件及全部物理、材质和页内排版参数。",
+      "required": [
+        "size",
+        "stage",
+        "perspective",
+        "shadow",
+        "cover",
+        "pageEdges",
+        "innerSpine",
+        "paper",
+        "pages"
+      ],
+      "properties": {
+        "size": {
+          "type": "object",
+          "description": "书本按窗口宽度比例取值，并使用硬最小宽度和固定宽高比。",
+          "required": ["viewportWidth", "minimumWidth", "aspectRatio"],
+          "properties": {
+            "viewportWidth": { "$ref": "#/$defs/cssLength" },
+            "minimumWidth": { "$ref": "#/$defs/cssLength" },
+            "aspectRatio": { "$ref": "#/$defs/cssRatio" }
           }
         },
-        "bookRegion": {
+        "stage": {
           "type": "object",
-          "description": "书本区域独立的最小高度和窗口边界间隔。",
-          "additionalProperties": false,
+          "description": "书本舞台的左右留白和上下内边距。",
           "required": [
-            "minimumHeight",
-            "inlineGapFixed",
-            "inlineGapProportional",
-            "blockGapFixed",
-            "blockGapProportional"
-          ],
-          "properties": {
-            "minimumHeight": {
-              "$ref": "#/$defs/length",
-              "description": "书本区域最小高度，较矮窗口允许页面纵向滚动。"
-            },
-            "inlineGapFixed": {
-              "$ref": "#/$defs/length",
-              "description": "书本与窗口左右边界的固定间隔。"
-            },
-            "inlineGapProportional": {
-              "$ref": "#/$defs/length",
-              "description": "书本与窗口左右边界的比例间隔；实际取两者中较小者。"
-            },
-            "blockGapFixed": {
-              "$ref": "#/$defs/length",
-              "description": "书本与内容区上下边界的固定间隔。"
-            },
-            "blockGapProportional": {
-              "$ref": "#/$defs/length",
-              "description": "书本与内容区上下边界的比例间隔。"
-            }
-          }
-        },
-        "book": {
-          "type": "object",
-          "description": "整本双开书独立的比例、参考尺寸和物理材质尺寸。",
-          "additionalProperties": false,
-          "required": [
-            "aspectRatio",
-            "referenceMinimumWidth",
-            "referenceMinimumHeight",
-            "perspective",
-            "rotateX",
-            "shadowOffsetY",
-            "shadowBlur",
-            "coverInsetTop",
-            "coverInsetInline",
-            "coverInsetBottom",
-            "coverRadius",
-            "bindingWidth",
-            "edgeWidth",
-            "gutterWidth"
-          ],
-          "properties": {
-            "aspectRatio": {
-              "$ref": "#/$defs/ratio",
-              "description": "书本固定宽高比，配置模块会自动派生数值比例。"
-            },
-            "referenceMinimumWidth": {
-              "$ref": "#/$defs/length",
-              "description": "设计校准使用的参考最小宽度，不阻止书本继续缩小。"
-            },
-            "referenceMinimumHeight": {
-              "$ref": "#/$defs/length",
-              "description": "设计校准使用的参考最小高度，不阻止书本继续缩小。"
-            },
-            "perspective": {
-              "$ref": "#/$defs/length",
-              "description": "书本 3D 透视距离。"
-            },
-            "rotateX": {
-              "$ref": "#/$defs/angle",
-              "description": "书本沿 X 轴的轻微倾角。"
-            },
-            "shadowOffsetY": {
-              "$ref": "#/$defs/length",
-              "description": "书本投影向下偏移。"
-            },
-            "shadowBlur": {
-              "$ref": "#/$defs/length",
-              "description": "书本投影模糊半径。"
-            },
-            "coverInsetTop": {
-              "$ref": "#/$defs/length",
-              "description": "硬壳封面超出纸页顶部的距离。"
-            },
-            "coverInsetInline": {
-              "$ref": "#/$defs/length",
-              "description": "硬壳封面超出纸页左右的距离。"
-            },
-            "coverInsetBottom": {
-              "$ref": "#/$defs/length",
-              "description": "硬壳封面超出纸页底部的距离。"
-            },
-            "coverRadius": {
-              "$ref": "#/$defs/length",
-              "description": "封面圆角。"
-            },
-            "bindingWidth": {
-              "$ref": "#/$defs/length",
-              "description": "装订布宽度。"
-            },
-            "edgeWidth": {
-              "$ref": "#/$defs/length",
-              "description": "左右书口纸层宽度。"
-            },
-            "gutterWidth": {
-              "$ref": "#/$defs/length",
-              "description": "中央中缝宽度。"
-            }
-          }
-        },
-        "lifePage": {
-          "$ref": "#/$defs/pageLayout",
-          "description": "生活书页独立的内边距、目录间距、入口和页码位置。"
-        },
-        "technicalPage": {
-          "$ref": "#/$defs/pageLayout",
-          "description": "技术书页独立的内边距、目录间距、入口和页码位置。"
-        },
-        "footer": {
-          "type": "object",
-          "description": "每日一句与版权区域独立的高度、留白和文字间距。",
-          "additionalProperties": false,
-          "required": [
-            "minimumHeight",
-            "fluidHeight",
-            "maximumHeight",
             "inlineGapFixed",
             "inlineGapProportional",
             "paddingTop",
-            "paddingBottom",
-            "englishTranslationGap",
-            "translationMetaGap",
-            "authorCopyrightGap"
+            "paddingBottom"
+          ],
+          "additionalProperties": { "$ref": "#/$defs/cssLength" }
+        },
+        "perspective": {
+          "type": "object",
+          "description": "书本整体 3D 透视。",
+          "required": ["distance", "rotateX"],
+          "properties": {
+            "distance": { "$ref": "#/$defs/cssLength" },
+            "rotateX": { "$ref": "#/$defs/cssAngle" }
+          }
+        },
+        "shadow": {
+          "type": "object",
+          "description": "整本书投影。",
+          "required": ["offsetY", "blur", "color"],
+          "properties": {
+            "offsetY": { "$ref": "#/$defs/cssLength" },
+            "blur": { "$ref": "#/$defs/cssLength" },
+            "color": { "$ref": "#/$defs/cssColor" }
+          }
+        },
+        "cover": {
+          "type": "object",
+          "description": "硬壳封面的外扩、圆角和颜色。",
+          "required": [
+            "insetTop",
+            "insetInline",
+            "insetBottom",
+            "radius",
+            "color"
           ],
           "properties": {
-            "minimumHeight": {
-              "$ref": "#/$defs/length",
-              "description": "页脚最小高度。"
+            "insetTop": { "$ref": "#/$defs/cssLength" },
+            "insetInline": { "$ref": "#/$defs/cssLength" },
+            "insetBottom": { "$ref": "#/$defs/cssLength" },
+            "radius": { "$ref": "#/$defs/cssLength" },
+            "color": { "$ref": "#/$defs/cssColor" }
+          }
+        },
+        "pageEdges": {
+          "type": "object",
+          "description": "左右书口厚度和纸张边缘颜色。",
+          "required": ["width", "color"],
+          "properties": {
+            "width": { "$ref": "#/$defs/cssLength" },
+            "color": { "$ref": "#/$defs/cssColor" }
+          }
+        },
+        "innerSpine": {
+          "type": "object",
+          "description": "纸页下方的深色书内脊、1px 中缝、阴影和上下弧形端面。",
+          "required": [
+            "width",
+            "color",
+            "centerColor",
+            "seamWidth",
+            "seamColor",
+            "seamShadowBlur",
+            "seamShadowColor",
+            "capWidth",
+            "capHeight",
+            "capRadius"
+          ],
+          "properties": {
+            "width": { "$ref": "#/$defs/cssLength" },
+            "color": { "$ref": "#/$defs/cssColor" },
+            "centerColor": { "$ref": "#/$defs/cssColor" },
+            "seamWidth": { "$ref": "#/$defs/cssLength" },
+            "seamColor": { "$ref": "#/$defs/cssColor" },
+            "seamShadowBlur": { "$ref": "#/$defs/cssLength" },
+            "seamShadowColor": { "$ref": "#/$defs/cssColor" },
+            "capWidth": { "$ref": "#/$defs/cssLength" },
+            "capHeight": { "$ref": "#/$defs/cssLength" },
+            "capRadius": { "$ref": "#/$defs/cssLength" }
+          }
+        },
+        "paper": {
+          "type": "object",
+          "description": "纸张颜色、正文颜色和纹理透明度。",
+          "required": [
+            "color",
+            "textColor",
+            "mutedColor",
+            "accentColor",
+            "textureOpacity"
+          ],
+          "properties": {
+            "color": { "$ref": "#/$defs/cssColor" },
+            "textColor": { "$ref": "#/$defs/cssColor" },
+            "mutedColor": { "$ref": "#/$defs/cssColor" },
+            "accentColor": { "$ref": "#/$defs/cssColor" },
+            "textureOpacity": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            }
+          }
+        },
+        "pages": {
+          "type": "object",
+          "description": "纸页共享弯曲参数，以及生活页和技术页的独立内容与排版。",
+          "required": ["shared", "life", "technical"],
+          "properties": {
+            "shared": {
+              "type": "object",
+              "description": "左右页镜像使用的弯曲角度和中缝渐变阴影。",
+              "required": [
+                "rotationY",
+                "innerShadowWidth",
+                "innerShadowColor"
+              ],
+              "properties": {
+                "rotationY": { "$ref": "#/$defs/cssAngle" },
+                "innerShadowWidth": { "$ref": "#/$defs/cssLength" },
+                "innerShadowColor": { "$ref": "#/$defs/cssColor" }
+              }
             },
-            "fluidHeight": {
-              "$ref": "#/$defs/length",
-              "description": "页脚流式高度。"
+            "life": {
+              "$ref": "#/$defs/bookPage",
+              "description": "生活书页的文案、间距、目录和各文字角色。"
             },
-            "maximumHeight": {
-              "$ref": "#/$defs/length",
-              "description": "页脚最大高度。"
-            },
-            "inlineGapFixed": {
-              "$ref": "#/$defs/length",
-              "description": "页脚内容左右固定留白。"
-            },
-            "inlineGapProportional": {
-              "$ref": "#/$defs/length",
-              "description": "页脚内容左右比例留白。"
-            },
-            "paddingTop": {
-              "$ref": "#/$defs/length",
-              "description": "页脚顶部内边距。"
-            },
-            "paddingBottom": {
-              "$ref": "#/$defs/length",
-              "description": "页脚底部内边距。"
-            },
-            "englishTranslationGap": {
-              "$ref": "#/$defs/length",
-              "description": "英文句子与中文译文间距。"
-            },
-            "translationMetaGap": {
-              "$ref": "#/$defs/length",
-              "description": "译文与作者信息间距。"
-            },
-            "authorCopyrightGap": {
-              "$ref": "#/$defs/length",
-              "description": "窄屏作者与版权之间的间距。"
+            "technical": {
+              "$ref": "#/$defs/bookPage",
+              "description": "技术书页的文案、间距、目录和各文字角色。"
             }
           }
         }
       }
     },
-    "catalogs": {
+    "footer": {
       "type": "object",
-      "description": "生活与技术目录分别管理的数量、阈值、日期格式和窄页间距。",
-      "additionalProperties": false,
-      "required": ["life", "technical"],
-      "properties": {
-        "life": {
-          "$ref": "#/$defs/catalog",
-          "description": "生活目录独立参数。"
-        },
-        "technical": {
-          "$ref": "#/$defs/catalog",
-          "description": "技术目录独立参数。"
-        }
-      }
-    },
-    "textStyles": {
-      "type": "object",
-      "description": "每处文字独立管理的字体、最小字号、流式字号、最大字号和明暗颜色。",
-      "additionalProperties": false,
+      "description": "每日一句和版权页脚组件。",
       "required": [
-        "navigation",
-        "lifePage",
-        "technicalPage",
-        "footer",
-        "lifeDirectory",
-        "technicalDirectory"
+        "content",
+        "size",
+        "spacing",
+        "quoteEnglish",
+        "quoteTranslation",
+        "quoteAuthor",
+        "copyright"
       ],
       "properties": {
-        "navigation": {
-          "$ref": "#/$defs/navigationTextStyles",
-          "description": "导航品牌、导航标题和四个链接分别独立配置。"
+        "content": {
+          "type": "object",
+          "required": ["copyrightLabel"],
+          "properties": {
+            "copyrightLabel": { "type": "string", "minLength": 1 }
+          }
         },
-        "lifePage": {
-          "$ref": "#/$defs/pageTextStyles",
-          "description": "生活页眉、Part、目录标题、日期、入口和页码分别独立配置。"
+        "size": {
+          "type": "object",
+          "required": ["minimumHeight"],
+          "properties": {
+            "minimumHeight": { "$ref": "#/$defs/cssLength" }
+          }
         },
-        "technicalPage": {
-          "$ref": "#/$defs/pageTextStyles",
-          "description": "技术页目录标题等文字使用独立参数，不与生活页共享。"
+        "spacing": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/cssLength" }
         },
-        "footer": {
-          "$ref": "#/$defs/footerTextStyles",
-          "description": "英文句子、译文、作者和版权分别独立配置。"
-        },
-        "lifeDirectory": {
-          "$ref": "#/$defs/directoryTextStyles",
-          "description": "生活子目录页码独立配置。"
-        },
-        "technicalDirectory": {
-          "$ref": "#/$defs/directoryTextStyles",
-          "description": "技术子目录页码独立配置。"
-        }
+        "quoteEnglish": { "$ref": "#/$defs/clampedText" },
+        "quoteTranslation": { "$ref": "#/$defs/clampedText" },
+        "quoteAuthor": { "$ref": "#/$defs/clampedText" },
+        "copyright": { "$ref": "#/$defs/clampedText" }
       }
     },
-    "materials": {
-      "$ref": "#/$defs/materials"
+    "directories": {
+      "type": "object",
+      "description": "生活目录页和技术目录页的独立页码组件。",
+      "required": ["life", "technical"],
+      "properties": {
+        "life": { "$ref": "#/$defs/directory" },
+        "technical": { "$ref": "#/$defs/directory" }
+      }
     }
   },
   "$defs": {
-    "text": {
-      "type": "string",
-      "minLength": 1
-    },
-    "length": {
+    "cssLength": {
       "type": "string",
       "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$"
     },
-    "angle": {
+    "cssAngle": {
       "type": "string",
       "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:deg|rad|turn)$"
     },
-    "ratio": {
+    "cssRatio": {
       "type": "string",
       "pattern": "^\\d+(?:\\.\\d+)?\\s*/\\s*\\d+(?:\\.\\d+)?$"
     },
-    "positiveInteger": {
-      "type": "integer",
-      "minimum": 1
-    },
-    "dateFormat": {
+    "cssColor": {
       "type": "string",
-      "pattern": "^(?:YYYY|MM|DD|[.\\-/\\s])+$"
+      "pattern": "^(?:#[0-9a-fA-F]{3,8}|rgba?\\(.+\\))$"
     },
-    "content": {
+    "fontFamily": {
+      "type": "string",
+      "enum": ["serif", "sans", "monospace"]
+    },
+    "clampedHeight": {
       "type": "object",
-      "description": "首页显示文字。",
-      "additionalProperties": false,
-      "required": [
-        "siteName",
-        "navigationTitle",
-        "copyrightLabel",
-        "navigation",
-        "life",
-        "technical"
-      ],
+      "required": ["minimumHeight", "fluidHeight", "maximumHeight"],
       "properties": {
-        "siteName": {
-          "$ref": "#/$defs/text",
-          "description": "导航品牌文字。"
-        },
-        "navigationTitle": {
-          "$ref": "#/$defs/text",
-          "description": "导航中间标题。"
-        },
-        "copyrightLabel": {
-          "$ref": "#/$defs/text",
-          "description": "版权年份与分隔点之后的文字。"
-        },
-        "navigation": {
-          "$ref": "#/$defs/navigationLabels"
-        },
-        "life": {
-          "$ref": "#/$defs/bookSection"
-        },
-        "technical": {
-          "$ref": "#/$defs/bookSection"
-        }
+        "minimumHeight": { "$ref": "#/$defs/cssLength" },
+        "fluidHeight": { "$ref": "#/$defs/cssLength" },
+        "maximumHeight": { "$ref": "#/$defs/cssLength" }
       }
     },
-    "navigationLabels": {
+    "clampedText": {
       "type": "object",
-      "additionalProperties": false,
       "required": [
-        "lifeLabel",
-        "technicalLabel",
-        "aboutLabel",
-        "rssLabel"
+        "fontFamily",
+        "minimumSize",
+        "fluidSize",
+        "maximumSize",
+        "lightColor",
+        "darkColor"
       ],
       "properties": {
-        "lifeLabel": {
-          "$ref": "#/$defs/text",
-          "description": "生活链接文字。"
-        },
-        "technicalLabel": {
-          "$ref": "#/$defs/text",
-          "description": "技术链接文字。"
-        },
-        "aboutLabel": {
-          "$ref": "#/$defs/text",
-          "description": "关于链接文字。"
-        },
-        "rssLabel": {
-          "$ref": "#/$defs/text",
-          "description": "RSS 链接文字。"
-        }
+        "fontFamily": { "$ref": "#/$defs/fontFamily" },
+        "minimumSize": { "$ref": "#/$defs/cssLength" },
+        "fluidSize": { "$ref": "#/$defs/cssLength" },
+        "maximumSize": { "$ref": "#/$defs/cssLength" },
+        "lightColor": { "$ref": "#/$defs/cssColor" },
+        "darkColor": { "$ref": "#/$defs/cssColor" }
       }
     },
-    "bookSection": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "outerRunningLabel",
-        "innerRunningLabel",
-        "partLabel",
-        "archiveLabel",
-        "homepageFolio",
-        "directoryFolio"
-      ],
-      "properties": {
-        "outerRunningLabel": {
-          "$ref": "#/$defs/text"
-        },
-        "innerRunningLabel": {
-          "$ref": "#/$defs/text"
-        },
-        "partLabel": {
-          "$ref": "#/$defs/text"
-        },
-        "archiveLabel": {
-          "$ref": "#/$defs/text"
-        },
-        "homepageFolio": {
-          "$ref": "#/$defs/text"
-        },
-        "directoryFolio": {
-          "$ref": "#/$defs/text"
+    "navigationLink": {
+      "allOf": [
+        { "$ref": "#/$defs/clampedText" },
+        {
+          "type": "object",
+          "required": ["label", "href"],
+          "properties": {
+            "label": { "type": "string", "minLength": 1 },
+            "href": { "type": "string", "minLength": 1 }
+          }
         }
-      }
+      ]
     },
-    "pageLayout": {
+    "bookText": {
       "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "paddingTop",
-        "paddingInline",
-        "paddingBottom",
-        "partMarginTop",
-        "partMarginBottom",
-        "partPaddingTop",
-        "catalogGap",
-        "catalogColumnGap",
-        "archiveBottom",
-        "folioBottom"
-      ],
+      "required": ["fontFamily", "fontSize", "lightColor", "darkColor"],
       "properties": {
-        "paddingTop": {
-          "$ref": "#/$defs/length"
+        "fontFamily": { "$ref": "#/$defs/fontFamily" },
+        "fontSize": {
+          "type": "string",
+          "pattern": "^(?:\\d+(?:\\.\\d+)?|\\.\\d+)cqw$"
         },
-        "paddingInline": {
-          "$ref": "#/$defs/length"
-        },
-        "paddingBottom": {
-          "$ref": "#/$defs/length"
-        },
-        "partMarginTop": {
-          "$ref": "#/$defs/length"
-        },
-        "partMarginBottom": {
-          "$ref": "#/$defs/length"
-        },
-        "partPaddingTop": {
-          "$ref": "#/$defs/length"
-        },
-        "catalogGap": {
-          "$ref": "#/$defs/length"
-        },
-        "catalogColumnGap": {
-          "$ref": "#/$defs/length"
-        },
-        "archiveBottom": {
-          "$ref": "#/$defs/length"
-        },
-        "folioBottom": {
-          "$ref": "#/$defs/length"
-        }
+        "lightColor": { "$ref": "#/$defs/cssColor" },
+        "darkColor": { "$ref": "#/$defs/cssColor" }
       }
     },
     "catalog": {
       "type": "object",
-      "additionalProperties": false,
       "required": [
         "wideMaximumEntries",
         "narrowMaximumEntries",
@@ -521,115 +384,22 @@
         "narrowRowGap"
       ],
       "properties": {
-        "wideMaximumEntries": {
-          "$ref": "#/$defs/positiveInteger",
-          "description": "宽页最多准备的文章数量。"
-        },
-        "narrowMaximumEntries": {
-          "$ref": "#/$defs/positiveInteger",
-          "description": "窄页最多显示的文章数量。"
-        },
-        "narrowBookWidth": {
-          "$ref": "#/$defs/length",
-          "description": "进入两行目录布局的整本书宽度阈值。"
-        },
-        "extremeBookWidth": {
-          "$ref": "#/$defs/length",
-          "description": "改用紧凑日期的整本书宽度阈值。"
-        },
-        "titleMaximumLines": {
-          "$ref": "#/$defs/positiveInteger",
-          "description": "目录标题最多显示行数。"
-        },
-        "wideDateFormat": {
-          "$ref": "#/$defs/dateFormat",
-          "description": "宽页日期格式。"
-        },
-        "compactDateFormat": {
-          "$ref": "#/$defs/dateFormat",
-          "description": "极窄页日期格式。"
-        },
-        "narrowRowGap": {
-          "$ref": "#/$defs/length",
-          "description": "窄页标题与日期之间的行间距。"
-        }
+        "wideMaximumEntries": { "type": "integer", "minimum": 1 },
+        "narrowMaximumEntries": { "type": "integer", "minimum": 1 },
+        "narrowBookWidth": { "$ref": "#/$defs/cssLength" },
+        "extremeBookWidth": { "$ref": "#/$defs/cssLength" },
+        "titleMaximumLines": { "type": "integer", "minimum": 1 },
+        "wideDateFormat": { "type": "string" },
+        "compactDateFormat": { "type": "string" },
+        "narrowRowGap": { "$ref": "#/$defs/cssLength" }
       }
     },
-    "textStyle": {
+    "bookPage": {
       "type": "object",
-      "additionalProperties": false,
       "required": [
-        "fontFamily",
-        "minimumSize",
-        "fluidSize",
-        "maximumSize",
-        "lightColor",
-        "darkColor"
-      ],
-      "properties": {
-        "fontFamily": {
-          "type": "string",
-          "enum": ["serif", "sans", "monospace"],
-          "description": "该位置独立使用的字体族。"
-        },
-        "minimumSize": {
-          "$ref": "#/$defs/length",
-          "description": "该位置不会再缩小的最小字号。"
-        },
-        "fluidSize": {
-          "$ref": "#/$defs/length",
-          "description": "相对所属区域容器的流式字号。"
-        },
-        "maximumSize": {
-          "$ref": "#/$defs/length",
-          "description": "该位置最大字号。"
-        },
-        "lightColor": {
-          "$ref": "#/$defs/color",
-          "description": "亮色模式颜色。"
-        },
-        "darkColor": {
-          "$ref": "#/$defs/color",
-          "description": "暗色模式颜色。"
-        }
-      }
-    },
-    "navigationTextStyles": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "brand",
-        "title",
-        "lifeLink",
-        "technicalLink",
-        "aboutLink",
-        "rssLink"
-      ],
-      "properties": {
-        "brand": {
-          "$ref": "#/$defs/textStyle"
-        },
-        "title": {
-          "$ref": "#/$defs/textStyle"
-        },
-        "lifeLink": {
-          "$ref": "#/$defs/textStyle"
-        },
-        "technicalLink": {
-          "$ref": "#/$defs/textStyle"
-        },
-        "aboutLink": {
-          "$ref": "#/$defs/textStyle"
-        },
-        "rssLink": {
-          "$ref": "#/$defs/textStyle"
-        }
-      }
-    },
-    "pageTextStyles": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
+        "content",
+        "layout",
+        "catalog",
         "runningOuter",
         "runningInner",
         "partLink",
@@ -639,117 +409,55 @@
         "folio"
       ],
       "properties": {
-        "runningOuter": {
-          "$ref": "#/$defs/textStyle"
+        "content": {
+          "type": "object",
+          "required": [
+            "outerRunningLabel",
+            "innerRunningLabel",
+            "partLabel",
+            "partHref",
+            "archiveLabel",
+            "archiveHref",
+            "homepageFolio"
+          ],
+          "additionalProperties": { "type": "string", "minLength": 1 }
         },
-        "runningInner": {
-          "$ref": "#/$defs/textStyle"
+        "layout": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/cssLength" }
         },
-        "partLink": {
-          "$ref": "#/$defs/textStyle"
-        },
-        "catalogTitle": {
-          "$ref": "#/$defs/textStyle"
-        },
-        "catalogDate": {
-          "$ref": "#/$defs/textStyle"
-        },
-        "archiveLink": {
-          "$ref": "#/$defs/textStyle"
-        },
-        "folio": {
-          "$ref": "#/$defs/textStyle"
-        }
+        "catalog": { "$ref": "#/$defs/catalog" },
+        "runningOuter": { "$ref": "#/$defs/bookText" },
+        "runningInner": { "$ref": "#/$defs/bookText" },
+        "partLink": { "$ref": "#/$defs/bookText" },
+        "catalogTitle": { "$ref": "#/$defs/bookText" },
+        "catalogDate": { "$ref": "#/$defs/bookText" },
+        "archiveLink": { "$ref": "#/$defs/bookText" },
+        "folio": { "$ref": "#/$defs/bookText" }
       }
     },
-    "footerTextStyles": {
+    "directory": {
       "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "quoteEnglish",
-        "quoteTranslation",
-        "quoteAuthor",
-        "copyright"
-      ],
-      "properties": {
-        "quoteEnglish": {
-          "$ref": "#/$defs/textStyle"
-        },
-        "quoteTranslation": {
-          "$ref": "#/$defs/textStyle"
-        },
-        "quoteAuthor": {
-          "$ref": "#/$defs/textStyle"
-        },
-        "copyright": {
-          "$ref": "#/$defs/textStyle"
-        }
-      }
-    },
-    "directoryTextStyles": {
-      "type": "object",
-      "additionalProperties": false,
       "required": ["folio"],
       "properties": {
         "folio": {
-          "$ref": "#/$defs/textStyle"
+          "type": "object",
+          "required": [
+            "content",
+            "fontFamily",
+            "fontSize",
+            "lightColor",
+            "darkColor"
+          ],
+          "properties": {
+            "content": { "type": "string", "minLength": 1 },
+            "fontFamily": { "$ref": "#/$defs/fontFamily" },
+            "fontSize": { "$ref": "#/$defs/cssLength" },
+            "lightColor": { "$ref": "#/$defs/cssColor" },
+            "darkColor": { "$ref": "#/$defs/cssColor" }
+          }
         }
       }
-    },
-    "materials": {
-      "type": "object",
-      "description": "整本书的材质颜色和纹理。",
-      "additionalProperties": false,
-      "required": [
-        "paperColor",
-        "coverColor",
-        "bindingColor",
-        "pageEdgeColor",
-        "gutterColor",
-        "pageTextColor",
-        "pageMutedColor",
-        "pageAccentColor",
-        "bookShadowColor",
-        "paperTextureOpacity"
-      ],
-      "properties": {
-        "paperColor": {
-          "$ref": "#/$defs/color"
-        },
-        "coverColor": {
-          "$ref": "#/$defs/color"
-        },
-        "bindingColor": {
-          "$ref": "#/$defs/color"
-        },
-        "pageEdgeColor": {
-          "$ref": "#/$defs/color"
-        },
-        "gutterColor": {
-          "$ref": "#/$defs/color"
-        },
-        "pageTextColor": {
-          "$ref": "#/$defs/color"
-        },
-        "pageMutedColor": {
-          "$ref": "#/$defs/color"
-        },
-        "pageAccentColor": {
-          "$ref": "#/$defs/color"
-        },
-        "bookShadowColor": {
-          "$ref": "#/$defs/color"
-        },
-        "paperTextureOpacity": {
-          "type": "number",
-          "minimum": 0,
-          "maximum": 1
-        }
-      }
-    },
-    "color": {
-      "type": "string",
-      "pattern": "^(?:#[\\da-fA-F]{3,8}|rgba?\\(\\s*[\\d.%\\s,/-]+\\))$"
     }
   }
 }
