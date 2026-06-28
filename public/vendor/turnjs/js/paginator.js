@@ -87,24 +87,30 @@ var PAGINATOR = (function () {
     return { el: el, rest: rest };
   }
 
-  /** Split <pre> by removing lines from the end. */
+  /** Split <pre> by removing lines from the end, preserving inner HTML. */
   function splitPre(el, inner, maxH) {
     var code = el.querySelector('code') || el;
-    var lines = code.textContent.split('\n');
-    if (lines.length < 2) return false;
+    // Split the inner HTML by newline boundaries, keeping tags intact
+    var origHTML = code.innerHTML;
+    var htmlLines = origHTML.split('\n');
+    if (htmlLines.length < 2) return false;
     inner.appendChild(el);
-    var origLines = lines.slice();
-    for (var n = lines.length - 1; n >= 1; n--) {
-      code.textContent = origLines.slice(0, n).join('\n');
+    for (var n = htmlLines.length - 1; n >= 1; n--) {
+      code.innerHTML = htmlLines.slice(0, n).join('\n');
       if (inner.scrollHeight <= maxH) {
         var restEl = el.cloneNode(true);
-        (restEl.querySelector('code') || restEl).textContent = origLines.slice(n).join('\n');
+        var restCode = restEl.querySelector('code') || restEl;
+        // Preserve inline tags across the split boundary
+        var openTags = openInlineTags(code.innerHTML, code.innerHTML.length);
+        var closeTags = openTags.slice().reverse().map(function(t){ return '</' + t + '>'; }).join('');
+        code.innerHTML = code.innerHTML + closeTags;
+        var reopenTags = openTags.map(function(t){ return '<' + t + '>'; }).join('');
+        restCode.innerHTML = reopenTags + htmlLines.slice(n).join('\n');
         inner.removeChild(el);
-        // el stays reduced — caller adds it back to the measurement container
         return { el: el, rest: restEl };
       }
     }
-    code.textContent = origLines.join('\n'); // restore
+    code.innerHTML = origHTML; // restore
     inner.removeChild(el);
     return false;
   }

@@ -42,6 +42,7 @@
   --font-cjk-sans: "PingFang SC", "Microsoft YaHei", "Heiti SC";
   --font-sans: var(--font-latin-sans), var(--font-cjk-sans), sans-serif;
 
+  --font-cjk-fangsong: "STFangsong", "FangSong", "FangSong_GB2312", var(--font-cjk-serif);
   --font-cjk-kai: "Kaiti SC", "STKaiti", "KaiTi", var(--font-cjk-serif);
 
   --font-mono: "SFMono-Regular", Consolas, monospace;
@@ -51,7 +52,7 @@
   --font-size-code: 10px;
   --font-size-blockquote: 12px;
   --font-size-table: 9px;
-  --font-size-h1: 17px;
+  --font-size-h1: 18px;
   --font-size-h2: 14px;
   --font-size-h3: 13px;
   --line-height-body: 1.7;
@@ -60,7 +61,7 @@
 
   /* ── Spacing ───────────────────────────────────────────────── */
   --spacing-line: 22px;
-  --spacing-half: 11px;
+  --spacing-half: 8px;
   --spacing-quarter: 5px;
   --spacing-list-indent: 22px;
   --spacing-text-indent: 2em;
@@ -89,8 +90,9 @@
   margin: 0 0 var(--spacing-half);
   color: var(--text-heading);
   font-size: var(--font-size-h1);
-  font-weight: 700;
+  font-weight: 400;
   line-height: var(--line-height-heading);
+  -webkit-text-stroke-width: 0;
 }
 
 .sj-book .book-content h2 {
@@ -215,6 +217,14 @@
   padding-inline-start: var(--spacing-list-indent);
 }
 
+/* Collapse gap between sibling lists so nested lists don't double-space */
+.sj-book .book-content ul + ul,
+.sj-book .book-content ol + ol,
+.sj-book .book-content ul + ol,
+.sj-book .book-content ol + ul {
+  margin-top: calc(3px - var(--spacing-half));
+}
+
 /* Nested list marker differentiation */
 .sj-book .book-content ul           { list-style-type: disc; }
 .sj-book .book-content ul ul        { list-style-type: "\2013\00A0\00A0\00A0"; } /* –   */
@@ -272,6 +282,7 @@
 .sj-book .book-content td {
   padding: 6px 10px;
   border: none;
+  text-align: left;
 }
 
 .sj-book .book-content th {

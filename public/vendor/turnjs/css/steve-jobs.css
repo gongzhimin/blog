@@ -3,7 +3,24 @@
 @font-face {
   font-family: 'Stempel-Garamond-W01-Roman';
   font-style: normal;
-  font-weight: normal;
+  font-weight: 400;
+  size-adjust: 105%;
+  src: url('../fonts/Stempel-Garamond-W01-Roman.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Stempel-Garamond-W01-Roman';
+  font-style: normal;
+  font-weight: 600;
+  size-adjust: 105%;
+  src: url('../fonts/Stempel-Garamond-W01-Roman.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Stempel-Garamond-W01-Roman';
+  font-style: normal;
+  font-weight: 700;
+  size-adjust: 105%;
   src: url('../fonts/Stempel-Garamond-W01-Roman.woff') format('woff');
 }
 

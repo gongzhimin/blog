@@ -15,7 +15,7 @@
 .hljs-doctag,
 .hljs-template-tag,
 .hljs-template-variable {
-  color: #8b5a2b;   /* warm brown */
+  color: #8b5a2b;
 }
 
 /* Strings, attributes */
@@ -23,7 +23,7 @@
 .hljs-attr,
 .hljs-attribute,
 .hljs-selector-attr {
-  color: #6a8759;   /* muted green */
+  color: #6a8759;
 }
 
 /* Numbers, literals */
@@ -32,7 +32,7 @@
 .hljs-variable,
 .hljs-selector-class,
 .hljs-selector-id {
-  color: #b07c4b;   /* amber */
+  color: #b07c4b;
 }
 
 /* Function names, titles */
@@ -40,7 +40,7 @@
 .hljs-title.class_,
 .hljs-title.function_,
 .hljs-name {
-  color: #7a6644;   /* dark tan */
+  color: #7a6644;
 }
 
 /* Comments */
@@ -53,13 +53,13 @@
 /* Built-ins, symbols */
 .hljs-built_in,
 .hljs-symbol {
-  color: #b35c44;   /* terracotta */
+  color: #b35c44;
 }
 
 /* Regex, meta strings */
 .hljs-regexp,
 .hljs-meta .hljs-string {
-  color: #5a7a5a;   /* sage */
+  color: #5a7a5a;
 }
 
 /* Emphasis, strong */

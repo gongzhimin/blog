@@ -191,10 +191,12 @@ const homepageStyles = `
   .sj-book .p${totalPages} {
     background-color: white;
     background-image: url(/vendor/turnjs/pics/book-covers.jpg) !important;
+    background-repeat: no-repeat;
+    background-size: 2400px 600px;
   }
   .sj-book .p1  { background-position: 0 0 !important; }
-  .sj-book .p2  { background-position: -480px 0 !important; }
-  .sj-book .p3  { background-position: -1920px 0 !important; }
+  .sj-book .p2  { background-position: -484px 0 !important; }
+  .sj-book .p3  { background-position: -1930px 0 !important; }
   .sj-book .p${backPage}   { background-position: -960px 0 !important; }
   .sj-book .p${totalPages} { background-position: -1440px 0 !important; }
 
@@ -231,6 +233,7 @@ const quoteAuthor = quote.author || footer.content.author;
 <html lang="zh-CN">
   <head>
     <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{SITE_TITLE}</title>
     <meta name="description" content={SITE_DESC} />
     <meta name="viewport" content="width=1050, user-scalable=no" />

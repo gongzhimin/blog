@@ -45,7 +45,7 @@
 		"canvasWidth": 960,
 		"width": 960,
 		"height": 600,
-			"contentAreaHeight": 405,
+		"contentAreaHeight": 405,
 		"hardPage": {
 			"width": 480,
 			"height": 600
