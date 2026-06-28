@@ -140,19 +140,38 @@ var PAGINATOR = (function () {
 
   /** Pin column widths so split table halves stay aligned.
    *  Must be called while the table is in the DOM. */
+  /** Pin column widths based on the widest content in each column
+   *  across ALL rows, so every row (and every split sub-table)
+   *  gets the same proportional column allocation. */
   function pinColWidths(table) {
     var rows = table.querySelectorAll('tr');
     if (rows.length === 0) return;
-    var cells = rows[0].querySelectorAll('td, th');
-    if (cells.length === 0) return;
-    var widths = [];
-    for (var c = 0; c < cells.length; c++)
-      widths.push(cells[c].getBoundingClientRect().width);
+
+    // Count columns (handle rows with different cell counts)
+    var colCount = 0;
     for (var r = 0; r < rows.length; r++) {
-      var rCells = rows[r].querySelectorAll('td, th');
-      for (var c = 0; c < Math.min(rCells.length, widths.length); c++) {
-        rCells[c].style.width = widths[c] + 'px';
-        rCells[c].style.boxSizing = 'border-box';
+      var n = rows[r].querySelectorAll('td, th').length;
+      if (n > colCount) colCount = n;
+    }
+    if (colCount === 0) return;
+
+    // Max natural width per column across all rows
+    var maxWidths = [];
+    for (var c = 0; c < colCount; c++) maxWidths.push(0);
+    for (var r = 0; r < rows.length; r++) {
+      var cells = rows[r].querySelectorAll('td, th');
+      for (var c = 0; c < cells.length; c++) {
+        var w = cells[c].getBoundingClientRect().width;
+        if (w > maxWidths[c]) maxWidths[c] = w;
+      }
+    }
+
+    // Apply max widths to every cell
+    for (var r = 0; r < rows.length; r++) {
+      var cells = rows[r].querySelectorAll('td, th');
+      for (var c = 0; c < cells.length; c++) {
+        cells[c].style.width = maxWidths[c] + 'px';
+        cells[c].style.boxSizing = 'border-box';
       }
     }
   }
