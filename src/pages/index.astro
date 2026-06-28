@@ -7,6 +7,7 @@ import bookConfig from '../data/book-config.json';
 import { renderMarkdown, stripLeadingTitle, romanTocPage } from '../lib/book-renderer.js';
 import fontsCSS from '../styles/fonts.css?raw';
 import bookContentCSS from '../styles/book-content.css?raw';
+import codeHighlightCSS from '../styles/code-highlight.css?raw';
 import bookTocCSS from '../styles/book-toc.css?raw';
 
 const SITE_TITLE = bookConfig.footer.content.copyright;
@@ -17,7 +18,7 @@ const katexCSS = readFileSync('node_modules/katex/dist/katex.min.css', 'utf8');
 
 // Build measurement CSS from the same source.
 // Article: straight selector swap + KaTeX CSS for formula layout accuracy.
-const measureArticleCSS = katexCSS +
+const measureArticleCSS = katexCSS + codeHighlightCSS +
   bookContentCSS.replace(/\.sj-book \.book-content/g, '#__bap_inner');
 
 // TOC: auto-generated from book-toc.css, with measurement-required
@@ -219,7 +220,7 @@ const homepageStyles = `
     font-size: ${footer.copyrightFontSize}px;
     margin-top: 8px;
   }
-` + katexCSS + fontsCSS + bookContentCSS + bookTocCSS;
+` + katexCSS + codeHighlightCSS + fontsCSS + bookContentCSS + bookTocCSS;
 
 const quoteEnglish = quote.english || footer.content.quoteEnglish;
 const quoteChinese = quote.chinese || footer.content.quoteChinese;

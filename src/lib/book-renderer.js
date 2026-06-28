@@ -13,6 +13,7 @@
 
 import { marked } from 'marked';
 import katex from 'katex';
+import hljs from 'highlight.js';
 import { imageSize } from 'image-size';
 import { readFileSync, existsSync } from 'fs';
 import { resolve } from 'path';
@@ -60,8 +61,15 @@ export function renderMarkdown(md) {
     return `\uE000KATEX_${katexBlocks.length - 1}__ENDKATEX\uE000`;
   });
 
-  // Convert remaining Markdown to HTML
-  html = marked.parse(html);
+  // Convert remaining Markdown to HTML with syntax highlighting
+  html = marked.parse(html, {
+    highlight: function(code, lang) {
+      if (lang && hljs.getLanguage(lang)) {
+        try { return hljs.highlight(code, { language: lang }).value; } catch (_) {}
+      }
+      return code;
+    }
+  });
 
   // Restore KaTeX placeholders
   html = html.replace(/\uE000KATEX_(\d+)__ENDKATEX\uE000/g, (_, i) => katexBlocks[parseInt(i)]);

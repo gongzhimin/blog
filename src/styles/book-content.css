@@ -42,13 +42,15 @@
   --font-cjk-sans: "PingFang SC", "Microsoft YaHei", "Heiti SC";
   --font-sans: var(--font-latin-sans), var(--font-cjk-sans), sans-serif;
 
+  --font-cjk-kai: "Kaiti SC", "STKaiti", "KaiTi", var(--font-cjk-serif);
+
   --font-mono: "SFMono-Regular", Consolas, monospace;
 
   /* ── Sizes ─────────────────────────────────────────────────── */
   --font-size-body: 13px;
   --font-size-code: 10px;
   --font-size-blockquote: 12px;
-  --font-size-table: 10px;
+  --font-size-table: 9px;
   --font-size-h1: 17px;
   --font-size-h2: 14px;
   --font-size-h3: 13px;
@@ -180,7 +182,14 @@
   padding-left: var(--spacing-list-indent);
   padding-right: var(--spacing-list-indent);
   color: var(--text-muted);
+  font-family: var(--font-latin-serif), var(--font-cjk-kai), serif;
   font-size: var(--font-size-blockquote);
+  font-style: normal;
+}
+
+/* Latin italic inside blockquote */
+.sj-book .book-content blockquote em,
+.sj-book .book-content blockquote cite {
   font-style: italic;
 }
 
