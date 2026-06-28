@@ -1,0 +1,253 @@
+{
+	"nav": {
+		"height": 56,
+		"innerGap": 28,
+		"brand": {
+			"text": "ZHIMIN",
+			"fontSize": 15
+		},
+		"links": {
+			"gap": 18,
+			"fontSize": 13,
+			"items": [
+				{
+					"label": "生活",
+					"href": "/life"
+				},
+				{
+					"label": "技术",
+					"href": "/blog"
+				},
+				{
+					"label": "关于",
+					"href": "/about"
+				},
+				{
+					"label": "RSS",
+					"href": "/rss.xml"
+				}
+			]
+		},
+		"dark": {
+			"border": "rgba(255,255,255,0.08)",
+			"brandText": "#c4beb6",
+			"linkText": "#888",
+			"linkHover": "#c4beb6"
+		},
+		"light": {
+			"border": "rgba(0,0,0,0.08)",
+			"brandText": "#555",
+			"linkText": "#999",
+			"linkHover": "#444"
+		}
+	},
+	"book": {
+		"canvasWidth": 960,
+		"width": 960,
+		"height": 600,
+			"contentAreaHeight": 405,
+		"hardPage": {
+			"width": 480,
+			"height": 600
+		},
+		"contentPage": {
+			"width": 460,
+			"height": 582
+		},
+		"depth": {
+			"width": 16,
+			"height": 590,
+			"top": 7
+		},
+		"spineStrip": {
+			"width": 5,
+			"left": 475
+		},
+		"turn": {
+			"elevation": 50,
+			"duration": 1000,
+			"totalPages": 112,
+			"startPage": 7
+		},
+		"gap": 30,
+		"pagination": {
+			"contentWidth": 380,
+			"contentHeight": 450,
+			"baseFontSize": 16,
+			"baseLineHeight": 27,
+			"charsPerLine": 23,
+			"elements": {
+				"h1": {
+					"lineHeight": 21,
+					"paddingTop": 0,
+					"paddingBottom": 0,
+					"marginBottom": 8,
+					"splittable": true,
+					"splitStrategy": "line",
+					"orphanLines": 1
+				},
+				"h2": {
+					"lineHeight": 24,
+					"paddingTop": 0,
+					"paddingBottom": 0,
+					"marginBottom": 6,
+					"splittable": true,
+					"splitStrategy": "line",
+					"orphanLines": 1
+				},
+				"h3": {
+					"lineHeight": 22,
+					"paddingTop": 0,
+					"paddingBottom": 0,
+					"marginBottom": 4,
+					"splittable": true,
+					"splitStrategy": "line",
+					"orphanLines": 1
+				},
+				"h4": {
+					"lineHeight": 22,
+					"paddingTop": 0,
+					"paddingBottom": 0,
+					"marginBottom": 3,
+					"splittable": true,
+					"splitStrategy": "line",
+					"orphanLines": 1
+				},
+				"h5": {
+					"lineHeight": 19,
+					"paddingTop": 0,
+					"paddingBottom": 0,
+					"marginBottom": 2,
+					"splittable": true,
+					"splitStrategy": "line",
+					"orphanLines": 1
+				},
+				"h6": {
+					"lineHeight": 15,
+					"paddingTop": 0,
+					"paddingBottom": 0,
+					"marginBottom": 2,
+					"splittable": true,
+					"splitStrategy": "line",
+					"orphanLines": 1
+				},
+				"hr": {
+					"lineHeight": 30,
+					"paddingTop": 0,
+					"paddingBottom": 0,
+					"marginBottom": 20,
+					"splittable": false,
+					"splitStrategy": "none",
+					"orphanLines": 0
+				},
+				"p": {
+					"lineHeight": 22,
+					"paddingTop": 0,
+					"paddingBottom": 0,
+					"marginBottom": 7,
+					"splittable": true,
+					"splitStrategy": "sentence",
+					"orphanLines": 2
+				},
+				"pre": {
+					"lineHeight": 14,
+					"paddingTop": 5,
+					"paddingBottom": 5,
+					"marginBottom": 7,
+					"splittable": true,
+					"splitStrategy": "line",
+					"orphanLines": 1
+				},
+				"blockquote": {
+					"lineHeight": 20,
+					"paddingTop": 0,
+					"paddingBottom": 0,
+					"marginBottom": 7,
+					"splittable": true,
+					"splitStrategy": "line",
+					"orphanLines": 1
+				},
+				"li": {
+					"lineHeight": 22,
+					"paddingTop": 0,
+					"paddingBottom": 0,
+					"marginBottom": 0,
+					"splittable": false,
+					"splitStrategy": "none",
+					"orphanLines": 0
+				},
+				"table": {
+					"lineHeight": 22,
+					"paddingTop": 0,
+					"paddingBottom": 0,
+					"marginBottom": 20,
+					"splittable": true,
+					"splitStrategy": "child",
+					"orphanLines": 1
+				},
+				"img": {
+					"lineHeight": 200,
+					"paddingTop": 0,
+					"paddingBottom": 0,
+					"marginBottom": 20,
+					"splittable": false,
+					"splitStrategy": "none",
+					"orphanLines": 0
+				},
+				".katex-display": {
+					"lineHeight": 90,
+					"paddingTop": 0,
+					"paddingBottom": 0,
+					"marginBottom": 20,
+					"splittable": false,
+					"splitStrategy": "none",
+					"orphanLines": 0
+				}
+			}
+		}
+	},
+	"footer": {
+		"padding": {
+			"top": 20,
+			"bottom": 48
+		},
+		"fontSize": 13,
+		"copyrightFontSize": 11,
+		"content": {
+			"quoteEnglish": "To free us from the expectations of others, to give us back to ourselves.",
+			"quoteChinese": "将自己从他人的期待中解放出来，把自己还给自己",
+			"author": "Joan Didion",
+			"copyright": "Zhimin 的博客书"
+		},
+		"dark": {
+			"border": "rgba(255,255,255,0.08)",
+			"text": "#666",
+			"quote": "#999",
+			"copyright": "#555"
+		},
+		"light": {
+			"border": "rgba(0,0,0,0.08)",
+			"text": "#999",
+			"quote": "#777",
+			"copyright": "#bbb"
+		}
+	},
+	"backgrounds": {
+		"dark": {
+			"solid": "#3a3632",
+			"radial": "radial-gradient(ellipse at 50% 40%, #4a4540 0%, #2a2622 100%)",
+			"noise": "#3a3632",
+			"vignette": "radial-gradient(ellipse at 50% 45%, #3a3632 0%, #1a1816 100%)",
+			"gradient": "linear-gradient(180deg, #2a2622 0%, #3a3632 50%, #2a2622 100%)",
+			"fabric": "repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0,0,0,0.04) 2px, rgba(0,0,0,0.04) 4px), repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.01) 2px, rgba(255,255,255,0.01) 4px), #3a3632"
+		},
+		"light": {
+			"solid": "#e8e4de",
+			"radial": "radial-gradient(ellipse at 50% 40%, #f0ece6 0%, #d8d2ca 100%)",
+			"noise": "#e8e4de",
+			"vignette": "radial-gradient(ellipse at 50% 45%, #e8e4de 0%, #c4bdb4 100%)",
+			"gradient": "linear-gradient(180deg, #d8d2ca 0%, #e8e4de 50%, #d8d2ca 100%)",
+			"fabric": "repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0,0,0,0.02) 2px, rgba(0,0,0,0.02) 4px), repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.01) 2px, rgba(0,0,0,0.01) 4px), #e8e4de"
+		}
+	}
+}

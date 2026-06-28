@@ -2,8 +2,8 @@ import rss from '@astrojs/rss';
 import { getCollection } from 'astro:content';
 
 export async function GET(context) {
-  const blogPosts = await getCollection('blog');
-  const lifePosts = await getCollection('life');
+  const blogPosts = (await getCollection('blog')).filter(p => !p.data.draft);
+  const lifePosts = (await getCollection('life')).filter(p => !p.data.draft);
 
   const allPosts = [...blogPosts, ...lifePosts].sort((a, b) => {
     const dateA = a.data.pubDatetime || a.data.date;

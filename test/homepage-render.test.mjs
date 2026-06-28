@@ -21,129 +21,133 @@ async function loadDailyQuote() {
   );
 }
 
-async function loadHomepageConfig() {
+async function loadBookConfig() {
   return JSON.parse(
     await readFile(
-      new URL("../src/data/homepage-config.json", import.meta.url),
+      new URL("../src/data/book-config.json", import.meta.url),
       "utf8",
     ),
   );
 }
 
-test("homepage renders the approved linear structure", async () => {
+function readBookData(document) {
+  const node = document.querySelector("#book-data");
+  assert.ok(node, "missing #book-data");
+
+  const config = JSON.parse(node.dataset.config);
+  return {
+    config,
+    articles: config.articles || [],
+  };
+}
+
+test("homepage renders the configured turnjs book shell", async () => {
   const document = await loadHomepage();
-  const config = await loadHomepageConfig();
+  const config = await loadBookConfig();
   const bodyChildren = [...document.body.children];
 
-  assert.equal(bodyChildren[0].classList.contains("home-navigation"), true);
+  assert.equal(bodyChildren[0].classList.contains("site-nav"), true);
   assert.equal(
-    document.querySelector(".home-navigation__title").textContent.trim(),
-    config.content.navigationTitle,
+    document.querySelector(".site-nav .brand").textContent.trim(),
+    config.nav.brand.text,
   );
-  assert.equal(document.querySelector(".home-hero"), null);
-  assert.ok(document.querySelector(".home-book-frame"));
-  assert.ok(document.querySelector(".home-book"));
-  assert.ok(document.querySelector(".daily-quote"));
-  assert.match(
-    document.body.getAttribute("style"),
-    /--home-layout-book-aspect-ratio:1\.8 \/ 1/,
+  assert.deepEqual(
+    [...document.querySelectorAll(".site-nav .links a")].map((node) => ({
+      text: node.textContent.trim(),
+      href: node.getAttribute("href"),
+    })),
+    config.nav.links.items.map((item) => ({
+      text: item.label,
+      href: item.href,
+    })),
   );
-  assert.match(
-    [...document.querySelectorAll("style")]
-      .map((style) => style.textContent)
-      .join("\n"),
-    /@container home-book/,
-  );
-
-  for (const selector of [
-    ".home-book-cover",
-    ".home-book-binding",
-    ".home-book-edge--left",
-    ".home-book-edge--right",
-    ".home-book-gutter",
-  ]) {
-    assert.ok(document.querySelector(selector), `missing ${selector}`);
-  }
+  assert.ok(document.querySelector("#canvas"));
+  assert.ok(document.querySelector("#book-zoom"));
+  assert.ok(document.querySelector(".sj-book"));
+  assert.equal(document.querySelector(".home-book-frame"), null);
+  assert.equal(document.querySelector(".book-page"), null);
+  assert.equal(document.querySelector("script[src='/vendor/turnjs/js/book-app.js']") !== null, true);
 });
 
-test("homepage renders life first, technical second, and required navigation links", async () => {
+test("homepage serializes dynamic book config and content pages", async () => {
   const document = await loadHomepage();
-  const config = await loadHomepageConfig();
-  const pages = [...document.querySelectorAll(".book-page")];
+  const { config, articles } = readBookData(document);
 
-  assert.equal(pages.length, 2);
-  assert.equal(pages[0].dataset.section, "life");
-  assert.equal(pages[1].dataset.section, "technical");
-  assert.equal(document.querySelector(".book-page__title"), null);
-  assert.deepEqual(
-    [...document.querySelectorAll(".book-page__part")].map((node) => ({
-      text: node.textContent.trim(),
-      href: node.getAttribute("href"),
-    })),
-    [
-      { text: config.content.life.partLabel, href: "/life" },
-      { text: config.content.technical.partLabel, href: "/blog" },
-    ],
-  );
-  assert.deepEqual(
-    [...document.querySelectorAll(".book-page__archive")].map((node) => ({
-      text: node.textContent.trim(),
-      href: node.getAttribute("href"),
-    })),
-    [
-      { text: config.content.life.archiveLabel, href: "/life" },
-      { text: config.content.technical.archiveLabel, href: "/blog" },
-    ],
-  );
-  const runningHeads = [
-    ...document.querySelectorAll(".book-page__running-head"),
-  ];
-  assert.deepEqual(
-    [...runningHeads[0].children].map((node) => node.textContent.trim()),
-    [
-      config.content.life.outerRunningLabel,
-      config.content.life.innerRunningLabel,
-    ],
-  );
-  assert.deepEqual(
-    [...runningHeads[1].children].map((node) => node.textContent.trim()),
-    [
-      config.content.technical.innerRunningLabel,
-      config.content.technical.outerRunningLabel,
-    ],
-  );
-  assert.equal(document.querySelector(".book-page__running-head strong"), null);
-  assert.deepEqual(
-    [...document.querySelectorAll(".book-page__folio")].map((node) =>
-      node.textContent.trim(),
-    ),
-    [
-      config.content.life.homepageFolio,
-      config.content.technical.homepageFolio,
-    ],
-  );
+  assert.equal(config.book.width, 960);
+  assert.equal(config.book.contentPage.width, 460);
+  assert.equal(config.book.turn.startPage, 7);
+  assert.equal(config.book.turn.backPage, config.book.turn.totalPages - 1);
+  assert.equal(config.book.turn.totalPages % 2, 0);
+  assert.ok(config.book.turn.totalPages >= 8);
 
-  for (const href of ["/", "/blog", "/life", "/about", "/rss.xml"]) {
-    assert.ok(document.querySelector(`.home-navigation a[href="${href}"]`));
+  assert.match(config.toc, /<div class="table-contents">/);
+  assert.match(config.toc, /目录/);
+  // runtime paginated — not in static JSON
+  assert.ok(articles.length >= 5);
+
+  for (const pageNumber of [
+    config.book.turn.backPage,
+    config.book.turn.totalPages,
+  ]) {
+    assert.equal(
+      document.querySelector(`.sj-book .p${pageNumber}`) !== null,
+      true,
+      `missing dynamic cover page ${pageNumber}`,
+    );
   }
 });
 
-test("homepage quote contains the bilingual quote, author, and copyright", async () => {
+test("homepage provides content for the opening spread via book-data", async () => {
+  const document = await loadHomepage();
+  const { config, articles } = readBookData(document);
+  const startPage = config.book.turn.startPage;
+
+  // Articles are available for runtime pagination
+  assert.ok(articles.length >= 5, "articles data present");
+  assert.ok(articles[0].bodyHTML.length > 10, "first article has body HTML");
+  assert.ok(articles[0].title, "first article has title");
+
+  // Initial DOM has no static bootstrapped pages (Turn.js handles creation)
+  const bootstrapped = document.querySelectorAll(
+    ".sj-book > .own-size[data-bootstrap-page]",
+  );
+  assert.equal(bootstrapped.length, 0, "no static bootstrapped pages");
+
+  // Blank own-size placeholders exist for pages 4 and 6 (Turn.js endpapers)
+  const blankPages = document.querySelectorAll(
+    ".sj-book > .own-size:not([class*=\"p1\"])",
+  );
+  assert.ok(blankPages.length >= 2, "endpaper placeholders present");
+});
+
+test("homepage quote contains the bilingual quote, author, and configured copyright", async () => {
   const document = await loadHomepage();
   const quote = await loadDailyQuote();
-  const config = await loadHomepageConfig();
-  const footer = document.querySelector(".daily-quote");
+  const config = await loadBookConfig();
+  const footer = document.querySelector(".site-footer");
   const currentYear = new Date().getFullYear();
 
-  assert.ok(footer.querySelector(".daily-quote__english"));
-  assert.ok(footer.querySelector(".daily-quote__chinese"));
-  assert.ok(footer.querySelector(".daily-quote__meta"));
-  assert.equal(
-    footer.querySelector(".daily-quote__copyright").textContent.trim(),
-    `© ${currentYear} · ${config.content.copyrightLabel}`,
+  assert.ok(footer.querySelector(".quote"));
+  assert.match(footer.textContent, new RegExp(quote.english.slice(0, 18)));
+  assert.match(footer.textContent, new RegExp(quote.chinese.slice(0, 8)));
+  assert.match(footer.textContent, new RegExp(`— ${quote.author}`));
+  assert.match(
+    footer.textContent,
+    new RegExp(`© ${currentYear} · ${config.footer.content.copyright}`),
   );
-  assert.equal(
-    footer.querySelector(".daily-quote__author").textContent.trim(),
-    `— ${quote.author}`,
-  );
+});
+
+test("first article page does not duplicate the article title heading", async () => {
+  const { articles } = readBookData(await loadHomepage());
+  let dupCount = 0;
+  for (const a of articles) {
+    try {
+      const bodyDoc = new JSDOM(a.bodyHTML).window.document;
+      const h1s = bodyDoc.querySelectorAll("h1");
+      for (const h1 of h1s) {
+        if (h1.textContent.trim() === a.title) dupCount++;
+      }
+    } catch(e) { /* skip */ }
+  }
+  assert.equal(dupCount, 0, `found ${dupCount} duplicated article h1 headings`);
 });

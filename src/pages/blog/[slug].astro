@@ -1,9 +1,9 @@
 ---
 import { getCollection, render } from 'astro:content';
-import BlogLayout from '../../layouts/BlogLayout.astro';
+import PostLayout from '../../layouts/PostLayout.astro';
 
 export async function getStaticPaths() {
-  const posts = await getCollection('blog');
+  const posts = (await getCollection('blog')).filter(p => !p.data.draft);
   return posts.map((post) => ({
     params: { slug: post.id },
     props: { post },
@@ -14,6 +14,6 @@ const { post } = Astro.props;
 const { Content } = await render(post);
 ---
 
-<BlogLayout {...post.data}>
+<PostLayout {...post.data} collection="blog">
   <Content />
-</BlogLayout>
+</PostLayout>

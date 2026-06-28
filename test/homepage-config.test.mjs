@@ -14,6 +14,7 @@ async function readJson(path) {
 
 const config = await readJson("../src/data/homepage-config.json");
 const schema = await readJson("../src/data/homepage-config.schema.json");
+const bookConfig = await readJson("../src/data/book-config.json");
 
 test("homepage config is grouped by component and produces component variables", () => {
   assert.deepEqual(
@@ -144,44 +145,42 @@ test("schema and tuning fields expose component groups", () => {
   assert.equal(FIELDS.some(([path]) => path.startsWith("textStyles.")), false);
 });
 
-test("homepage CSS consumes component variables and direct book font sizes", async () => {
-  const css = await readFile(
-    new URL("../src/styles/home.css", import.meta.url),
-    "utf8",
+test("turnjs book config defines navigation, page geometry, and pagination", () => {
+  assert.equal(bookConfig.nav.brand.text, "ZHIMIN");
+  assert.deepEqual(
+    bookConfig.nav.links.items.map((item) => item.href),
+    ["/life", "/blog", "/about", "/rss.xml"],
   );
-
-  assert.match(
-    css,
-    /width:\s*max\(\s*var\(--home-book-size-viewport-width\),\s*var\(--home-book-size-minimum-width\)/,
-  );
-  assert.match(
-    css,
-    /font-size:\s*var\(--home-book-pages-life-catalog-title-font-size\)/,
-  );
-  assert.match(
-    css,
-    /font-size:\s*var\(--home-book-pages-technical-catalog-title-font-size\)/,
-  );
-  assert.doesNotMatch(
-    css,
-    /clamp\(\s*var\(--home-book-pages-life-catalog-title/,
-  );
-  assert.match(css, /width:\s*var\(--home-book-inner-spine-seam-width\)/);
-  assert.match(css, /\.home-book-binding::before/);
-  assert.match(css, /\.home-book-binding::after/);
+  assert.equal(bookConfig.book.width, 960);
+  assert.equal(bookConfig.book.height, 600);
+  assert.equal(bookConfig.book.contentPage.width, 460);
+  assert.equal(bookConfig.book.contentPage.height, 582);
+  assert.equal(bookConfig.book.turn.startPage, 7);
+  assert.equal(bookConfig.book.pagination.charsPerLine, 23);
 });
 
-test("homepage and tuning page consume component copy", async () => {
-  const [page, tune] = await Promise.all([
+test("homepage consumes book config and the shared turnjs app", async () => {
+  const [page, app] = await Promise.all([
     readFile(new URL("../src/pages/index.astro", import.meta.url), "utf8"),
-    readFile(new URL("../src/pages/tune.astro", import.meta.url), "utf8"),
+    readFile(
+      new URL("../public/vendor/turnjs/js/book-app.js", import.meta.url),
+      "utf8",
+    ),
   ]);
 
-  for (const source of [page, tune]) {
-    assert.match(source, /homepageConfig\.navigation\.content\.siteName/);
-    assert.match(source, /homepageConfig\.book\.pages\.life\.content/);
-    assert.match(source, /homepageConfig\.footer\.content\.copyrightLabel/);
-  }
+  assert.match(page, /import bookConfig from ['"]\.\.\/data\/book-config\.json['"]/);
+  assert.match(page, /data-config=\{JSON\.stringify\(runConfig\)\}/);
+  assert.match(page, /src="\/vendor\/turnjs\/js\/book-app\.js"/);
+  assert.doesNotMatch(page, /function loadApp\(/);
+  assert.doesNotMatch(page, /updateDepth = function/);
+
+  assert.match(app, /BACK_PAGE/);
+  assert.match(app, /BOOK_CONFIG\.book\.turn\.totalPages/);
+  assert.match(app, /Hash\.check\(\)\.update\(\)/);
+  assert.match(app, /nop:[\s\S]{0,140}START_PAGE/);
+  assert.doesNotMatch(app, /nop:[\s\S]{0,140}turn\('page', 1\)/);
+  assert.doesNotMatch(app, /\.p111\b/);
+  assert.doesNotMatch(app, /turn\.html4/);
 });
 
 test("directory folios consume separate component styles", async () => {

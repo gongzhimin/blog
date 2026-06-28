@@ -26,11 +26,11 @@ test("life and technical archives use independent roman folios", async () => {
 
   assert.equal(
     life.querySelector(".archive-page__folio").textContent.trim(),
-    config.content.life.directoryFolio,
+    config.directories.life.folio.content,
   );
   assert.equal(
     technical.querySelector(".archive-page__folio").textContent.trim(),
-    config.content.technical.directoryFolio,
+    config.directories.technical.folio.content,
   );
 
   assert.equal(life.querySelector(".archive-page").dataset.section, "life");
@@ -40,16 +40,16 @@ test("life and technical archives use independent roman folios", async () => {
   );
 
   const lifeStyle = life.body.getAttribute("style");
-  assert.match(lifeStyle, /--home-text-life-directory-folio-font-family:/);
-  assert.match(lifeStyle, /--home-text-life-directory-folio-minimum-size:/);
+  assert.match(lifeStyle, /--home-directories-life-folio-font-family:/);
+  assert.match(lifeStyle, /--home-directories-life-folio-font-size:/);
 
   const technicalStyle = technical.body.getAttribute("style");
   assert.match(
     technicalStyle,
-    /--home-text-technical-directory-folio-font-family:/,
+    /--home-directories-technical-folio-font-family:/,
   );
   assert.match(
     technicalStyle,
-    /--home-text-technical-directory-folio-minimum-size:/,
+    /--home-directories-technical-folio-font-size:/,
   );
 });

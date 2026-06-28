@@ -3,13 +3,26 @@ import '../styles/global.css';
 import type { CollectionEntry } from 'astro:content';
 import Giscus from '../components/Giscus.astro';
 
-type Props = CollectionEntry<'blog'>['data'];
+type Props = (CollectionEntry<'blog'>['data'] | CollectionEntry<'life'>['data']) & {
+  collection: 'blog' | 'life';
+};
 
-const { title, pubDatetime, description, tags } = Astro.props;
+const { title, description, collection } = Astro.props;
+const tags = 'tags' in Astro.props ? Astro.props.tags : [];
+const pubDatetime = 'pubDatetime' in Astro.props ? Astro.props.pubDatetime : null;
+const date = 'date' in Astro.props ? Astro.props.date : null;
+const displayDate = pubDatetime || date;
+const isBlog = collection === 'blog';
+const label = isBlog ? 'Technical note' : 'Essay';
+const widthClass = isBlog ? 'site-shell--narrow' : 'site-shell--compact';
 
-const formattedDate = pubDatetime.toLocaleDateString('en-US', {
+if (!displayDate) {
+  throw new Error(`Missing post date for ${title}`);
+}
+
+const formattedDate = displayDate.toLocaleDateString('en-US', {
   year: 'numeric',
-  month: 'short',
+  month: isBlog ? 'short' : 'long',
   day: 'numeric',
 });
 ---
@@ -25,13 +38,13 @@ const formattedDate = pubDatetime.toLocaleDateString('en-US', {
     <link rel="alternate" type="application/rss+xml" title="RSS Feed" href="/rss.xml" />
   </head>
   <body>
-    <main class="site-shell site-shell--narrow article-page">
+    <main class={`site-shell ${widthClass} article-page`}>
       <a href="/" class="article-page__back">← Back</a>
 
       <header class="article-hero">
         <div class="article-hero__meta">
           <time>{formattedDate}</time>
-          <span class="editorial-note">Technical note</span>
+          <span class="editorial-note">{label}</span>
         </div>
         <h1 class="article-title">
           {title}
@@ -41,7 +54,7 @@ const formattedDate = pubDatetime.toLocaleDateString('en-US', {
             {description}
           </p>
         )}
-        {tags && tags.length > 0 && (
+        {isBlog && tags.length > 0 && (
           <div class="article-tags">
             {tags.map((tag) => (
               <span class="article-tag">
@@ -57,7 +70,6 @@ const formattedDate = pubDatetime.toLocaleDateString('en-US', {
       </article>
 
       <Giscus />
-
     </main>
   </body>
 </html>

@@ -32,7 +32,7 @@ blog/
 
 ### 示例
 
-![图片示例](/images/image-guide.svg)
+![图片示例](/images/test-placeholder.png)
 
 ---
 

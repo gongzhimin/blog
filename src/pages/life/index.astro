@@ -7,7 +7,7 @@ import {
   validateHomepageConfig,
 } from '../../lib/homepage-config.mjs';
 
-const lifePosts = await getCollection('life');
+const lifePosts = (await getCollection('life')).filter(p => !p.data.draft);
 const sortedPosts = lifePosts.sort((a, b) => {
   const dateA = a.data.date;
   const dateB = b.data.date;
@@ -55,7 +55,7 @@ const homepageStyle = buildHomepageCssVariables(homepageConfig);
       </div>
 
       <p class="archive-page__folio">
-        {homepageConfig.content.life.directoryFolio}
+        {homepageConfig.directories.life.folio.content}
       </p>
     </main>
   </body>

@@ -1,118 +1,420 @@
 ---
-import "../styles/global.css";
-import "../styles/home.css";
-import { getCollection } from "astro:content";
-import SiteNavigation from "../components/SiteNavigation.astro";
-import BookCatalogPage from "../components/BookCatalogPage.astro";
-import DailyQuote from "../components/DailyQuote.astro";
-import quote from "../data/daily-quote.json";
-import homepageConfig from "../data/homepage-config.json";
-import {
-  buildHomepageResponsiveStyles,
-  buildHomepageCssVariables,
-  validateHomepageConfig,
-} from "../lib/homepage-config.mjs";
-import { buildCatalogEntries } from "../lib/homepage.mjs";
+import { getCollection } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import quote from '../data/daily-quote.json';
+import bookConfig from '../data/book-config.json';
+import { renderMarkdown, stripLeadingTitle, romanTocPage } from '../lib/book-renderer.js';
 
-validateHomepageConfig(homepageConfig);
+const SITE_TITLE = bookConfig.footer.content.copyright;
+const SITE_DESC = '文字留住瞬间。技术笔记与生活随笔。';
 
-const lifeEntries = buildCatalogEntries(
-  await getCollection("life"),
-  "/life",
-  homepageConfig.catalogs.life,
+type BlogPost = CollectionEntry<'blog'>;
+type LifePost = CollectionEntry<'life'>;
+
+function getPostDate(post: BlogPost | LifePost) {
+  return 'pubDatetime' in post.data ? post.data.pubDatetime : post.data.date;
+}
+
+const lifePosts = (await getCollection('life'))
+  .filter((post) => !post.data.draft)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const blogPosts = (await getCollection('blog'))
+  .filter((post) => !post.data.draft)
+  .sort((a, b) => b.data.pubDatetime.valueOf() - a.data.pubDatetime.valueOf());
+
+const allPosts = [...lifePosts, ...blogPosts].sort(
+  (a, b) => getPostDate(b).valueOf() - getPostDate(a).valueOf(),
 );
-const technicalEntries = buildCatalogEntries(
-  await getCollection("blog"),
-  "/blog",
-  homepageConfig.catalogs.technical,
-);
-const currentYear = new Date().getFullYear();
-const homepageStyle = buildHomepageCssVariables(homepageConfig);
-const homepageResponsiveStyles =
-  buildHomepageResponsiveStyles(homepageConfig);
+
+// Build article data for runtime pagination
+function fmtDate(d) {
+  return d.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' });
+}
+
+const articles = allPosts.map((post) => {
+  const df = 'pubDatetime' in post.data ? 'pubDatetime' : 'date';
+  const bodyHTML = renderMarkdown(stripLeadingTitle(post.body || '', post.data.title));
+  return {
+    title: post.data.title,
+    dateStr: fmtDate(post.data[df]),
+    bodyHTML,
+  };
+});
+
+// TOC
+const toc = '<div class="table-contents"><h1>目录</h1><ul>' +
+  articles.map((a, i) =>
+    `<li><a href="#page/${7 + i}">${a.title} <span>${1 + i}</span></a></li>`
+  ).join('') +
+  `</ul></div><span class="page-number">${romanTocPage(5)}</span>`;
+
+// Estimate total pages (runtime will correct)
+const estPages = 7 + articles.length * 3 + 2; // rough: 3 pages/article + covers
+const runConfig = JSON.parse(JSON.stringify(bookConfig));
+runConfig.book.turn.startPage = 7;
+runConfig.book.turn.totalPages = estPages;
+runConfig.book.turn.backPage = runConfig.book.turn.totalPages - 1;
+runConfig.articles = articles;
+runConfig.toc = toc;
+
+const backPage = runConfig.book.turn.backPage;
+const totalPages = runConfig.book.turn.totalPages;
+const nav = bookConfig.nav;
+const footer = bookConfig.footer;
+const light = {
+  nav: nav.light,
+  footer: footer.light,
+  background: bookConfig.backgrounds.light,
+};
+const pageDepthAttrs = { depth: '5' };
+
+const homepageStyles = `
+  html {
+    min-height: 100%;
+    background: ${light.background.fabric};
+  }
+
+  body {
+    min-height: 100vh;
+    overflow-x: auto !important;
+    overflow-y: auto !important;
+    color: #3a3a3a;
+  }
+
+  .site-nav {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    width: 100%;
+    height: ${nav.height}px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 24px;
+    border-bottom: 1px solid ${light.nav.border};
+    background: rgba(232, 228, 222, 0.88);
+    backdrop-filter: blur(8px);
+    box-sizing: border-box;
+  }
+
+  .site-nav .inner {
+    display: flex;
+    align-items: center;
+    gap: ${nav.innerGap}px;
+  }
+
+  .site-nav .brand {
+    color: ${light.nav.brandText};
+    font-size: ${nav.brand.fontSize}px;
+    letter-spacing: 0.08em;
+    text-decoration: none;
+  }
+
+  .site-nav .links {
+    display: flex;
+    align-items: center;
+    gap: ${nav.links.gap}px;
+  }
+
+  .site-nav .links a {
+    color: ${light.nav.linkText};
+    font-size: ${nav.links.fontSize}px;
+    text-decoration: none;
+  }
+
+  .site-nav .links a:hover {
+    color: ${light.nav.linkHover};
+  }
+
+  #canvas {
+    visibility: hidden;
+    width: ${bookConfig.book.canvasWidth}px !important;
+    height: ${bookConfig.book.height}px !important;
+    margin: 0 auto !important;
+    padding: ${bookConfig.book.gap}px 0 !important;
+  }
+
+  .sj-book {
+    width: ${bookConfig.book.width}px !important;
+    height: ${bookConfig.book.height}px !important;
+  }
+
+  .sj-book .hard {
+    width: ${bookConfig.book.hardPage.width}px;
+    height: ${bookConfig.book.hardPage.height}px;
+  }
+
+  .sj-book .own-size {
+    width: ${bookConfig.book.contentPage.width}px;
+    height: ${bookConfig.book.contentPage.height}px;
+  }
+
+  .sj-book .p1 .side {
+    width: ${bookConfig.book.spineStrip.width}px !important;
+    left: ${bookConfig.book.spineStrip.left}px !important;
+  }
+
+  .sj-book .depth {
+    top: ${bookConfig.book.depth.top}px;
+    height: ${bookConfig.book.depth.height}px;
+  }
+
+  .sj-book .book-content {
+    width: ${bookConfig.book.pagination.contentWidth}px;
+    margin: 56px auto 0;
+    color: #3a3a3a;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 13px;
+    line-height: 1.7;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+
+  .sj-book .book-content h1 {
+    margin: 0 0 8px;
+    color: #222;
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.25;
+  }
+
+  .sj-book .book-content h2 {
+    margin: 14px 0 6px;
+    color: #333;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0;
+  }
+
+  .sj-book .book-content h3 {
+    margin: 10px 0 4px;
+    color: #444;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .sj-book .book-content p {
+    margin: 0 0 7px;
+    line-height: 1.7;
+    text-indent: 1em;
+  }
+
+  .sj-book .book-content p:first-of-type,
+  .sj-book .book-content .no-indent {
+    text-indent: 0;
+  }
+
+  .sj-book .book-content pre {
+    margin: 7px 0;
+    padding: 5px 7px;
+    overflow-x: auto;
+    border-radius: 3px;
+    background: #f5f2eb;
+    font-size: 10px;
+    line-height: 1.4;
+    white-space: pre-wrap;
+  }
+
+  .sj-book .book-content code {
+    padding: 1px 3px;
+    border-radius: 2px;
+    background: #f5f2eb;
+    font-family: "SFMono-Regular", Consolas, monospace;
+    font-size: 10px;
+  }
+
+  .sj-book .book-content pre code {
+    padding: 0;
+    background: transparent;
+    font-size: 10px;
+  }
+
+  .sj-book .book-content blockquote {
+    margin: 7px 0;
+    padding: 3px 7px 3px 9px;
+    border-left: 2px solid #c9b99a;
+    color: #666;
+    font-size: 12px;
+    font-style: italic;
+  }
+
+  .sj-book .book-content blockquote::before,
+  .sj-book .book-content blockquote::after {
+    content: "";
+  }
+
+  .sj-book .book-content ul,
+  .sj-book .book-content ol {
+    margin: 0 0 7px;
+    padding-left: 16px;
+  }
+  .sj-book .book-content .list-lvl-1 { padding-left: 16px; }
+  .sj-book .book-content .list-lvl-2 { padding-left: 32px; }
+  .sj-book .book-content .list-lvl-3 { padding-left: 48px; }
+
+  .sj-book .book-content li {
+    margin-bottom: 1px;
+  }
+
+  .sj-book .book-content a {
+    color: #8b7355;
+    text-decoration: none;
+    border-bottom: 1px dotted #c9b99a;
+  }
+
+  .sj-book .book-content img {
+    display: block;
+    max-width: 100%;
+    max-height: 440px; height: auto;
+    object-fit: scale-down;
+    margin: 7px auto;
+    border-radius: 2px;
+  }
+
+  .sj-book .book-content table {
+    width: 100%;
+    margin: 7px 0;
+    border-collapse: collapse;
+    font-size: 10px;
+  }
+
+  .sj-book .book-content th,
+  .sj-book .book-content td {
+    padding: 3px 5px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+  }
+
+  .sj-book .book-content .katex-display {
+    margin: 7px 0;
+    font-size: 13px;
+  }
+
+  .sj-book .table-contents { color: #5a5a5a; }
+  .sj-book .table-contents a,
+  .sj-book .table-contents a:hover {
+    color: #8b7355;
+    display: flex;
+    float: none;
+    justify-content: space-between;
+    align-items: baseline;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 4px 10px;
+  }
+  .sj-book .table-contents span { color: #666; float: none; flex-shrink: 0; margin-left: 16px; }
+
+  /* ── Cover sprites & content surface ───────────────── */
+  .sj-book .p1,
+  .sj-book .p2,
+  .sj-book .p3,
+  .sj-book .p${backPage},
+  .sj-book .p${totalPages} {
+    background-color: white;
+    background-image: url(/vendor/turnjs/pics/book-covers.jpg) !important;
+  }
+  .sj-book .p1  { background-position: 0 0 !important; }
+  .sj-book .p2  { background-position: -480px 0 !important; }
+  .sj-book .p3  { background-position: -1920px 0 !important; }
+  .sj-book .p${backPage}   { background-position: -960px 0 !important; }
+  .sj-book .p${totalPages} { background-position: -1440px 0 !important; }
+
+  .sj-book .own-size.odd  { background-image: linear-gradient(to left,  #fff 95%, #cacaca 100%); }
+  .sj-book .own-size.even { background-image: linear-gradient(to right, #fff 95%, #dadada 100%); }
+
+  .site-footer {
+    text-align: center;
+    padding: ${footer.padding.top}px 24px ${footer.padding.bottom}px;
+    color: ${light.footer.text};
+    font-size: ${footer.fontSize}px;
+    border-top: 1px solid ${light.footer.border};
+  }
+
+  .site-footer .quote {
+    color: ${light.footer.quote};
+    font-style: italic;
+    margin-bottom: 6px;
+  }
+
+  .site-footer .copyright {
+    color: ${light.footer.copyright};
+    font-size: ${footer.copyrightFontSize}px;
+    margin-top: 8px;
+  }
+`;
+
+const quoteEnglish = quote.english || footer.content.quoteEnglish;
+const quoteChinese = quote.chinese || footer.content.quoteChinese;
+const quoteAuthor = quote.author || footer.content.author;
 ---
 
 <!doctype html>
 <html lang="zh-CN">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta
-      name="description"
-      content={homepageConfig.content.navigationTitle}
-    />
-    <title>{homepageConfig.content.siteName}</title>
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link
-      rel="alternate"
-      type="application/rss+xml"
-      title="RSS Feed"
-      href="/rss.xml"
-    />
-    <style is:inline set:html={homepageResponsiveStyles}></style>
+    <title>{SITE_TITLE}</title>
+    <meta name="description" content={SITE_DESC} />
+    <meta name="viewport" content="width=1050, user-scalable=no" />
+    <script is:inline src="/vendor/turnjs/jquery.min.1.7.js"></script>
+    <script is:inline src="/vendor/turnjs/jquery-ui-1.8.20.custom.min.js"></script>
+    <script is:inline src="/vendor/turnjs/jquery.mousewheel.min.js"></script>
+    <script is:inline src="/vendor/turnjs/modernizr.2.5.3.min.js"></script>
+    <script is:inline src="/vendor/turnjs/hash.js"></script>
+    <link rel="stylesheet" href="/vendor/turnjs/css/jquery.ui.css" />
+    <link rel="stylesheet" href="/vendor/turnjs/css/steve-jobs.css" />
+    <style is:inline set:html={homepageStyles}></style>
   </head>
-  <body class="home-body" style={homepageStyle}>
-    <SiteNavigation
-      siteName={homepageConfig.content.siteName}
-      title={homepageConfig.content.navigationTitle}
-      lifeLabel={homepageConfig.content.navigation.lifeLabel}
-      technicalLabel={homepageConfig.content.navigation.technicalLabel}
-      aboutLabel={homepageConfig.content.navigation.aboutLabel}
-      rssLabel={homepageConfig.content.navigation.rssLabel}
-    />
+  <body>
+    <header class="site-nav">
+      <div class="inner">
+        <a class="brand" href="/">{nav.brand.text}</a>
+        <nav class="links">
+          {nav.links.items.map((item) => (
+            <a href={item.href}>{item.label}</a>
+          ))}
+        </nav>
+      </div>
+    </header>
 
-    <div class="home-shell">
-      <main class="home-page">
-        <section class="home-book-frame" aria-label="最新文章目录">
-          <div class="home-book-cover" aria-hidden="true"></div>
-          <div class="home-book-binding" aria-hidden="true"></div>
-          <div
-            class="home-book-edge home-book-edge--left"
-            aria-hidden="true"
-          ></div>
-          <div
-            class="home-book-edge home-book-edge--right"
-            aria-hidden="true"
-          ></div>
-
-          <div class="home-book">
-            <BookCatalogPage
-              section="life"
-              side="left"
-              outerRunningLabel={homepageConfig.content.life.outerRunningLabel}
-              innerRunningLabel={homepageConfig.content.life.innerRunningLabel}
-              partLabel={homepageConfig.content.life.partLabel}
-              partHref="/life"
-              entries={lifeEntries}
-              archiveHref="/life"
-              archiveLabel={homepageConfig.content.life.archiveLabel}
-              folio={homepageConfig.content.life.homepageFolio}
-            />
-            <BookCatalogPage
-              section="technical"
-              side="right"
-              outerRunningLabel={homepageConfig.content.technical.outerRunningLabel}
-              innerRunningLabel={homepageConfig.content.technical.innerRunningLabel}
-              partLabel={homepageConfig.content.technical.partLabel}
-              partHref="/blog"
-              entries={technicalEntries}
-              archiveHref="/blog"
-              archiveLabel={homepageConfig.content.technical.archiveLabel}
-              folio={homepageConfig.content.technical.homepageFolio}
-            />
+    <main>
+      <div id="canvas">
+        <div id="book-zoom">
+          <div class="sj-book">
+            <div {...pageDepthAttrs} class="hard">
+              <div class="side"></div>
+            </div>
+            <div {...pageDepthAttrs} class="hard front-side">
+              <div class="depth"></div>
+            </div>
+            <div class="own-size"></div>
+            <div class="own-size even"></div>
+            <div class={`hard fixed back-side p${backPage}`}>
+              <div class="depth"></div>
+            </div>
+            <div class={`hard p${totalPages}`}></div>
           </div>
+        </div>
+        <div id="slider-bar" class="turnjs-slider">
+          <div id="slider"></div>
+        </div>
+      </div>
+    </main>
 
-          <div class="home-book-gutter" aria-hidden="true"></div>
-        </section>
-      </main>
+    <footer class="site-footer">
+      <div class="quote">"{quoteEnglish}"</div>
+      <div>{quoteChinese}</div>
+      <div style="margin-top:4px;color:#888">— {quoteAuthor}</div>
+      <div class="copyright">
+        &copy; {new Date().getFullYear()} · {footer.content.copyright}
+      </div>
+    </footer>
 
-      <DailyQuote
-        english={quote.english}
-        chinese={quote.chinese}
-        author={quote.author}
-        year={currentYear}
-        copyrightLabel={homepageConfig.content.copyrightLabel}
-      />
-    </div>
+    <div
+      id="book-data"
+      hidden
+      data-config={JSON.stringify(runConfig)}
+    ></div>
+
+    <script is:inline src="/vendor/turnjs/js/book-app.js"></script>
   </body>
 </html>
