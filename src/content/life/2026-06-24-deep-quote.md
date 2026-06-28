@@ -31,11 +31,11 @@ tags: ["test", "blockquote"]
 
 ## 引用中的代码
 
-> 在 `book-assembler.js` 中，`HEADER_LINES` 常量定义了首页标题占用的行数：
+> 在 `paginator.js` 中，`ARTICLE_H` 常量定义了文章页的可用测量高度：
 >
 > ```
-> const HEADER_LINES = 3;
+> var ARTICLE_H = 471;
 > ```
 >
-> 这个值意味着首页内容区将减少 3 行的空间，用于容纳 `<h1>` 标题和日期行。
+> 这个值是 582（页面总高）减去 56（顶部 margin）再减去 55（底部页码区）得出的，确保排版内容不会溢出到底部页码之下。
 

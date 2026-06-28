@@ -24,13 +24,13 @@ tags: ["test", "table", "image"]
 
 | 文件名 | 层 | 行数 | 职责 |
 |--------|-----|------|------|
-| `book-renderer.js` | L1 | 96 | Markdown 转 HTML |
-| `book-paginator.js` | L2 | 307 | 排版引擎 |
-| `book-assembler.js` | L3 | 104 | 书页组装 |
-| `paginate.js` | L2 | 288 | JSDOM 精确排版 |
-| `book-config.json` | — | 250 | 全局配置 |
-| `book-app.js` | — | 142 | Turn.js 运行时 |
-| `index.astro` | — | 390 | 首页编排 |
+| `book-renderer.js` | L1 | 126 | Markdown 转 HTML + 图片尺寸注入 |
+| `measurement-css.js` | — | 35 | 测量容器样式单源 |
+| `paginator.js` | L2 | 391 | 运行时 DOM 测量分页引擎 |
+| `orchestrator.js` | — | 107 | 全局页码编排与目录生成 |
+| `book-app.js` | — | 173 | Turn.js 初始化胶水 |
+| `book-config.json` | — | 253 | 书本尺寸与排版参数 |
+| `index.astro` | — | 423 | 书页首页渲染 |
 
 ## 超链接与图片
 
