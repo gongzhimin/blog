@@ -51,16 +51,16 @@ const allPosts = [...lifePosts, ...blogPosts].sort(
 );
 
 // Build article data for runtime pagination
-function fmtDate(d) {
+function fmtDate(d: Date) {
   return d.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' });
 }
 
 const articles = allPosts.map((post) => {
-  const df = 'pubDatetime' in post.data ? 'pubDatetime' : 'date';
+  const date = getPostDate(post);
   const bodyHTML = renderMarkdown(stripLeadingTitle(post.body || '', post.data.title));
   return {
     title: post.data.title,
-    dateStr: fmtDate(post.data[df]),
+    dateStr: fmtDate(date),
     bodyHTML,
   };
 });
