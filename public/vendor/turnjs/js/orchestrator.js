@@ -93,8 +93,8 @@ function paginateAll(articles, initialTOC) {
   // Inject back‑cover sprite CSS
   var spriteCSS = document.createElement('style');
   spriteCSS.textContent =
-    '.sj-book .p' + backPage + '{background-color:white;background-image:url(/vendor/turnjs/pics/book-covers.jpg)!important;background-repeat:no-repeat;background-size:2400px 600px;background-position:-960px 0!important}' +
-    '.sj-book .p' + totalPages + '{background-color:white;background-image:url(/vendor/turnjs/pics/book-covers.jpg)!important;background-repeat:no-repeat;background-size:2400px 600px;background-position:-1440px 0!important}';
+    '.sj-book .p' + backPage + '{background-color:white;background-image:url(/vendor/turnjs/pics/book-covers.jpg)!important;background-repeat:no-repeat;background-size:2400px 600px;background-position:-968px 0!important}' +
+    '.sj-book .p' + totalPages + '{background-color:white;background-image:url(/vendor/turnjs/pics/book-covers.jpg)!important;background-repeat:no-repeat;background-size:2400px 600px;background-position:-1452px 0!important}';
   document.head.appendChild(spriteCSS);
 
   _paginated = true;
