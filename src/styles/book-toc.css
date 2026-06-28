@@ -1,0 +1,28 @@
+/* ── Table of contents ─────────────────────────────────────────────
+ * Mirrored into #__toc at build time for the TOC measurement container.
+ */
+
+.sj-book .table-contents {
+  font-family: 'Stempel-Garamond-W01-Roman', Georgia, "Times New Roman",
+               "Chiron Sung HK", "Noto Serif SC", "Songti SC", "STSong", "SimSun", serif;
+  color: #5a5a5a;
+}
+
+.sj-book .table-contents a,
+.sj-book .table-contents a:hover {
+  color: #8b7355;
+  display: flex;
+  float: none;
+  justify-content: space-between;
+  align-items: baseline;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 4px 10px;
+}
+
+.sj-book .table-contents span {
+  color: #666;
+  float: none;
+  flex-shrink: 0;
+  margin-left: 16px;
+}
