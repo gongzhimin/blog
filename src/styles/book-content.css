@@ -8,63 +8,119 @@
  *   ¼  line  =  5px
  */
 
+/* ══════════════════════════════════════════════════════════════════
+   CSS Custom Properties — change colors / fonts / sizes here
+   ══════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── Colors ───────────────────────────────────────────────── */
+  --text-color: #3a3a3a;
+  --text-muted: #666;
+  --text-heading: #222;
+  --text-h2: #333;
+  --text-h3: #444;
+  --link-color: #8b7355;
+  --link-border: #c9b99a;
+
+  /* ── Code ─────────────────────────────────────────────────── */
+  --code-bg: #f5f2eb;
+  --code-border: #e0ddd5;
+  --code-shadow: rgba(0,0,0,0.08);
+
+  /* ── Blockquote ────────────────────────────────────────────── */
+  --blockquote-border: #c9b99a;
+
+  /* ── Horizontal rule ───────────────────────────────────────── */
+  --hr-color: #ddd;
+
+  /* ── Fonts ─────────────────────────────────────────────────── */
+  --font-latin-serif: 'Stempel-Garamond-W01-Roman', Georgia, "Times New Roman";
+  --font-cjk-serif: "Chiron Sung HK", "Noto Serif SC", "Songti SC", "STSong", "SimSun";
+  --font-serif: var(--font-latin-serif), var(--font-cjk-serif), serif;
+
+  --font-latin-sans: "Helvetica Neue", Helvetica, Arial;
+  --font-cjk-sans: "PingFang SC", "Microsoft YaHei", "Heiti SC";
+  --font-sans: var(--font-latin-sans), var(--font-cjk-sans), sans-serif;
+
+  --font-mono: "SFMono-Regular", Consolas, monospace;
+
+  /* ── Sizes ─────────────────────────────────────────────────── */
+  --font-size-body: 13px;
+  --font-size-code: 10px;
+  --font-size-blockquote: 12px;
+  --font-size-table: 10px;
+  --font-size-h1: 17px;
+  --font-size-h2: 14px;
+  --font-size-h3: 13px;
+  --line-height-body: 1.7;
+  --line-height-heading: 1.25;
+  --line-height-code: 1.4;
+
+  /* ── Spacing ───────────────────────────────────────────────── */
+  --spacing-line: 22px;
+  --spacing-half: 11px;
+  --spacing-quarter: 5px;
+  --spacing-list-indent: 22px;
+  --spacing-text-indent: 2em;
+
+  /* ── Table ─────────────────────────────────────────────────── */
+  --table-border: #999;
+}
+
+
 .sj-book .book-content {
   width: 380px;
   margin: 56px auto 0;
-  color: #3a3a3a;
-  font-family: 'Stempel-Garamond-W01-Roman', Georgia, "Times New Roman",
-               "Chiron Sung HK", "Noto Serif SC", "Songti SC", "STSong", "SimSun", serif;
-  font-size: 13px;
-  line-height: 1.7;
+  color: var(--text-color);
+  font-family: var(--font-serif);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
   overflow-wrap: break-word;
   word-break: break-word;
+  font-variant-numeric: proportional-nums;
 }
 
 /* ── Headings ────────────────────────────────────────────────── */
 
 .sj-book .book-content h1 {
-  font-family: 'Stempel-Garamond-W01-Roman', Georgia, "Times New Roman",
-               "Chiron Sung HK", "Noto Serif SC", "Songti SC", "STSong", "SimSun", serif;
-  margin: 0 0 11px;            /* ½ line */
-  color: #222;
-  font-size: 17px;
+  font-family: var(--font-serif);
+  margin: 0 0 var(--spacing-half);
+  color: var(--text-heading);
+  font-size: var(--font-size-h1);
   font-weight: 700;
-  line-height: 1.25;
+  line-height: var(--line-height-heading);
 }
 
 .sj-book .book-content h2 {
-  font-family: "Helvetica Neue", Helvetica, Arial,
-               "PingFang SC", "Microsoft YaHei", "Heiti SC", sans-serif;
-  margin: 22px 0 11px;         /* 1 line above, ½ line below */
-  color: #333;
-  font-size: 14px;
+  font-family: var(--font-sans);
+  margin: var(--spacing-line) 0 var(--spacing-half);
+  color: var(--text-h2);
+  font-size: var(--font-size-h2);
   font-weight: 600;
 }
 
 .sj-book .book-content h3 {
-  font-family: "Helvetica Neue", Helvetica, Arial,
-               "PingFang SC", "Microsoft YaHei", "Heiti SC", sans-serif;
-  margin: 11px 0 5px;          /* ½ line above, ¼ line below */
-  color: #444;
-  font-size: 13px;
+  font-family: var(--font-sans);
+  margin: var(--spacing-half) 0 var(--spacing-quarter);
+  color: var(--text-h3);
+  font-size: var(--font-size-h3);
   font-weight: 600;
 }
 
-/* Compress spacing between consecutive headings */
 .sj-book .book-content h1 + h2,
 .sj-book .book-content h2 + h3,
 .sj-book .book-content h3 + h4,
 .sj-book .book-content h4 + h5,
 .sj-book .book-content h5 + h6 {
-  margin-block-start: 5px;     /* ¼ line */
+  margin-block-start: var(--spacing-quarter);
 }
 
 /* ── Paragraphs ───────────────────────────────────────────────── */
 
 .sj-book .book-content p {
-  margin: 0 0 11px;            /* ½ line */
-  line-height: 1.7;
-  text-indent: 2em;            /* standard Chinese indent */
+  margin: 0 0 var(--spacing-half);
+  line-height: var(--line-height-body);
+  text-indent: var(--spacing-text-indent);
   text-align: justify;
 }
 
@@ -73,43 +129,68 @@
   text-indent: 0;
 }
 
+/* ── Horizontal rule ──────────────────────────────────────────── */
+
+.sj-book .book-content hr {
+  width: 30%;
+  height: 1px;
+  margin: var(--spacing-line) auto;
+  border: 0;
+  background: var(--hr-color);
+}
+
 /* ── Code ─────────────────────────────────────────────────────── */
 
 .sj-book .book-content pre {
-  margin: 11px 0;              /* ½ line */
-  padding: 5px 11px;
+  margin: var(--spacing-half) 0;
+  padding: var(--spacing-quarter) var(--spacing-half);
   overflow-x: auto;
-  border-radius: 3px;
-  background: #f5f2eb;
-  font-size: 10px;
-  line-height: 1.4;
+  border: 1px solid var(--code-border);
+  border-radius: 0;
+  background: var(--code-bg);
+  font-size: var(--font-size-code);
+  line-height: var(--line-height-code);
   white-space: pre-wrap;
 }
 
 .sj-book .book-content code {
   padding: 1px 3px;
-  border-radius: 2px;
-  background: #f5f2eb;
-  font-family: "SFMono-Regular", Consolas, monospace;
-  font-size: 10px;
+  margin: 0 0.15em;
+  border-radius: 0.3em;
+  background: var(--code-bg);
+  box-shadow: 0 0 1px 1px var(--code-shadow);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-code);
   word-break: break-all;
 }
 
 .sj-book .book-content pre code {
   padding: 0;
+  margin: 0;
+  border-radius: 0;
   background: transparent;
-  font-size: 10px;
+  box-shadow: none;
+  font-size: var(--font-size-code);
 }
 
 /* ── Blockquote ────────────────────────────────────────────────── */
 
 .sj-book .book-content blockquote {
-  margin: 11px 0;
-  padding: 5px 11px 5px 13px;
-  border-left: 2px solid #c9b99a;
-  color: #666;
-  font-size: 12px;
+  margin: var(--spacing-half) 0;
+  padding-left: var(--spacing-list-indent);
+  padding-right: var(--spacing-list-indent);
+  color: var(--text-muted);
+  font-size: var(--font-size-blockquote);
   font-style: italic;
+}
+
+/* Nested blockquote gets a vertical bar */
+.sj-book .book-content blockquote blockquote {
+  border-left: 4px solid var(--blockquote-border);
+  padding-left: calc(var(--spacing-list-indent) - 4px);
+  padding-right: 0;
+  margin-left: -4px;
+  border-radius: 0;
 }
 
 .sj-book .book-content blockquote::before,
@@ -121,13 +202,22 @@
 
 .sj-book .book-content ul,
 .sj-book .book-content ol {
-  margin: 0 0 11px;
-  padding-left: 22px;          /* 1 line = 2em indent */
+  margin: 0 0 var(--spacing-half);
+  padding-inline-start: var(--spacing-list-indent);
 }
 
-.sj-book .book-content .list-lvl-1 { padding-left: 22px; }
-.sj-book .book-content .list-lvl-2 { padding-left: 44px; }
-.sj-book .book-content .list-lvl-3 { padding-left: 66px; }
+/* Nested list marker differentiation */
+.sj-book .book-content ul           { list-style-type: disc; }
+.sj-book .book-content ul ul        { list-style-type: "\2013\00A0\00A0\00A0"; } /* –   */
+.sj-book .book-content ul ul ul     { list-style-type: "\25E6\00A0\00A0"; }       /* ◦  */
+
+.sj-book .book-content ol           { list-style-type: decimal; }
+.sj-book .book-content ol ol        { list-style-type: lower-alpha; }
+.sj-book .book-content ol ol ol     { list-style-type: lower-roman; }
+
+.sj-book .book-content .list-lvl-1 { padding-left: var(--spacing-list-indent); }
+.sj-book .book-content .list-lvl-2 { padding-left: calc(var(--spacing-list-indent) * 2); }
+.sj-book .book-content .list-lvl-3 { padding-left: calc(var(--spacing-list-indent) * 3); }
 
 .sj-book .book-content li {
   margin-bottom: 3px;
@@ -136,9 +226,9 @@
 /* ── Links ─────────────────────────────────────────────────────── */
 
 .sj-book .book-content a {
-  color: #8b7355;
+  color: var(--link-color);
   text-decoration: none;
-  border-bottom: 1px dotted #c9b99a;
+  border-bottom: 1px dotted var(--link-border);
 }
 
 /* ── Images ────────────────────────────────────────────────────── */
@@ -149,36 +239,46 @@
   max-height: 440px;
   height: auto;
   object-fit: scale-down;
-  margin: 11px auto;
+  margin: var(--spacing-half) auto;
   border-radius: 2px;
 }
 
-/* ── Tables ────────────────────────────────────────────────────── */
+/* ── Tables (three-line style) ─────────────────────────────────── */
 
 .sj-book .book-content table {
   width: 100%;
-  margin: 11px 0;
+  margin: var(--spacing-half) 0;
   border-collapse: collapse;
-  font-size: 10px;
+  border-top: 2px solid var(--table-border);
+  border-bottom: 2px solid var(--table-border);
+  font-size: var(--font-size-table);
+  font-variant-numeric: tabular-nums;
+}
+
+.sj-book .book-content thead {
+  border-bottom: 1.5px solid var(--table-border);
 }
 
 .sj-book .book-content th,
 .sj-book .book-content td {
-  padding: 5px 11px;
-  border-bottom: 1px solid #ddd;
-  text-align: left;
+  padding: 6px 10px;
+  border: none;
+}
+
+.sj-book .book-content th {
+  font-weight: 700;
 }
 
 /* ── KaTeX ─────────────────────────────────────────────────────── */
 
 .sj-book .book-content .katex-display {
-  margin: 11px 0;
+  display: block;
+  margin: var(--spacing-half) 0;
   font-size: 13px;
 }
 
 /* ── Chinese typography ────────────────────────────────────────── */
 
-/* No italic in Chinese — only Latin text gets italic */
 .sj-book .book-content em,
 .sj-book .book-content cite,
 .sj-book .book-content dfn,
