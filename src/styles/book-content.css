@@ -1,6 +1,11 @@
 /* ── Book content typography ───────────────────────────────────────
  * Single source of truth for article text styling.
  * Mirrored into #__bap_inner at build time for the measurement container.
+ *
+ * Spacing grid: font-size 13px × line-height 1.7 ≈ 22px per line.
+ *   1  line  = 22px
+ *   ½  line  = 11px
+ *   ¼  line  =  5px
  */
 
 .sj-book .book-content {
@@ -15,41 +20,52 @@
   word-break: break-word;
 }
 
-/* h1 — same serif stack as body */
+/* ── Headings ────────────────────────────────────────────────── */
+
 .sj-book .book-content h1 {
   font-family: 'Stempel-Garamond-W01-Roman', Georgia, "Times New Roman",
                "Chiron Sung HK", "Noto Serif SC", "Songti SC", "STSong", "SimSun", serif;
-  margin: 0 0 8px;
+  margin: 0 0 11px;            /* ½ line */
   color: #222;
   font-size: 17px;
   font-weight: 700;
   line-height: 1.25;
 }
 
-/* h2/h3 — sans-serif stack */
 .sj-book .book-content h2 {
   font-family: "Helvetica Neue", Helvetica, Arial,
                "PingFang SC", "Microsoft YaHei", "Heiti SC", sans-serif;
-  margin: 14px 0 6px;
+  margin: 22px 0 11px;         /* 1 line above, ½ line below */
   color: #333;
   font-size: 14px;
   font-weight: 600;
-  letter-spacing: 0;
 }
 
 .sj-book .book-content h3 {
   font-family: "Helvetica Neue", Helvetica, Arial,
                "PingFang SC", "Microsoft YaHei", "Heiti SC", sans-serif;
-  margin: 10px 0 4px;
+  margin: 11px 0 5px;          /* ½ line above, ¼ line below */
   color: #444;
   font-size: 13px;
   font-weight: 600;
 }
 
+/* Compress spacing between consecutive headings */
+.sj-book .book-content h1 + h2,
+.sj-book .book-content h2 + h3,
+.sj-book .book-content h3 + h4,
+.sj-book .book-content h4 + h5,
+.sj-book .book-content h5 + h6 {
+  margin-block-start: 5px;     /* ¼ line */
+}
+
+/* ── Paragraphs ───────────────────────────────────────────────── */
+
 .sj-book .book-content p {
-  margin: 0 0 7px;
+  margin: 0 0 11px;            /* ½ line */
   line-height: 1.7;
-  text-indent: 1em;
+  text-indent: 2em;            /* standard Chinese indent */
+  text-align: justify;
 }
 
 .sj-book .book-content p:first-of-type,
@@ -57,9 +73,11 @@
   text-indent: 0;
 }
 
+/* ── Code ─────────────────────────────────────────────────────── */
+
 .sj-book .book-content pre {
-  margin: 7px 0;
-  padding: 5px 7px;
+  margin: 11px 0;              /* ½ line */
+  padding: 5px 11px;
   overflow-x: auto;
   border-radius: 3px;
   background: #f5f2eb;
@@ -74,6 +92,7 @@
   background: #f5f2eb;
   font-family: "SFMono-Regular", Consolas, monospace;
   font-size: 10px;
+  word-break: break-all;
 }
 
 .sj-book .book-content pre code {
@@ -82,9 +101,11 @@
   font-size: 10px;
 }
 
+/* ── Blockquote ────────────────────────────────────────────────── */
+
 .sj-book .book-content blockquote {
-  margin: 7px 0;
-  padding: 3px 7px 3px 9px;
+  margin: 11px 0;
+  padding: 5px 11px 5px 13px;
   border-left: 2px solid #c9b99a;
   color: #666;
   font-size: 12px;
@@ -96,19 +117,23 @@
   content: "";
 }
 
+/* ── Lists ─────────────────────────────────────────────────────── */
+
 .sj-book .book-content ul,
 .sj-book .book-content ol {
-  margin: 0 0 7px;
-  padding-left: 16px;
+  margin: 0 0 11px;
+  padding-left: 22px;          /* 1 line = 2em indent */
 }
 
-.sj-book .book-content .list-lvl-1 { padding-left: 16px; }
-.sj-book .book-content .list-lvl-2 { padding-left: 32px; }
-.sj-book .book-content .list-lvl-3 { padding-left: 48px; }
+.sj-book .book-content .list-lvl-1 { padding-left: 22px; }
+.sj-book .book-content .list-lvl-2 { padding-left: 44px; }
+.sj-book .book-content .list-lvl-3 { padding-left: 66px; }
 
 .sj-book .book-content li {
-  margin-bottom: 1px;
+  margin-bottom: 3px;
 }
+
+/* ── Links ─────────────────────────────────────────────────────── */
 
 .sj-book .book-content a {
   color: #8b7355;
@@ -116,31 +141,54 @@
   border-bottom: 1px dotted #c9b99a;
 }
 
+/* ── Images ────────────────────────────────────────────────────── */
+
 .sj-book .book-content img {
   display: block;
   max-width: 100%;
   max-height: 440px;
   height: auto;
   object-fit: scale-down;
-  margin: 7px auto;
+  margin: 11px auto;
   border-radius: 2px;
 }
 
+/* ── Tables ────────────────────────────────────────────────────── */
+
 .sj-book .book-content table {
   width: 100%;
-  margin: 7px 0;
+  margin: 11px 0;
   border-collapse: collapse;
   font-size: 10px;
 }
 
 .sj-book .book-content th,
 .sj-book .book-content td {
-  padding: 3px 5px;
+  padding: 5px 11px;
   border-bottom: 1px solid #ddd;
   text-align: left;
 }
 
+/* ── KaTeX ─────────────────────────────────────────────────────── */
+
 .sj-book .book-content .katex-display {
-  margin: 7px 0;
+  margin: 11px 0;
   font-size: 13px;
+}
+
+/* ── Chinese typography ────────────────────────────────────────── */
+
+/* No italic in Chinese — only Latin text gets italic */
+.sj-book .book-content em,
+.sj-book .book-content cite,
+.sj-book .book-content dfn,
+.sj-book .book-content address {
+  font-style: normal;
+}
+
+:lang(en) em,
+:lang(en) cite,
+:lang(en) dfn,
+:lang(en) address {
+  font-style: italic;
 }

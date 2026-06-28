@@ -70,6 +70,42 @@ export function renderMarkdown(md) {
   // correct space even before the image loads.
   html = injectImageDimensions(html);
 
+  // CJK-Latin auto-spacing — add thin space (U+2006, ⅙ em) between
+  // Chinese characters and adjacent Latin words / numbers.
+  // Protected blocks (<code>, <pre>, <script>, <style>) are skipped.
+  html = addCJKLatinSpacing(html);
+
+  return html;
+}
+
+/**
+ * Add ⅙-em spacing between CJK and ANS characters.
+ * Code/pre/script/style blocks are left untouched.
+ */
+function addCJKLatinSpacing(html) {
+  const CJK = '\u4e00-\u9fff\u3400-\u4dbf\u2e80-\u2eff\uf900-\ufaff\u3000-\u303f\uff00-\uffef';
+  const protectedBlocks = [];
+
+  // Protect code/pre blocks
+  html = html.replace(/(<(code|pre|script|style)\b[^>]*>[\s\S]*?<\/\2>)/gi, (m) => {
+    protectedBlocks.push(m);
+    return `\uE001PROT_${protectedBlocks.length - 1}_PROT\uE001`;
+  });
+
+  // CJK → ANS word
+  html = html.replace(
+    new RegExp(`([${CJK}])([A-Za-z0-9]+(?:\\s+[A-Za-z0-9]+)*)`, 'g'),
+    '$1\u2006$2'
+  );
+  // ANS word → CJK
+  html = html.replace(
+    new RegExp(`([A-Za-z0-9]+(?:\\s+[A-Za-z0-9]+)*)([${CJK}])`, 'g'),
+    '$1\u2006$2'
+  );
+
+  // Restore protected blocks
+  html = html.replace(/\uE001PROT_(\d+)_PROT\uE001/g, (_, i) => protectedBlocks[parseInt(i)]);
+
   return html;
 }
 

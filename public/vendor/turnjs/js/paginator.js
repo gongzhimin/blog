@@ -25,6 +25,32 @@ var PAGINATOR = (function () {
     return off;
   }
 
+  // ── inline tag preservation ─────────────────────────────────────
+
+  var INLINE_TAGS = { code:1, strong:1, em:1, b:1, i:1, a:1, span:1,
+    u:1, s:1, del:1, ins:1, sub:1, sup:1, mark:1, small:1,
+    abbr:1, dfn:1, cite:1, q:1, kbd:1, samp:1, var:1 };
+
+  /** Find which inline tags are open at byte offset `cut` in `html`. */
+  function openInlineTags(html, cut) {
+    var before = html.substring(0, cut);
+    var stack = [];
+    var re = /<\/?([a-zA-Z][a-zA-Z0-9]*)[^>]*>/g;
+    var m;
+    while ((m = re.exec(before)) !== null) {
+      var name = m[1].toLowerCase();
+      if (INLINE_TAGS[name]) {
+        if (m[0].substring(0, 2) === '</') {
+          var idx = stack.lastIndexOf(name);
+          if (idx >= 0) stack.splice(idx, 1);
+        } else if (!/\/>$/.test(m[0])) {
+          stack.push(name);
+        }
+      }
+    }
+    return stack;
+  }
+
   // ── split functions — pure, no closure over i / elems ────────────
 
   /** Split a text‑level element (p, li, blockquote, h1‑h6) by binary
@@ -47,9 +73,16 @@ var PAGINATOR = (function () {
     inner.removeChild(el);
     if (best === 0 || best >= origText.length - 3) { el.innerHTML = origHTML; return false; }
     var cut = charToHTML(origHTML, best);
-    el.innerHTML = origHTML.substring(0, cut);
+
+    // Preserve inline tags across the split boundary:
+    // tags still open at `cut` are closed in Part 1 and reopened in Part 2.
+    var openTags = openInlineTags(origHTML, cut);
+    var closePart = openTags.slice().reverse().map(function(t){ return '</' + t + '>'; }).join('');
+    var reopenPart = openTags.map(function(t){ return '<' + t + '>'; }).join('');
+
+    el.innerHTML = origHTML.substring(0, cut) + closePart;
     var rest = document.createElement(tag);
-    rest.innerHTML = origHTML.substring(cut);
+    rest.innerHTML = reopenPart + origHTML.substring(cut);
     rest.className = 'no-indent';
     return { el: el, rest: rest };
   }
