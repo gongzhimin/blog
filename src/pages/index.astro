@@ -186,9 +186,7 @@ const homepageStyles = `
   /* ── Cover sprites & content surface ───────────────── */
   .sj-book .p1,
   .sj-book .p2,
-  .sj-book .p3,
-  .sj-book .p${backPage},
-  .sj-book .p${totalPages} {
+  .sj-book .p3 {
     background-color: white;
     background-image: url(/vendor/turnjs/pics/book-covers.jpg) !important;
     background-repeat: no-repeat;
@@ -197,8 +195,8 @@ const homepageStyles = `
   .sj-book .p1  { background-position: 0 0 !important; }
   .sj-book .p2  { background-position: -483px 0 !important; }
   .sj-book .p3  { background-position: -1936px 0 !important; }
-  .sj-book .p${backPage}   { background-position: -968px 0 !important; }
-  .sj-book .p${totalPages} { background-position: -1452px 0 !important; }
+  /* Back-cover pages (.p${backPage}, .p${totalPages}) injected at runtime
+     by orchestrator.js — not here, to avoid stale estimated page numbers. */
 
   /* ── Paper texture ──────────────────────────────────────── */
   .sj-book .own-size {

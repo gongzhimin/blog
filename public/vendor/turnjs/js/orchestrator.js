@@ -80,6 +80,12 @@ function paginateAll(articles, initialTOC) {
   var totalPages = pg % 2 === 0 ? pg + 2 : pg + 1;
   var backPage = totalPages - 1;
 
+  // Pre-fill back-cover and blank parity pages so the fallback
+  // doesn't stamp a physical page number onto them.
+  _pageCache[backPage] = '<div class="book-content"></div>';
+  _pageCache[totalPages] = '<div class="book-content"></div>';
+  if (pg < backPage) _pageCache[pg] = '<div class="book-content"></div>';
+
   // Update back‑cover DOM
   var oldBack = document.querySelector('.sj-book .back-side');
   var oldOuter = oldBack ? oldBack.nextElementSibling : null;

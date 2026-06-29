@@ -23,9 +23,11 @@
   --link-border: #c9b99a;
 
   /* ── Code ─────────────────────────────────────────────────── */
-  --code-bg: #f5f2eb;
-  --code-border: #e0ddd5;
-  --code-shadow: rgba(0,0,0,0.08);
+  --code-bg: rgba(72,70,62,0.045);
+  --code-line: rgba(70,68,60,0.22);
+  --code-text: rgba(48,46,42,0.92);
+  --inline-code-text: rgba(42,40,36,0.92);
+  --inline-code-bg: rgba(72,70,62,0.055);
 
   /* ── Blockquote ────────────────────────────────────────────── */
   --blockquote-border: #c9b99a;
@@ -146,35 +148,60 @@
 /* ── Code ─────────────────────────────────────────────────────── */
 
 .sj-book .book-content pre {
-  margin: var(--spacing-half) 0;
-  padding: var(--spacing-quarter) var(--spacing-half);
-  overflow-x: auto;
-  border: 1px solid var(--code-border);
+  margin: 1.55em 0 1.8em;
+  padding: 1.1em 0;
+  color: var(--code-text);
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--code-line);
+  border-bottom: 1px solid var(--code-line);
   border-radius: 0;
-  background: var(--code-bg);
+  box-shadow: none;
+  overflow-x: auto;
+  overflow-y: hidden;
   font-size: var(--font-size-code);
-  line-height: var(--line-height-code);
-  white-space: pre-wrap;
+  line-height: 1.68;
+  letter-spacing: 0;
+  tab-size: 2;
+  white-space: pre;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(70,68,60,0.22) transparent;
 }
 
 .sj-book .book-content code {
-  padding: 1px 3px;
-  margin: 0 0.15em;
-  border-radius: 0.3em;
-  background: var(--code-bg);
-  box-shadow: 0 0 1px 1px var(--code-shadow);
   font-family: var(--font-mono);
-  font-size: var(--font-size-code);
-  word-break: break-all;
+  font-size: 0.86em;
+  line-height: 1.15;
+  color: var(--inline-code-text);
+  background: var(--inline-code-bg);
+  border: 0;
+  border-radius: 2px;
+  padding: 0.03em 0.18em;
+  margin: 0 0.04em;
+  box-shadow: none;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
 }
 
 .sj-book .book-content pre code {
-  padding: 0;
+  display: block;
+  padding: 0 0.65em;
   margin: 0;
-  border-radius: 0;
+  color: inherit;
   background: transparent;
+  border: 0;
+  border-radius: 0;
   box-shadow: none;
-  font-size: var(--font-size-code);
+  font-size: inherit;
+  line-height: inherit;
+  white-space: pre;
+}
+
+.sj-book .book-content pre::-webkit-scrollbar { height: 3px; }
+.sj-book .book-content pre::-webkit-scrollbar-track { background: transparent; }
+.sj-book .book-content pre::-webkit-scrollbar-thumb {
+  background: rgba(70,68,60,0.22);
+  border-radius: 999px;
 }
 
 /* ── Blockquote ────────────────────────────────────────────────── */
