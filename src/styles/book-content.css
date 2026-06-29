@@ -135,6 +135,13 @@
   text-indent: 0;
 }
 
+/* Poetry / short-line verse */
+.sj-book .book-content p:has(br) {
+  text-align: left;
+  text-indent: 0;
+  padding-left: 3em;
+}
+
 /* ── Horizontal rule ──────────────────────────────────────────── */
 
 .sj-book .book-content hr {
@@ -207,44 +214,30 @@
 /* ── Blockquote ────────────────────────────────────────────────── */
 
 .sj-book .book-content blockquote {
-  width: 82%;
-  margin: 2.15em auto;
-  padding: 0.85em 0;
+  margin: 1.05em 0 1.15em;
+  padding: 0.1em 0 0.1em 0.9em;
   font-family: var(--font-latin-serif), var(--font-cjk-kai), serif;
   font-size: var(--font-size-blockquote);
   font-style: normal;
-  line-height: 2;
+  line-height: 1.9;
   background: transparent;
   border: 0;
+  border-left: 1px solid var(--blockquote-border);
+  border-radius: 0;
   box-shadow: none;
 }
 
 .sj-book .book-content blockquote p {
-  margin: 0 0 0.85em;
+  margin: 0 0 0.55em;
 }
 
 .sj-book .book-content blockquote p:last-child {
   margin-bottom: 0;
 }
 
-/* Top and bottom decorative lines */
 .sj-book .book-content blockquote::before,
 .sj-book .book-content blockquote::after {
-  content: "";
-  display: block;
-  width: 3.2em;
-  height: 1px;
-  margin-left: auto;
-  margin-right: auto;
-  background: var(--blockquote-border);
-}
-
-.sj-book .book-content blockquote::before {
-  margin-bottom: 1.05em;
-}
-
-.sj-book .book-content blockquote::after {
-  margin-top: 1.05em;
+  content: none !important;
 }
 
 /* Latin italic inside blockquote */
@@ -255,25 +248,23 @@
 
 .sj-book .book-content blockquote cite {
   display: block;
-  margin-top: 0.9em;
+  margin-top: 0.45em;
   text-align: right;
-  font-size: 0.88em;
-  letter-spacing: 0.04em;
+  font-size: 0.86em;
+  letter-spacing: 0.03em;
 }
 
-/* Nested blockquote gets a vertical bar */
+/* Nested blockquote gets a thicker bar */
 .sj-book .book-content blockquote blockquote {
-  width: auto;
   margin: var(--spacing-half) 0;
   border-left: 4px solid var(--blockquote-border);
-  padding: 5px 0 5px calc(var(--spacing-half) - 4px);
-  border-radius: 0;
+  padding-left: calc(var(--spacing-half) - 4px);
   line-height: var(--line-height-body);
 }
 
 .sj-book .book-content blockquote blockquote::before,
 .sj-book .book-content blockquote blockquote::after {
-  display: none;
+  content: none !important;
 }
 
 /* ── Lists ─────────────────────────────────────────────────────── */
