@@ -14,11 +14,11 @@
 
 :root {
   /* ── Colors ───────────────────────────────────────────────── */
-  --text-color: #3a3a3a;
-  --text-muted: #666;
-  --text-heading: #222;
-  --text-h2: #333;
-  --text-h3: #444;
+  --text-color: rgba(45, 42, 37, 0.88);
+  --text-muted: rgba(45, 42, 37, 0.58);
+  --text-heading: rgba(30, 28, 24, 0.92);
+  --text-h2: rgba(40, 36, 30, 0.88);
+  --text-h3: rgba(45, 42, 37, 0.82);
   --link-color: #8b7355;
   --link-border: #c9b99a;
 
@@ -49,9 +49,9 @@
 
   /* ── Sizes ─────────────────────────────────────────────────── */
   --font-size-body: 13px;
-  --font-size-code: 10px;
-  --font-size-blockquote: 12px;
-  --font-size-table: 9px;
+  --font-size-code: 11px;
+  --font-size-blockquote: 11px;
+  --font-size-table: 11px;
   --font-size-h1: 18px;
   --font-size-h2: 14px;
   --font-size-h3: 13px;
