@@ -76,7 +76,6 @@
 .sj-book .book-content {
   width: 380px;
   margin: 56px auto 0;
-  overflow-x: auto;
   color: var(--text-color);
   font-family: var(--font-serif);
   font-size: var(--font-size-body);
@@ -84,15 +83,6 @@
   overflow-wrap: break-word;
   word-break: break-word;
   font-variant-numeric: proportional-nums;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(70,68,60,0.22) transparent;
-}
-
-.sj-book .book-content::-webkit-scrollbar { height: 3px; }
-.sj-book .book-content::-webkit-scrollbar-track { background: transparent; }
-.sj-book .book-content::-webkit-scrollbar-thumb {
-  background: rgba(70,68,60,0.22);
-  border-radius: 999px;
 }
 
 /* ── Headings ────────────────────────────────────────────────── */
@@ -224,6 +214,7 @@
 /* ── Blockquote ────────────────────────────────────────────────── */
 
 .sj-book .book-content blockquote {
+  color: rgba(45, 42, 37, 0.92);
   margin: 1.05em 0 1.15em;
   padding: 0.1em 0 0.1em 0.9em;
   font-family: var(--font-latin-serif), var(--font-cjk-kai), serif;
@@ -332,10 +323,24 @@
 
 /* ── Tables (three-line style) ─────────────────────────────────── */
 
-.sj-book .book-content table {
+.sj-book .book-content .table-wrap {
+  overflow-x: auto;
+  margin: var(--spacing-half) 0;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(70,68,60,0.22) transparent;
+}
+
+.sj-book .book-content .table-wrap::-webkit-scrollbar { height: 3px; }
+.sj-book .book-content .table-wrap::-webkit-scrollbar-track { background: transparent; }
+.sj-book .book-content .table-wrap::-webkit-scrollbar-thumb {
+  background: rgba(70,68,60,0.22);
+  border-radius: 999px;
+}
+
+.sj-book .book-content .table-wrap table {
   width: max-content;
   min-width: 100%;
-  margin: var(--spacing-half) 0;
+  margin: 0;
   border-collapse: collapse;
   border-top: 2px solid var(--table-border);
   border-bottom: 2px solid var(--table-border);

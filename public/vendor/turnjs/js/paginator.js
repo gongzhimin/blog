@@ -240,7 +240,11 @@ var PAGINATOR = (function () {
     for (var r = 0; r < rowsToRemove.length; r++) {
       if (rowsToRemove[r].parentNode) rowsToRemove[r].parentNode.removeChild(rowsToRemove[r]);
     }
-    return { el: el, rest: rest };
+    // Wrap rest in .table-wrap so horizontal scroll works on split pages too
+    var wrap = document.createElement('div');
+    wrap.className = 'table-wrap';
+    wrap.appendChild(rest);
+    return { el: el, rest: wrap };
   }
 
   // ── article pagination ───────────────────────────────────────────

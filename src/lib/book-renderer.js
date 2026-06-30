@@ -84,6 +84,10 @@ export function renderMarkdown(md) {
   // Restore KaTeX placeholders
   html = html.replace(/\uE000KATEX_(\d+)__ENDKATEX\uE000/g, (_, i) => katexBlocks[parseInt(i)]);
 
+  // Wrap tables for horizontal scroll without breaking table layout
+  html = html.replace(/<table/g, '<div class="table-wrap"><table');
+  html = html.replace(/<\/table>/g, '</table></div>');
+
   // Inject real width/height into <img> so the browser reserves
   // correct space even before the image loads.
   html = injectImageDimensions(html);
