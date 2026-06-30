@@ -4,7 +4,7 @@ const TurndownService = require('turndown');
 const { gfm } = require('turndown-plugin-gfm');
 
 const PORT = 9000;
-const SECRET_TOKEN = process.env.BLOG_WEBHOOK_TOKEN || 'zhimin_secret_post_2026';
+const SECRET_TOKEN = process.env.BLOG_WEBHOOK_TOKEN;
 const GITHUB_REPO = process.env.BLOG_GITHUB_REPO || 'gongzhimin/blog';
 const GITHUB_BRANCH = process.env.BLOG_GITHUB_BRANCH || 'main';
 const GITHUB_TOKEN = process.env.BLOG_GITHUB_TOKEN;
@@ -494,6 +494,11 @@ const server = http.createServer((req, res) => {
 });
 
 if (require.main === module) {
+  if (!SECRET_TOKEN) {
+    console.error('Missing required BLOG_WEBHOOK_TOKEN environment variable');
+    process.exit(1);
+  }
+
   server.listen(PORT, '127.0.0.1');
 }
 
