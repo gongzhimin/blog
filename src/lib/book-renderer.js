@@ -12,21 +12,28 @@
  */
 
 import { marked } from 'marked';
-import { markedHighlight } from 'marked-highlight';
 import katex from 'katex';
 import hljs from 'highlight.js';
 import { imageSize } from 'image-size';
 import { readFileSync, existsSync } from 'fs';
 import { resolve } from 'path';
 
-marked.use(markedHighlight({
-  highlight: function(code, lang) {
-    if (lang && hljs.getLanguage(lang)) {
-      try { return hljs.highlight(code, { language: lang }).value; } catch (_) {}
+// Syntax highlighting via marked renderer — avoids marked-highlight's
+// HTML-escaping issue in marked v18.
+marked.use({
+  renderer: {
+    code(token) {
+      if (token.lang && hljs.getLanguage(token.lang)) {
+        try {
+          var h = hljs.highlight(token.text, { language: token.lang }).value;
+          return '<pre><code class="hljs language-' + token.lang + '">' + h + '</code></pre>';
+        } catch (_) {}
+      }
+      return '<pre><code' + (token.lang ? ' class="language-' + token.lang + '"' : '') + '>' +
+        token.text + '</code></pre>';
     }
-    return code;
   }
-}));
+});
 
 // ── Markdown → HTML ───────────────────────────────────────────
 

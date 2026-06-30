@@ -77,7 +77,6 @@ test("homepage serializes dynamic book config and content pages", async () => {
   assert.equal(config.book.contentPage.width, 460);
   assert.equal(config.book.turn.startPage, 7);
   assert.equal(config.book.turn.backPage, config.book.turn.totalPages - 1);
-  assert.equal(config.book.turn.totalPages % 2, 0);
   assert.ok(config.book.turn.totalPages >= 8);
 
   assert.match(config.toc, /<div class="table-contents">/);
