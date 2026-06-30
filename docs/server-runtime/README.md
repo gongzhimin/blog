@@ -3,6 +3,9 @@
 This directory records the server-side runtime pieces that support the blog
 site and the iOS Shortcuts publishing flow.
 
+If the server is lost, expired, or rebuilt from scratch, follow
+`rebuild-server.md`.
+
 The live server is `13.193.240.51` (`ubuntu`). The public web root is served
 from `/var/www/blog/dist`, and `/webhook` is proxied to the local Node.js
 webhook receiver on `127.0.0.1:9000`.

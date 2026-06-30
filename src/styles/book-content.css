@@ -76,6 +76,7 @@
 .sj-book .book-content {
   width: 380px;
   margin: 56px auto 0;
+  overflow-x: auto;
   color: var(--text-color);
   font-family: var(--font-serif);
   font-size: var(--font-size-body);
@@ -83,6 +84,15 @@
   overflow-wrap: break-word;
   word-break: break-word;
   font-variant-numeric: proportional-nums;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(70,68,60,0.22) transparent;
+}
+
+.sj-book .book-content::-webkit-scrollbar { height: 3px; }
+.sj-book .book-content::-webkit-scrollbar-track { background: transparent; }
+.sj-book .book-content::-webkit-scrollbar-thumb {
+  background: rgba(70,68,60,0.22);
+  border-radius: 999px;
 }
 
 /* ── Headings ────────────────────────────────────────────────── */
@@ -323,45 +333,22 @@
 /* ── Tables (three-line style) ─────────────────────────────────── */
 
 .sj-book .book-content table {
-  display: block;
-  overflow-x: auto;
+  width: max-content;
+  min-width: 100%;
   margin: var(--spacing-half) 0;
   border-collapse: collapse;
   border-top: 2px solid var(--table-border);
   border-bottom: 2px solid var(--table-border);
   font-size: var(--font-size-table);
   font-variant-numeric: tabular-nums;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(70,68,60,0.22) transparent;
-}
-
-.sj-book .book-content table::-webkit-scrollbar { height: 3px; }
-.sj-book .book-content table::-webkit-scrollbar-track { background: transparent; }
-.sj-book .book-content table::-webkit-scrollbar-thumb {
-  background: rgba(70,68,60,0.22);
-  border-radius: 999px;
-}
-
-.sj-book .book-content thead,
-.sj-book .book-content tbody {
-  display: table;
-  width: 100%;
-  table-layout: auto;
 }
 
 .sj-book .book-content thead {
   border-bottom: 1.5px solid var(--table-border);
 }
 
-.sj-book .book-content tr {
-  display: table;
-  width: 100%;
-  table-layout: fixed;
-}
-
 .sj-book .book-content th,
 .sj-book .book-content td {
-  display: table-cell;
   padding: 6px 10px;
   border: none;
   text-align: left;
