@@ -1,0 +1,22 @@
+{
+  "id": "sample-json-book",
+  "title": "一本独立的小书",
+  "description": "一个不依赖博客 Markdown collections 的 Book Runtime 示例。",
+  "tocTitle": "章节",
+  "entries": [
+    {
+      "id": "opening",
+      "title": "开场",
+      "date": "2026-07-01",
+      "bodyType": "markdown",
+      "body": "# 开场\n\n这本小书来自一个 JSON 文件，而不是博客文章目录。它仍然会经过同一套 Markdown 渲染、目录生成、浏览器分页和 Turn.js 翻页流程。"
+    },
+    {
+      "id": "notes",
+      "title": "一些说明",
+      "date": "2026-07-02",
+      "bodyType": "markdown",
+      "body": "## 内容源\n\nBook Runtime 接收的是标准化后的 `BookDocument`。\n\n- 博客文章可以转成它\n- JSON 文件也可以转成它\n- 未来单本书、图文册、课程讲义也可以转成它"
+    }
+  ]
+}

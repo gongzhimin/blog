@@ -85,11 +85,13 @@ blog/
 
 ### PC 端
 
-`git push` → GitHub Actions → AWS 服务器 `git pull` + `npm run build`
+`git push` → GitHub Actions → `npm run build` → rsync `dist/` 到 AWS 服务器
 
 ### iOS 移动端
 
 快捷指令 POST 到 `/webhook`，服务端通过 GitHub API 直接写入文章。
+
+图片发布方案见 [`docs/ios-shortcuts-image-publishing.md`](docs/ios-shortcuts-image-publishing.md)。
 
 ---
 

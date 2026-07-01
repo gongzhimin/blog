@@ -1,0 +1,155 @@
+---
+import { readFileSync } from 'fs';
+import bookConfig from '../../data/book-config.json';
+import sampleBook from '../../book/examples/sample-book.json';
+import { renderMarkdown, stripLeadingTitle, romanTocPage } from '../../lib/book-renderer.js';
+import { buildBookRuntime } from '../../book/assembler/build-book-runtime.mjs';
+import { createJsonBookDocument } from '../../book/sources/json-book-source.mjs';
+import { loadBookTheme } from '../../book/themes/load-theme.mjs';
+import fontsCSS from '../../styles/fonts.css?raw';
+import bookContentCSS from '../../styles/book-content.css?raw';
+import codeHighlightCSS from '../../styles/code-highlight.css?raw';
+import bookTocCSS from '../../styles/book-toc.css?raw';
+
+const katexCSS = readFileSync('node_modules/katex/dist/katex.min.css', 'utf8');
+const demoConfig = JSON.parse(JSON.stringify(bookConfig));
+demoConfig.theme = { id: 'plain-manuscript' };
+demoConfig.footer.content.copyright = 'Book Runtime Demo';
+
+const theme = loadBookTheme(demoConfig.theme.id, {
+  fontsCSS,
+  bookContentCSS,
+  codeHighlightCSS,
+  bookTocCSS,
+  katexCSS,
+});
+const bookDocument = createJsonBookDocument(sampleBook);
+const runtime = buildBookRuntime({
+  document: bookDocument,
+  bookConfig: demoConfig,
+  renderMarkdown,
+  stripLeadingTitle,
+  romanTocPage,
+});
+const runConfig = runtime.config;
+runConfig.theme = theme.runtime;
+
+const backPage = runConfig.book.turn.backPage;
+const totalPages = runConfig.book.turn.totalPages;
+const pageDepthAttrs = { depth: '5' };
+
+const homepageStyles = `
+  body {
+    min-height: 100vh;
+    overflow-x: auto !important;
+    overflow-y: auto !important;
+    background: #e8e4de;
+    color: #3a3a3a;
+  }
+
+  .site-nav {
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid rgba(0,0,0,.08);
+  }
+
+  .site-nav .brand {
+    color: #555;
+    font-size: 15px;
+    letter-spacing: .08em;
+    text-decoration: none;
+  }
+
+  #canvas {
+    visibility: hidden;
+    width: ${demoConfig.book.canvasWidth}px !important;
+    height: ${demoConfig.book.height}px !important;
+    margin: 0 auto !important;
+    padding: ${demoConfig.book.gap}px 0 !important;
+  }
+
+  .sj-book {
+    width: ${demoConfig.book.width}px !important;
+    height: ${demoConfig.book.height}px !important;
+  }
+
+  .sj-book .hard {
+    width: ${demoConfig.book.hardPage.width}px;
+    height: ${demoConfig.book.hardPage.height}px;
+  }
+
+  .sj-book .own-size {
+    width: ${demoConfig.book.contentPage.width}px;
+    height: ${demoConfig.book.contentPage.height}px;
+  }
+
+  .sj-book .p1 .side {
+    width: ${demoConfig.book.spineStrip.width}px !important;
+    left: ${demoConfig.book.spineStrip.left}px !important;
+  }
+
+  .sj-book .depth {
+    top: ${demoConfig.book.depth.top}px;
+    height: ${demoConfig.book.depth.height}px;
+  }
+
+  .sj-book .p1,
+  .sj-book .p2,
+  .sj-book .p3 {
+    background-color: white;
+    background-image: url(/vendor/turnjs/pics/book-covers.jpg) !important;
+    background-repeat: no-repeat;
+    background-size: 2400px 600px;
+  }
+
+  .sj-book .p1 { background-position: 0 0 !important; }
+  .sj-book .p2 { background-position: -483px 0 !important; }
+  .sj-book .p3 { background-position: -1936px 0 !important; }
+` + theme.styles.visualCSS;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <title>Book Runtime Demo</title>
+    <meta name="viewport" content="width=1050, user-scalable=no" />
+    <script is:inline src="/vendor/turnjs/jquery.min.1.7.js"></script>
+    <script is:inline src="/vendor/turnjs/jquery-ui-1.8.20.custom.min.js"></script>
+    <script is:inline src="/vendor/turnjs/jquery.mousewheel.min.js"></script>
+    <script is:inline src="/vendor/turnjs/modernizr.2.5.3.min.js"></script>
+    <script is:inline src="/vendor/turnjs/hash.js"></script>
+    <link rel="stylesheet" href="/vendor/turnjs/css/jquery.ui.css" />
+    <link rel="stylesheet" href="/vendor/turnjs/css/steve-jobs.css" />
+    <style is:inline set:html={homepageStyles}></style>
+  </head>
+  <body>
+    <header class="site-nav">
+      <a class="brand" href="/demos/book-runtime/">Book Runtime Demo</a>
+    </header>
+
+    <main>
+      <div id="canvas">
+        <div id="book-zoom">
+          <div class="sj-book">
+            <div {...pageDepthAttrs} class="hard"><div class="side"></div></div>
+            <div {...pageDepthAttrs} class="hard front-side"><div class="depth"></div></div>
+            <div class="own-size"></div>
+            <div class="own-size even"></div>
+            <div class={`hard fixed back-side p${backPage}`}><div class="depth"></div></div>
+            <div class={`hard p${totalPages}`}></div>
+          </div>
+        </div>
+        <div id="slider-bar" class="turnjs-slider"><div id="slider"></div></div>
+      </div>
+    </main>
+
+    <div id="book-data" hidden data-config={JSON.stringify(runConfig)}></div>
+    <script is:inline set:html={`var MEASURE_CSS={article:` + JSON.stringify(theme.measurement.articleCSS) + `,toc:` + JSON.stringify(theme.measurement.tocCSS) + `};`}></script>
+    <script is:inline src="/vendor/turnjs/js/paginator.js"></script>
+    <script is:inline src="/vendor/turnjs/js/orchestrator.js"></script>
+    <script is:inline src="/vendor/turnjs/js/book-app.js"></script>
+  </body>
+</html>
