@@ -86,6 +86,8 @@ test("homepage serializes dynamic book config and content pages", async () => {
   assert.equal(config.source.documentId, "zhimin-blog");
   assert.equal(config.source.documentTitle, config.footer.content.copyright);
   assert.equal(config.source.entryCount, articles.length);
+  assert.equal(config.theme.id, "classic-paper");
+  assert.equal(config.theme.name, "Classic Paper");
 
   for (const pageNumber of [
     config.book.turn.backPage,

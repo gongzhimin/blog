@@ -169,8 +169,11 @@ test("homepage consumes book config and the shared turnjs app", async () => {
   ]);
 
   assert.match(page, /import bookConfig from ['"]\.\.\/data\/book-config\.json['"]/);
+  assert.match(page, /createClassicPaperTheme/);
   assert.match(page, /data-config=\{JSON\.stringify\(runConfig\)\}/);
   assert.match(page, /src="\/vendor\/turnjs\/js\/book-app\.js"/);
+  assert.doesNotMatch(page, /bookContentCSS\.replace/);
+  assert.doesNotMatch(page, /bookTocCSS\.replace/);
   assert.doesNotMatch(page, /function loadApp\(/);
   assert.doesNotMatch(page, /updateDepth = function/);
 

@@ -6,6 +6,7 @@ import bookConfig from '../data/book-config.json';
 import { renderMarkdown, stripLeadingTitle, romanTocPage } from '../lib/book-renderer.js';
 import { createAstroBlogDocument } from '../book/sources/astro-blog-source.mjs';
 import { buildBookRuntime } from '../book/assembler/build-book-runtime.mjs';
+import { createClassicPaperTheme } from '../book/themes/classic-paper/theme.mjs';
 import fontsCSS from '../styles/fonts.css?raw';
 import bookContentCSS from '../styles/book-content.css?raw';
 import codeHighlightCSS from '../styles/code-highlight.css?raw';
@@ -16,22 +17,15 @@ const SITE_DESC = '文字留住瞬间。技术笔记与生活随笔。';
 
 // Load KaTeX CSS so the measurement container can match rendered formula metrics
 const katexCSS = readFileSync('node_modules/katex/dist/katex.min.css', 'utf8');
-
-// Build measurement CSS from the same source.
-// Article: straight selector swap + KaTeX CSS for formula layout accuracy.
-const measureArticleCSS = katexCSS + codeHighlightCSS +
-  bookContentCSS.replace(/\.sj-book \.book-content/g, '#__bap_inner');
-
-// TOC: auto-generated from book-toc.css, with measurement-required
-// properties (from steve-jobs.css) prepended so the container
-// renders at the same dimensions as the real page.
-const measureTocCSS =
-  `#__toc{font-family:'Stempel-Garamond-W01-Roman',Georgia,"Times New Roman","Chiron Sung HK","Noto Serif SC","Songti SC","STSong","SimSun",serif;font-size:16px;line-height:1.7;overflow:hidden;overflow-wrap:break-word;word-break:break-word;width:300px;margin:80px auto}` +
-  `#__toc h1{font-size:28px;font-weight:700;margin:0 0 20px;text-align:center}` +
-  `#__toc ul{list-style:none;padding:0;margin:0}` +
-  `#__toc li{margin-bottom:8px;font-size:15px}` +
-  `#__toc a{color:#8b7355;text-decoration:none}` +
-  bookTocCSS.replace(/\.sj-book \.table-contents/g, '#__toc');
+const theme = createClassicPaperTheme({
+  fontsCSS,
+  bookContentCSS,
+  codeHighlightCSS,
+  bookTocCSS,
+  katexCSS,
+});
+const measureArticleCSS = theme.measurement.articleCSS;
+const measureTocCSS = theme.measurement.tocCSS;
 
 const lifePosts = await getCollection('life');
 const blogPosts = await getCollection('blog');
@@ -44,6 +38,7 @@ const runtime = buildBookRuntime({
   romanTocPage,
 });
 const runConfig = runtime.config;
+runConfig.theme = theme.runtime;
 
 const backPage = runConfig.book.turn.backPage;
 const totalPages = runConfig.book.turn.totalPages;
@@ -202,7 +197,7 @@ const homepageStyles = `
     font-size: ${footer.copyrightFontSize}px;
     margin-top: 8px;
   }
-` + katexCSS + codeHighlightCSS + fontsCSS + bookContentCSS + bookTocCSS;
+` + theme.styles.visualCSS;
 
 const quoteEnglish = quote.english || footer.content.quoteEnglish;
 const quoteChinese = quote.chinese || footer.content.quoteChinese;
