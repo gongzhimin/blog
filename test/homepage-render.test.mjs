@@ -83,6 +83,9 @@ test("homepage serializes dynamic book config and content pages", async () => {
   assert.match(config.toc, /目录/);
   // runtime paginated — not in static JSON
   assert.ok(articles.length >= 5);
+  assert.equal(config.source.documentId, "zhimin-blog");
+  assert.equal(config.source.documentTitle, config.footer.content.copyright);
+  assert.equal(config.source.entryCount, articles.length);
 
   for (const pageNumber of [
     config.book.turn.backPage,

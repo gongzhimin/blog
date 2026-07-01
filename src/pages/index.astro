@@ -1,10 +1,11 @@
 ---
 import { getCollection } from 'astro:content';
-import type { CollectionEntry } from 'astro:content';
 import { readFileSync } from 'fs';
 import quote from '../data/daily-quote.json';
 import bookConfig from '../data/book-config.json';
 import { renderMarkdown, stripLeadingTitle, romanTocPage } from '../lib/book-renderer.js';
+import { createAstroBlogDocument } from '../book/sources/astro-blog-source.mjs';
+import { buildBookRuntime } from '../book/assembler/build-book-runtime.mjs';
 import fontsCSS from '../styles/fonts.css?raw';
 import bookContentCSS from '../styles/book-content.css?raw';
 import codeHighlightCSS from '../styles/code-highlight.css?raw';
@@ -32,54 +33,17 @@ const measureTocCSS =
   `#__toc a{color:#8b7355;text-decoration:none}` +
   bookTocCSS.replace(/\.sj-book \.table-contents/g, '#__toc');
 
-type BlogPost = CollectionEntry<'blog'>;
-type LifePost = CollectionEntry<'life'>;
-
-function getPostDate(post: BlogPost | LifePost) {
-  return 'pubDatetime' in post.data ? post.data.pubDatetime : post.data.date;
-}
-
-const lifePosts = (await getCollection('life'))
-  .filter((post) => !post.data.draft)
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
-const blogPosts = (await getCollection('blog'))
-  .filter((post) => !post.data.draft)
-  .sort((a, b) => b.data.pubDatetime.valueOf() - a.data.pubDatetime.valueOf());
-
-const allPosts = [...lifePosts, ...blogPosts].sort(
-  (a, b) => getPostDate(b).valueOf() - getPostDate(a).valueOf(),
-);
-
-// Build article data for runtime pagination
-function fmtDate(d: Date) {
-  return d.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' });
-}
-
-const articles = allPosts.map((post) => {
-  const date = getPostDate(post);
-  const bodyHTML = renderMarkdown(stripLeadingTitle(post.body || '', post.data.title));
-  return {
-    title: post.data.title,
-    dateStr: fmtDate(date),
-    bodyHTML,
-  };
+const lifePosts = await getCollection('life');
+const blogPosts = await getCollection('blog');
+const bookDocument = createAstroBlogDocument({ lifePosts, blogPosts });
+const runtime = buildBookRuntime({
+  document: bookDocument,
+  bookConfig,
+  renderMarkdown,
+  stripLeadingTitle,
+  romanTocPage,
 });
-
-// TOC
-const toc = '<div class="table-contents"><h1>目录</h1><ul>' +
-  articles.map((a, i) =>
-    `<li><a href="#page/${7 + i}">${a.title} <span>${1 + i}</span></a></li>`
-  ).join('') +
-  `</ul></div><span class="page-number">${romanTocPage(5)}</span>`;
-
-// Estimate total pages (runtime will correct)
-const estPages = 7 + articles.length * 3 + 2; // rough: 3 pages/article + covers
-const runConfig = JSON.parse(JSON.stringify(bookConfig));
-runConfig.book.turn.startPage = 7;
-runConfig.book.turn.totalPages = estPages;
-runConfig.book.turn.backPage = runConfig.book.turn.totalPages - 1;
-runConfig.articles = articles;
-runConfig.toc = toc;
+const runConfig = runtime.config;
 
 const backPage = runConfig.book.turn.backPage;
 const totalPages = runConfig.book.turn.totalPages;
