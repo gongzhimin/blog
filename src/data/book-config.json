@@ -1,4 +1,7 @@
 {
+	"theme": {
+		"id": "classic-paper"
+	},
 	"nav": {
 		"height": 56,
 		"innerGap": 28,

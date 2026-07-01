@@ -6,7 +6,7 @@ import bookConfig from '../data/book-config.json';
 import { renderMarkdown, stripLeadingTitle, romanTocPage } from '../lib/book-renderer.js';
 import { createAstroBlogDocument } from '../book/sources/astro-blog-source.mjs';
 import { buildBookRuntime } from '../book/assembler/build-book-runtime.mjs';
-import { createClassicPaperTheme } from '../book/themes/classic-paper/theme.mjs';
+import { loadBookTheme } from '../book/themes/load-theme.mjs';
 import fontsCSS from '../styles/fonts.css?raw';
 import bookContentCSS from '../styles/book-content.css?raw';
 import codeHighlightCSS from '../styles/code-highlight.css?raw';
@@ -17,7 +17,7 @@ const SITE_DESC = '文字留住瞬间。技术笔记与生活随笔。';
 
 // Load KaTeX CSS so the measurement container can match rendered formula metrics
 const katexCSS = readFileSync('node_modules/katex/dist/katex.min.css', 'utf8');
-const theme = createClassicPaperTheme({
+const theme = loadBookTheme(bookConfig.theme?.id, {
   fontsCSS,
   bookContentCSS,
   codeHighlightCSS,

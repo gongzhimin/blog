@@ -71,6 +71,7 @@ test("homepage renders the configured turnjs book shell", async () => {
 
 test("homepage serializes dynamic book config and content pages", async () => {
   const document = await loadHomepage();
+  const bookConfig = await loadBookConfig();
   const { config, articles } = readBookData(document);
 
   assert.equal(config.book.width, 960);
@@ -86,7 +87,7 @@ test("homepage serializes dynamic book config and content pages", async () => {
   assert.equal(config.source.documentId, "zhimin-blog");
   assert.equal(config.source.documentTitle, config.footer.content.copyright);
   assert.equal(config.source.entryCount, articles.length);
-  assert.equal(config.theme.id, "classic-paper");
+  assert.equal(config.theme.id, bookConfig.theme.id);
   assert.equal(config.theme.name, "Classic Paper");
   assert.deepEqual(config.runtime.pagination, {
     articleWidth: 380,

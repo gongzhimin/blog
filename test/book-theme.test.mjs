@@ -1,17 +1,23 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { createClassicPaperTheme } from "../src/book/themes/classic-paper/theme.mjs";
+import {
+  listBookThemeIds,
+  loadBookTheme,
+} from "../src/book/themes/load-theme.mjs";
+
+const cssSources = {
+  fontsCSS: ".font-face{}",
+  bookContentCSS:
+    ".sj-book .book-content{font-size:16px}.sj-book .book-content p{margin:0}",
+  codeHighlightCSS: ".hljs{color:#333}",
+  bookTocCSS:
+    ".sj-book .table-contents{font-size:15px}.sj-book .table-contents a{color:#8b7355}",
+  katexCSS: ".katex{font-size:1.21em}",
+};
 
 test("classic-paper theme derives measurement css from visual css sources", () => {
-  const theme = createClassicPaperTheme({
-    fontsCSS: ".font-face{}",
-    bookContentCSS:
-      ".sj-book .book-content{font-size:16px}.sj-book .book-content p{margin:0}",
-    codeHighlightCSS: ".hljs{color:#333}",
-    bookTocCSS:
-      ".sj-book .table-contents{font-size:15px}.sj-book .table-contents a{color:#8b7355}",
-    katexCSS: ".katex{font-size:1.21em}",
-  });
+  const theme = createClassicPaperTheme(cssSources);
 
   assert.equal(theme.id, "classic-paper");
   assert.equal(theme.name, "Classic Paper");
@@ -30,4 +36,33 @@ test("classic-paper theme derives measurement css from visual css sources", () =
   assert.match(theme.measurement.tocCSS, /#__toc\{/);
   assert.match(theme.measurement.tocCSS, /#__toc a\{color:#8b7355\}/);
   assert.doesNotMatch(theme.measurement.tocCSS, /\.sj-book \.table-contents/);
+});
+
+test("book theme loader selects registered themes and defaults to classic-paper", () => {
+  assert.deepEqual(listBookThemeIds(), ["classic-paper", "plain-manuscript"]);
+
+  const defaultTheme = loadBookTheme(undefined, cssSources);
+  assert.equal(defaultTheme.id, "classic-paper");
+
+  const manuscript = loadBookTheme("plain-manuscript", cssSources);
+  assert.equal(manuscript.id, "plain-manuscript");
+  assert.equal(manuscript.name, "Plain Manuscript");
+  assert.equal(manuscript.runtime.id, "plain-manuscript");
+  assert.match(manuscript.styles.visualCSS, /plain-manuscript theme/);
+  assert.match(manuscript.styles.visualCSS, /\.sj-book \.book-content/);
+  assert.match(manuscript.measurement.articleCSS, /#__bap_inner/);
+  assert.doesNotMatch(
+    manuscript.measurement.articleCSS,
+    /\.sj-book \.book-content/,
+  );
+  assert.match(manuscript.measurement.tocCSS, /#__toc/);
+  assert.doesNotMatch(
+    manuscript.measurement.tocCSS,
+    /\.sj-book \.table-contents/,
+  );
+
+  assert.throws(
+    () => loadBookTheme("missing-theme", cssSources),
+    /Unknown book theme: missing-theme/,
+  );
 });

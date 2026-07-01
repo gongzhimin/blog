@@ -146,6 +146,7 @@ test("schema and tuning fields expose component groups", () => {
 });
 
 test("turnjs book config defines navigation, page geometry, and pagination", () => {
+  assert.equal(bookConfig.theme.id, "classic-paper");
   assert.equal(bookConfig.nav.brand.text, "ZHIMIN");
   assert.deepEqual(
     bookConfig.nav.links.items.map((item) => item.href),
@@ -169,11 +170,12 @@ test("homepage consumes book config and the shared turnjs app", async () => {
   ]);
 
   assert.match(page, /import bookConfig from ['"]\.\.\/data\/book-config\.json['"]/);
-  assert.match(page, /createClassicPaperTheme/);
+  assert.match(page, /loadBookTheme\(bookConfig\.theme\?\.id/);
   assert.match(page, /data-config=\{JSON\.stringify\(runConfig\)\}/);
   assert.match(page, /src="\/vendor\/turnjs\/js\/book-app\.js"/);
   assert.doesNotMatch(page, /bookContentCSS\.replace/);
   assert.doesNotMatch(page, /bookTocCSS\.replace/);
+  assert.doesNotMatch(page, /createClassicPaperTheme/);
   assert.doesNotMatch(page, /function loadApp\(/);
   assert.doesNotMatch(page, /updateDepth = function/);
 
