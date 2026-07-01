@@ -10,8 +10,31 @@
  */
 var PAGINATOR = (function () {
   var M = MEASURE_CSS;
+  var paginationConfig = {
+    articleWidth: 380,
+    articleHeight: 471,
+    tocWidth: 380,
+    tocHeight: 400
+  };
 
   // ── helpers ──────────────────────────────────────────────────────
+
+  function configure(options) {
+    options = options || {};
+    if (options.articleWidth) paginationConfig.articleWidth = options.articleWidth;
+    if (options.articleHeight) paginationConfig.articleHeight = options.articleHeight;
+    if (options.tocWidth) paginationConfig.tocWidth = options.tocWidth;
+    if (options.tocHeight) paginationConfig.tocHeight = options.tocHeight;
+  }
+
+  function getConfig() {
+    return {
+      articleWidth: paginationConfig.articleWidth,
+      articleHeight: paginationConfig.articleHeight,
+      tocWidth: paginationConfig.tocWidth,
+      tocHeight: paginationConfig.tocHeight
+    };
+  }
 
   /** Map visible‑char count → byte offset in rawHTML (skipping tags). */
   function charToHTML(html, target) {
@@ -249,12 +272,9 @@ var PAGINATOR = (function () {
 
   // ── article pagination ───────────────────────────────────────────
 
-  var ARTICLE_H = 471;
-  var ARTICLE_W = 380;
-
   function paginateArticle(article) {
-    var maxH = ARTICLE_H;
-    var cw = ARTICLE_W;
+    var maxH = paginationConfig.articleHeight;
+    var cw = paginationConfig.articleWidth;
 
     var measure = document.createElement('div');
     measure.style.cssText = 'position:absolute;opacity:0;width:' + cw + 'px;top:0;left:0;pointer-events:none';
@@ -405,11 +425,9 @@ var PAGINATOR = (function () {
 
   // ── TOC pagination ────────────────────────────────────────────────
 
-  var TOC_H = 400;
-
   function paginateTOC(html) {
-    var maxH = TOC_H;
-    var cw = 380;
+    var maxH = paginationConfig.tocHeight;
+    var cw = paginationConfig.tocWidth;
     var measure = document.createElement('div');
     measure.style.cssText = 'position:absolute;opacity:0;width:' + cw + 'px;top:0;left:0;pointer-events:none';
     measure.innerHTML = '<style>' + M.toc + '</style><div id="__toc"></div>';
@@ -445,9 +463,9 @@ var PAGINATOR = (function () {
   // ── public API ────────────────────────────────────────────────────
 
   return {
+    configure: configure,
+    getConfig: getConfig,
     paginateArticle: paginateArticle,
-    paginateTOC: paginateTOC,
-    ARTICLE_H: ARTICLE_H,
-    TOC_H: TOC_H
+    paginateTOC: paginateTOC
   };
 })();

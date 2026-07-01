@@ -88,6 +88,12 @@ test("homepage serializes dynamic book config and content pages", async () => {
   assert.equal(config.source.entryCount, articles.length);
   assert.equal(config.theme.id, "classic-paper");
   assert.equal(config.theme.name, "Classic Paper");
+  assert.deepEqual(config.runtime.pagination, {
+    articleWidth: 380,
+    articleHeight: 471,
+    tocWidth: 380,
+    tocHeight: 400,
+  });
 
   for (const pageNumber of [
     config.book.turn.backPage,

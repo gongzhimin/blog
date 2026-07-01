@@ -179,8 +179,11 @@ test("homepage consumes book config and the shared turnjs app", async () => {
 
   assert.match(app, /BACK_PAGE/);
   assert.match(app, /BOOK_CONFIG\.book\.turn\.totalPages/);
+  assert.match(app, /PAGINATOR\.configure/);
+  assert.match(app, /BOOK_CONFIG\.runtime\.pagination/);
   assert.match(app, /Hash\.check\(\)\.update\(\)/);
   assert.match(app, /nop:[\s\S]{0,140}START_PAGE/);
+  assert.doesNotMatch(app, /ARTICLE_H/);
   assert.doesNotMatch(app, /nop:[\s\S]{0,140}turn\('page', 1\)/);
   assert.doesNotMatch(app, /\.p111\b/);
   assert.doesNotMatch(app, /turn\.html4/);

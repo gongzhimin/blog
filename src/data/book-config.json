@@ -72,7 +72,9 @@
 		"gap": 30,
 		"pagination": {
 			"contentWidth": 380,
-			"contentHeight": 450,
+			"contentHeight": 471,
+			"tocWidth": 380,
+			"tocHeight": 400,
 			"baseFontSize": 16,
 			"baseLineHeight": 27,
 			"charsPerLine": 23,

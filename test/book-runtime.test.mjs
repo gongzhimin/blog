@@ -59,6 +59,12 @@ test("createAstroBlogDocument combines life and blog posts into sorted book entr
 test("buildBookRuntime renders entries and creates toc/runtime config", () => {
   const bookConfig = {
     book: {
+      pagination: {
+        contentWidth: 380,
+        contentHeight: 471,
+        tocWidth: 380,
+        tocHeight: 400,
+      },
       turn: { startPage: 7, totalPages: 112 },
     },
   };
@@ -98,5 +104,11 @@ test("buildBookRuntime renders entries and creates toc/runtime config", () => {
     runtime.config.book.turn.backPage,
     runtime.config.book.turn.totalPages - 1,
   );
+  assert.deepEqual(runtime.config.runtime.pagination, {
+    articleWidth: 380,
+    articleHeight: 471,
+    tocWidth: 380,
+    tocHeight: 400,
+  });
   assert.equal(runtime.config.source.documentId, "sample");
 });

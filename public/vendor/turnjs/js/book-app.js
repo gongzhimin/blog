@@ -10,6 +10,7 @@
   var ARTICLES = BOOK_CONFIG.articles || [];
   var TOC_HTML = BOOK_CONFIG.toc || '';
   var CONTENT_PAGE = BOOK_CONFIG.book.contentPage;
+  var PAGINATION_CONFIG = BOOK_CONFIG.runtime && BOOK_CONFIG.runtime.pagination;
 
   var TOTAL_PAGES = BOOK_CONFIG.book.turn.totalPages;
   var BACK_PAGE = BOOK_CONFIG.book.turn.backPage || TOTAL_PAGES - 1;
@@ -62,6 +63,9 @@
 
   function loadApp() {
     try {
+      if (PAGINATION_CONFIG && PAGINATOR.configure) {
+        PAGINATOR.configure(PAGINATION_CONFIG);
+      }
       var result = paginateAll(ARTICLES, TOC_HTML);
       TOTAL_PAGES = result.totalPages;
       BACK_PAGE = result.backPage;
