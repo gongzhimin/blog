@@ -11,6 +11,18 @@
   var TOC_HTML = BOOK_CONFIG.toc || '';
   var CONTENT_PAGE = BOOK_CONFIG.book.contentPage;
   var PAGINATION_CONFIG = BOOK_CONFIG.runtime && BOOK_CONFIG.runtime.pagination;
+  var MOBILE_PAGINATION = BOOK_CONFIG.runtime && BOOK_CONFIG.runtime.mobilePagination;
+  var MOBILE_BREAKPOINT = 800;
+
+  // Detect mobile via physical screen width because the desktop viewport meta
+  // locks to 1050px until mobile mode is selected.
+  var physicalScreenWidth = window.screen && window.screen.width;
+  var isMobile = (window.matchMedia && window.matchMedia('(max-width: 800px)').matches)
+              || (physicalScreenWidth && physicalScreenWidth < MOBILE_BREAKPOINT);
+  if (isMobile) {
+    var vp = document.querySelector('meta[name="viewport"]');
+    if (vp) vp.content = 'width=device-width, initial-scale=1';
+  }
 
   var TOTAL_PAGES = BOOK_CONFIG.book.turn.totalPages;
   var BACK_PAGE = BOOK_CONFIG.book.turn.backPage || TOTAL_PAGES - 1;
@@ -38,7 +50,10 @@
 
   function addPage(page, book) {
     if (!book.turn('hasPage', page)) {
-      if (!_paginated) paginateAll(ARTICLES, TOC_HTML);
+      if (!_paginated) {
+        configurePagination();
+        paginateAll(ARTICLES, TOC_HTML);
+      }
 
       var content = _pageCache[page] ||
         ('<div class="book-content"><p>&nbsp;</p></div><span class="page-number">' + page + '</span>');
@@ -50,8 +65,24 @@
     }
   }
 
-  function numberOfViews(book) { return Math.ceil(book.turn('pages') / 2); }
-  function getViewNumber(book, page) { return parseInt((page || book.turn('page')) / 2 + 1, 10); }
+  function numberOfViews(book) {
+    return isMobile ? book.turn('pages') : Math.ceil(book.turn('pages') / 2);
+  }
+  function getViewNumber(book, page) {
+    return isMobile ? (page || book.turn('page')) : parseInt((page || book.turn('page')) / 2 + 1, 10);
+  }
+  function clampPageTarget(book, page) {
+    return Math.min(book.turn('pages'), Math.max(1, page));
+  }
+  function getPaginationConfig() {
+    return (isMobile && MOBILE_PAGINATION) ? MOBILE_PAGINATION : PAGINATION_CONFIG;
+  }
+  function configurePagination() {
+    var pagination = getPaginationConfig();
+    if (pagination && PAGINATOR.configure) {
+      PAGINATOR.configure(pagination);
+    }
+  }
   function isChrome() { return navigator.userAgent.indexOf('Chrome') != -1; }
   function moveBar(yes) {
     if (Modernizr && Modernizr.csstransforms) {
@@ -63,9 +94,7 @@
 
   function loadApp() {
     try {
-      if (PAGINATION_CONFIG && PAGINATOR.configure) {
-        PAGINATOR.configure(PAGINATION_CONFIG);
-      }
+      configurePagination();
       var result = paginateAll(ARTICLES, TOC_HTML);
       TOTAL_PAGES = result.totalPages;
       BACK_PAGE = result.backPage;
@@ -84,7 +113,7 @@
       if (typeof(data.scrollX) == 'undefined') { data.scrollX = actualPos; data.scrollPage = flipbook.turn('page'); }
       data.scrollX = Math.min($('#slider').slider('option', 'max') * step, Math.max(0, data.scrollX + deltaX));
       var actualView = Math.round(data.scrollX / step),
-        page = Math.min(flipbook.turn('pages'), Math.max(1, actualView * 2 - 2));
+        page = isMobile ? clampPageTarget(flipbook, actualView) : clampPageTarget(flipbook, actualView * 2 - 2);
       if ($.inArray(data.scrollPage, flipbook.turn('view', page)) == -1) { data.scrollPage = page; flipbook.turn('page', page); }
       if (data.scrollTimer) clearInterval(data.scrollTimer);
       data.scrollTimer = setTimeout(function() { data.scrollX = undefined; data.scrollPage = undefined; data.scrollTimer = undefined; }, 1000);
@@ -93,7 +122,11 @@
     $('#slider').slider({
       min: 1, max: 100,
       start: function(event, ui) { moveBar(false); },
-      stop: function() { $('.sj-book').turn('page', Math.max(1, $(this).slider('value') * 2 - 2)); }
+      stop: function() {
+        var book = $('.sj-book');
+        var target = isMobile ? clampPageTarget(book, $(this).slider('value')) : clampPageTarget(book, $(this).slider('value') * 2 - 2);
+        book.turn('page', target);
+      }
     });
 
     Hash.on('^page\/([0-9]*)$', {
@@ -113,6 +146,7 @@
     });
 
     flipbook.turn({
+      display: isMobile ? 'single' : 'double',
       elevation: TURN_OPTIONS.elevation,
       acceleration: !isChrome(),
       autoCenter: true,

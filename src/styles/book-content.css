@@ -387,3 +387,28 @@
 :lang(en) address {
   font-style: italic;
 }
+
+/* ── Mobile 64K single-page ────────────────────────────────────── */
+
+@media (max-width: 800px) {
+  :root {
+    --font-size-body: 11px;
+    --font-size-h1: 15px;
+    --font-size-h2: 12px;
+    --font-size-h3: 11px;
+    --font-size-code: 11px;
+    --font-size-blockquote: 11px;
+    --font-size-table: 11px;
+    --line-height-body: 1.6;
+    --spacing-half: 6px;
+    --spacing-line: 18px;
+    --spacing-quarter: 4px;
+    --spacing-list-indent: 16px;
+    --spacing-text-indent: 1.5em;
+  }
+
+  .sj-book .book-content {
+    width: 280px;
+    margin-top: 46px;
+  }
+}

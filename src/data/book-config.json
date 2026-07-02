@@ -208,6 +208,12 @@
 					"splitStrategy": "none",
 					"orphanLines": 0
 				}
+			},
+			"mobilePagination": {
+				"contentWidth": 280,
+				"contentHeight": 380,
+				"tocWidth": 280,
+				"tocHeight": 320
 			}
 		}
 	},

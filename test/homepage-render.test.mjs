@@ -108,6 +108,17 @@ test("homepage serializes dynamic book config and content pages", async () => {
   }
 });
 
+test("homepage carries mobile toc styles in the themed visual css", async () => {
+  const document = await loadHomepage();
+  const styles = [...document.querySelectorAll("style")]
+    .map((node) => node.textContent)
+    .join("\n");
+
+  assert.match(styles, /@media \(max-width: 800px\)/);
+  assert.match(styles, /\.sj-book \.table-contents/);
+  assert.match(styles, /width: 280px/);
+});
+
 test("homepage provides content for the opening spread via book-data", async () => {
   const document = await loadHomepage();
   const { config, articles } = readBookData(document);

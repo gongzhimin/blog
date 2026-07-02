@@ -197,6 +197,18 @@ const homepageStyles = `
     font-size: ${footer.copyrightFontSize}px;
     margin-top: 8px;
   }
+
+  /* ── Mobile 64K single-page ─────────────────────────────── */
+  @media (max-width: 800px) {
+    #canvas { width: 390px !important; }
+    .sj-book { width: 390px !important; height: 507px !important; }
+    .sj-book .hard,
+    .sj-book .own-size { width: 370px !important; height: 507px !important; }
+    #slider-bar { display: none; }
+    .site-footer { max-width: 390px; margin-left: auto; margin-right: auto; padding-left: 12px; padding-right: 12px; }
+    .site-nav { padding-left: 12px; padding-right: 12px; }
+    body { overflow-x: hidden !important; }
+  }
 ` + theme.styles.visualCSS;
 
 const quoteEnglish = quote.english || footer.content.quoteEnglish;

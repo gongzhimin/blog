@@ -54,6 +54,7 @@ export function buildBookRuntime({
   config.book.turn.totalPages = estPages;
   config.book.turn.backPage = config.book.turn.totalPages - 1;
   const pagination = config.book.pagination || {};
+  const mobilePagination = config.book.pagination?.mobilePagination || null;
   config.runtime = {
     ...(config.runtime || {}),
     pagination: {
@@ -62,6 +63,12 @@ export function buildBookRuntime({
       tocWidth: pagination.tocWidth ?? pagination.contentWidth,
       tocHeight: pagination.tocHeight ?? 400,
     },
+    mobilePagination: mobilePagination ? {
+      articleWidth: mobilePagination.contentWidth,
+      articleHeight: mobilePagination.contentHeight,
+      tocWidth: mobilePagination.tocWidth ?? mobilePagination.contentWidth,
+      tocHeight: mobilePagination.tocHeight ?? 320,
+    } : null,
   };
   config.articles = articles;
   config.toc = toc;

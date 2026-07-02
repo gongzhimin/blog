@@ -64,6 +64,12 @@ test("buildBookRuntime renders entries and creates toc/runtime config", () => {
         contentHeight: 471,
         tocWidth: 380,
         tocHeight: 400,
+        mobilePagination: {
+          contentWidth: 280,
+          contentHeight: 380,
+          tocWidth: 270,
+          tocHeight: 320,
+        },
       },
       turn: { startPage: 7, totalPages: 112 },
     },
@@ -109,6 +115,12 @@ test("buildBookRuntime renders entries and creates toc/runtime config", () => {
     articleHeight: 471,
     tocWidth: 380,
     tocHeight: 400,
+  });
+  assert.deepEqual(runtime.config.runtime.mobilePagination, {
+    articleWidth: 280,
+    articleHeight: 380,
+    tocWidth: 270,
+    tocHeight: 320,
   });
   assert.equal(runtime.config.source.documentId, "sample");
 });

@@ -26,3 +26,10 @@
   flex-shrink: 0;
   margin-left: 16px;
 }
+
+@media (max-width: 800px) {
+  .sj-book .table-contents {
+    width: 280px;
+    margin-top: 46px;
+  }
+}

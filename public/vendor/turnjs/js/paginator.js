@@ -282,6 +282,7 @@ var PAGINATOR = (function () {
     document.body.appendChild(measure);
     var inner = document.getElementById('__bap_inner');
     inner.style.height = maxH + 'px';
+    inner.style.width = cw + 'px';
 
     var firstHdr = '<h1 style="font-size:17px;font-weight:700;margin:0 0 8px;line-height:1.25;color:#222">' +
       article.title + '</h1><p style="color:#999;font-size:11px;margin-bottom:18px">' +
@@ -434,6 +435,7 @@ var PAGINATOR = (function () {
     document.body.appendChild(measure);
     var toc = document.getElementById('__toc');
     toc.style.height = maxH + 'px';
+    toc.style.width = cw + 'px';
     var tmp = document.createElement('div');
     tmp.innerHTML = html;
     var h1 = tmp.querySelector('h1');

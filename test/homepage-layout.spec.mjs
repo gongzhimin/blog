@@ -7,13 +7,14 @@ async function readBookState(page) {
   return page.evaluate(() => {
     const data = document.querySelector("#book-data");
     const config = JSON.parse(data.dataset.config);
-    const content = JSON.parse(data.dataset.content);
     const canvas = document.querySelector("#canvas");
     const book = document.querySelector(".sj-book");
     const zoom = document.querySelector("#book-zoom");
     const flipbook = window.jQuery ? window.jQuery(book) : null;
     const currentPage =
       flipbook && flipbook.turn("is") ? flipbook.turn("page") : null;
+    const turnPages =
+      flipbook && flipbook.turn("is") ? flipbook.turn("pages") : null;
     const currentView =
       flipbook && flipbook.turn("is") ? flipbook.turn("view") : [];
     const visiblePageText = currentView
@@ -25,17 +26,19 @@ async function readBookState(page) {
 
     return {
       config,
-      contentKeys: Object.keys(content),
-      toc: content["5"],
+      articleCount: config.articles.length,
+      toc: config.toc,
       currentPage,
+      turnPages,
       currentView,
+      display: flipbook && flipbook.turn("is") ? flipbook.turn("display") : null,
       visiblePageText,
       canvasVisibility: getComputedStyle(canvas).visibility,
       book: book.getBoundingClientRect().toJSON(),
       bookText: book.textContent,
       zoom: zoom.getBoundingClientRect().toJSON(),
       backPageExists: Boolean(
-        document.querySelector(`.sj-book .p${config.book.turn.backPage}`),
+        document.querySelector(`.sj-book .p${turnPages - 1}`),
       ),
       scrollWidth: document.documentElement.scrollWidth,
       scrollHeight: document.documentElement.scrollHeight,
@@ -54,20 +57,17 @@ test("homepage initializes the configured turnjs book", async ({ page }) => {
   expect(state.config.book.width).toBe(960);
   expect(state.config.book.height).toBe(600);
   expect(state.config.book.turn.startPage).toBe(7);
-  expect(state.config.book.turn.totalPages % 2).toBe(0);
-  expect(state.config.book.turn.backPage).toBe(
-    state.config.book.turn.totalPages - 1,
-  );
-  expect(state.currentPage).toBe(state.config.book.turn.startPage);
-  expect(state.currentView).toContain(state.config.book.turn.startPage);
+  expect(state.turnPages % 2).toBe(0);
+  expect(state.currentPage).toBe(5);
+  expect(state.currentView).toContain(5);
   expect(state.backPageExists).toBe(true);
   expect(state.toc).toContain("目录");
-  expect(state.contentKeys.length).toBeGreaterThan(3);
+  expect(state.articleCount).toBeGreaterThan(3);
   expect(state.book.width).toBeGreaterThan(900);
   expect(state.book.height).toBeGreaterThan(560);
   expect(state.bookText).toMatch(/目录|失重|答案|手机写博客指南/);
   expect(state.bookText).not.toContain("Tips");
-  expect(state.visiblePageText).toMatch(/失重/);
+  expect(state.visiblePageText).toMatch(/目录/);
   expect(state.visiblePageText).not.toContain("Tips");
 
   await page.screenshot({
@@ -106,9 +106,11 @@ test("narrow viewport keeps the book usable with page scrolling", async ({
   await page.goto("/");
   const state = await readBookState(page);
 
-  expect(state.scrollWidth).toBeGreaterThanOrEqual(state.innerWidth);
+  expect(state.display).toBe("single");
+  expect(state.currentView).toHaveLength(1);
+  expect(state.scrollWidth).toBe(state.innerWidth);
   expect(state.scrollHeight).toBeGreaterThan(state.innerHeight);
-  expect(state.book.width).toBeGreaterThan(900);
+  expect(state.book.width).toBe(390);
   await expect(page.locator(".site-nav .links a")).toHaveCount(4);
 
   await page.screenshot({
