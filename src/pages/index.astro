@@ -198,14 +198,21 @@ const homepageStyles = `
 
   /* ── Mobile 64K single-page ─────────────────────────────── */
   @media (max-width: 800px) {
-    #canvas { width: 390px !important; }
-    .sj-book { width: 390px !important; height: 507px !important; }
+    #canvas { width: 370px !important; padding: 16px 0 !important; }
+    .sj-book { width: 370px !important; height: 507px !important; }
     .sj-book .hard,
     .sj-book .own-size { width: 370px !important; height: 507px !important; }
     #slider-bar { display: none; }
-    .site-footer { max-width: 390px; margin-left: auto; margin-right: auto; padding-left: 12px; padding-right: 12px; }
-    .site-nav { padding-left: 12px; padding-right: 12px; }
     body { overflow-x: hidden !important; }
+
+    .site-nav { height: 44px; padding: 0 12px; }
+    .site-nav .brand { font-size: 13px; }
+    .site-nav .links { gap: 12px; }
+    .site-nav .links a { font-size: 11px; }
+
+    .site-footer { max-width: 370px; margin: 0 auto; padding: 4px 12px 24px; font-size: 11px; }
+    .site-footer .quote { font-size: 11px; }
+    .site-footer .copyright { font-size: 10px; }
   }
 ` + theme.styles.visualCSS;
 

@@ -10,6 +10,11 @@ var _pageCache = {};
 /** Has the paginator finished? */
 var _paginated = false;
 
+function resetPageCache() {
+  _pageCache = {};
+  _paginated = false;
+}
+
 function toRoman(n) {
   var vals = [[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']];
   var r = '';

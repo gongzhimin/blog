@@ -184,8 +184,33 @@
       return true;
     }
 
+    function currentPage() {
+      var book = $(bookSelector);
+      return book.turn('is') ? book.turn('page') : startPage;
+    }
+
+    function destroy() {
+      var book = $(bookSelector);
+      if (book.turn('is')) book.turn('destroy');
+      $(sliderSelector).slider('destroy');
+      $(canvasSelector).css({ visibility: 'hidden' });
+      $(bookSelector).removeClass('animated').empty();
+      // Rebuild the book shell structure that Turn.js destroyed
+      var shell = document.createElement('div');
+      shell.innerHTML =
+        '<div class="hard"><div class="side"></div></div>' +
+        '<div class="hard front-side"><div class="depth"></div></div>' +
+        '<div class="own-size"></div>' +
+        '<div class="own-size even"></div>' +
+        '<div class="hard fixed back-side"><div class="depth"></div></div>' +
+        '<div class="hard"></div>';
+      while (shell.firstChild) book.append(shell.firstChild);
+    }
+
     return {
       mount: mount,
+      destroy: destroy,
+      currentPage: currentPage,
       clampPageTarget: clampPageTarget
     };
   }

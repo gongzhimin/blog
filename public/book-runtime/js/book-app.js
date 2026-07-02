@@ -10,18 +10,20 @@
   var ARTICLES = BOOK_CONFIG.articles || [];
   var TOC_HTML = BOOK_CONFIG.toc || '';
   var CONTENT_PAGE = BOOK_CONFIG.book.contentPage;
+  var MOBILE_CONTENT_PAGE = BOOK_CONFIG.book.mobileContentPage || {
+    width: 370, height: 507
+  };
   var PAGINATION_CONFIG = BOOK_CONFIG.runtime && BOOK_CONFIG.runtime.pagination;
   var MOBILE_PAGINATION = BOOK_CONFIG.runtime && BOOK_CONFIG.runtime.mobilePagination;
   var MOBILE_BREAKPOINT = 800;
 
-  // Detect mobile via physical screen width because the desktop viewport meta
-  // locks to 1050px until mobile mode is selected.
-  var physicalScreenWidth = window.screen && window.screen.width;
-  var isMobile = (window.matchMedia && window.matchMedia('(max-width: 800px)').matches)
-              || (physicalScreenWidth && physicalScreenWidth < MOBILE_BREAKPOINT);
+  // Detect mobile via actual window width, bypassing the viewport meta lock.
+  var isMobile = sessionStorage.getItem('book-mobile') === '1'
+              || (window.outerWidth || window.innerWidth) < MOBILE_BREAKPOINT;
   if (isMobile) {
     var vp = document.querySelector('meta[name="viewport"]');
     if (vp) vp.content = 'width=device-width, initial-scale=1';
+    sessionStorage.removeItem('book-mobile');
   }
 
   var TOTAL_PAGES = BOOK_CONFIG.book.turn.totalPages;
@@ -55,15 +57,19 @@
     }
   }
 
-  function loadApp() {
-    runPagination();
+  function detectMobile() {
+    // Check actual browser window width, not viewport (which is locked to 1050)
+    var winW = window.outerWidth || window.innerWidth;
+    return winW < MOBILE_BREAKPOINT;
+  }
 
-    var adapter = BookTurnAdapter.create({
+  function createAdapter() {
+    return BookTurnAdapter.create({
       bookSelector: '.sj-book',
       zoomSelector: '#book-zoom',
       sliderSelector: '#slider',
       canvasSelector: '#canvas',
-      contentPage: CONTENT_PAGE,
+      contentPage: isMobile ? MOBILE_CONTENT_PAGE : CONTENT_PAGE,
       totalPages: TOTAL_PAGES,
       backPage: BACK_PAGE,
       startPage: START_PAGE,
@@ -74,11 +80,31 @@
         return _pageCache[page];
       }
     });
+  }
 
+  function loadApp() {
+    runPagination();
+    var adapter = createAdapter();
     if (!adapter.mount()) {
       setTimeout(loadApp, 10);
     }
   }
+
+  // Resize listener — reload page when crossing the mobile breakpoint.
+  // A full reload is the most reliable way to switch between single/double
+  // page mode, since Turn.js does not cleanly rebuild after destroy().
+  var resizeTimer;
+  window.addEventListener('resize', function() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function() {
+      var nowMobile = detectMobile();
+      if (isMobile !== nowMobile) {
+        if (nowMobile) sessionStorage.setItem('book-mobile', '1');
+        else sessionStorage.removeItem('book-mobile');
+        window.location.reload();
+      }
+    }, 500);
+  });
 
   yepnope({
     test: Modernizr.csstransforms,
