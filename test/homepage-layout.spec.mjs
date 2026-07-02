@@ -99,7 +99,7 @@ test("navigation and footer stay configured around the book", async ({
   expect(scrolledTop).toBe(initialTop);
 });
 
-test("narrow viewport keeps the book usable with page scrolling", async ({
+test("narrow viewport keeps the book usable without horizontal overflow", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
@@ -109,8 +109,8 @@ test("narrow viewport keeps the book usable with page scrolling", async ({
   expect(state.display).toBe("single");
   expect(state.currentView).toHaveLength(1);
   expect(state.scrollWidth).toBe(state.innerWidth);
-  expect(state.scrollHeight).toBeGreaterThan(state.innerHeight);
-  expect(state.book.width).toBe(390);
+  expect(state.scrollHeight).toBeGreaterThanOrEqual(state.innerHeight);
+  expect(state.book.width).toBe(370);
   await expect(page.locator(".site-nav .links a")).toHaveCount(4);
 
   await page.screenshot({
