@@ -11,9 +11,9 @@ Astro content collections
   -> src/pages/index.astro
   -> src/lib/book-renderer.js
   -> src/styles/book-content.css
-  -> public/vendor/turnjs/js/paginator.js
-  -> public/vendor/turnjs/js/orchestrator.js
-  -> public/vendor/turnjs/js/book-app.js
+  -> public/book-runtime/js/paginator.js
+  -> public/book-runtime/js/orchestrator.js
+  -> public/book-runtime/js/book-app.js
   -> Turn.js book
 ```
 
@@ -130,7 +130,7 @@ src/lib/book-renderer.js
 
 ```text
 src/pages/index.astro
-public/vendor/turnjs/js/orchestrator.js
+public/book-runtime/js/orchestrator.js
 ```
 
 职责：
@@ -150,7 +150,7 @@ public/vendor/turnjs/js/orchestrator.js
 当前位置：
 
 ```text
-public/vendor/turnjs/js/paginator.js
+public/book-runtime/js/paginator.js
 ```
 
 职责：
@@ -195,8 +195,8 @@ src/pages/index.astro inline CSS
 当前位置：
 
 ```text
-public/vendor/turnjs/js/book-app.js
-public/vendor/turnjs/js/orchestrator.js
+public/book-runtime/js/book-app.js
+public/book-runtime/js/orchestrator.js
 public/vendor/turnjs/turn.js
 ```
 
@@ -277,6 +277,10 @@ src/book/
     page-cache.js
     turnjs-adapter.js
     book-app.js
+
+  components/
+    BookRuntimeAssets.astro
+    BookShell.astro
 ```
 
 Astro 页面层变薄：
@@ -572,7 +576,7 @@ BookRuntime
 选择 source
 选择 theme
 调用 buildBookRuntime
-渲染 BookShell
+渲染 BookRuntimeAssets 与 BookShell
 ```
 
 示意：
@@ -582,6 +586,7 @@ BookRuntime
 import { createAstroBlogSource } from "../book/sources/astro-blog-source";
 import { loadBookTheme } from "../book/themes/load-theme";
 import { buildBookRuntime } from "../book/assembler/build-book-runtime";
+import BookRuntimeAssets from "../book/components/BookRuntimeAssets.astro";
 import BookShell from "../book/components/BookShell.astro";
 
 const source = createAstroBlogSource();
@@ -589,6 +594,7 @@ const theme = await loadBookTheme("classic-paper");
 const runtime = await buildBookRuntime({ source, theme });
 ---
 
+<BookRuntimeAssets />
 <BookShell runtime={runtime} />
 ```
 
@@ -735,6 +741,60 @@ src/pages/demos/book-runtime.astro
 ```text
 /demos/book-runtime/ 显示独立内容。
 不读取 src/content/blog 或 src/content/life。
+```
+
+### 阶段 6：整理运行时资源边界
+
+目标：
+
+- 明确区分第三方 Turn.js 资源和自研 Book Runtime 代码。
+- 避免把自研分页、编排、启动代码误认为 Turn.js 魔改。
+- 让 Astro 页面复用同一套书本壳组件和资源注入组件。
+
+任务：
+
+```text
+1. 将 paginator.js、orchestrator.js、book-app.js 移到 public/book-runtime/js/。
+2. 保留 public/vendor/turnjs/ 只存放第三方库、CSS、图片。
+3. 新增 BookRuntimeAssets.astro 集中注入 Turn.js 依赖。
+4. 新增 BookShell.astro 集中渲染书本 DOM、#book-data 与自研运行时脚本。
+5. 更新首页与 demo 页面使用同一个 shell。
+```
+
+验收：
+
+```text
+npm run build 通过。
+node --test test/*.test.* 通过。
+npm run test:e2e 通过。
+vendor/turnjs/js 下不再存在自研运行时文件。
+```
+
+### 阶段 7：抽出 Turn.js 适配层
+
+目标：
+
+- 让 Turn.js 成为 Book Runtime 的实现细节。
+- 让 `book-app.js` 只负责读取配置、选择分页参数、启动分页和创建适配器。
+- 将页面注入、深度阴影、滑条、hash、键盘、单页/双页切换等 Turn.js 细节收束到 `turnjs-adapter.js`。
+
+任务：
+
+```text
+1. 新增 public/book-runtime/js/turnjs-adapter.js。
+2. 将 updateDepth、addPage、slider、mousewheel、hash、keyboard、turn({ ... }) 迁入 adapter。
+3. BookShell 在 book-app.js 之前加载 turnjs-adapter.js。
+4. book-app.js 通过 BookTurnAdapter.create(...).mount() 启动翻页层。
+5. 增加边界测试，防止 adapter 回流到 vendor/turnjs。
+```
+
+验收：
+
+```text
+book-app.js 不再直接定义 updateDepth/addPage。
+book-app.js 不再直接调用 flipbook.turn({ ... })。
+移动端页码 clamp 仍由 adapter 保留。
+首页和 JSON demo 构建结果继续加载同一套 runtime。
 ```
 
 ## 风险与约束

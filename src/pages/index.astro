@@ -7,6 +7,8 @@ import { renderMarkdown, stripLeadingTitle, romanTocPage } from '../lib/book-ren
 import { createAstroBlogDocument } from '../book/sources/astro-blog-source.mjs';
 import { buildBookRuntime } from '../book/assembler/build-book-runtime.mjs';
 import { loadBookTheme } from '../book/themes/load-theme.mjs';
+import BookShell from '../book/components/BookShell.astro';
+import BookRuntimeAssets from '../book/components/BookRuntimeAssets.astro';
 import fontsCSS from '../styles/fonts.css?raw';
 import bookContentCSS from '../styles/book-content.css?raw';
 import codeHighlightCSS from '../styles/code-highlight.css?raw';
@@ -40,8 +42,6 @@ const runtime = buildBookRuntime({
 const runConfig = runtime.config;
 runConfig.theme = theme.runtime;
 
-const backPage = runConfig.book.turn.backPage;
-const totalPages = runConfig.book.turn.totalPages;
 const nav = bookConfig.nav;
 const footer = bookConfig.footer;
 const light = {
@@ -49,8 +49,6 @@ const light = {
   footer: footer.light,
   background: bookConfig.backgrounds.light,
 };
-const pageDepthAttrs = { depth: '5' };
-
 const homepageStyles = `
   html {
     min-height: 100%;
@@ -154,8 +152,8 @@ const homepageStyles = `
   .sj-book .p1  { background-position: 0 0 !important; }
   .sj-book .p2  { background-position: -483px 0 !important; }
   .sj-book .p3  { background-position: -1936px 0 !important; }
-  /* Back-cover pages (.p${backPage}, .p${totalPages}) injected at runtime
-     by orchestrator.js — not here, to avoid stale estimated page numbers. */
+  /* Back-cover pages are injected at runtime by orchestrator.js to avoid stale
+     estimated page numbers. */
 
   /* ── Paper texture ──────────────────────────────────────── */
   .sj-book .own-size {
@@ -227,13 +225,7 @@ const quoteAuthor = quote.author || footer.content.author;
     <link rel="preconnect" href="https://fonts.loli.net" />
     <link rel="preconnect" href="https://gstatic.loli.net" crossorigin />
     <link href="https://fonts.loli.net/css2?family=Chiron+Sung+HK&display=swap" rel="stylesheet" />
-    <script is:inline src="/vendor/turnjs/jquery.min.1.7.js"></script>
-    <script is:inline src="/vendor/turnjs/jquery-ui-1.8.20.custom.min.js"></script>
-    <script is:inline src="/vendor/turnjs/jquery.mousewheel.min.js"></script>
-    <script is:inline src="/vendor/turnjs/modernizr.2.5.3.min.js"></script>
-    <script is:inline src="/vendor/turnjs/hash.js"></script>
-    <link rel="stylesheet" href="/vendor/turnjs/css/jquery.ui.css" />
-    <link rel="stylesheet" href="/vendor/turnjs/css/steve-jobs.css" />
+    <BookRuntimeAssets />
     <style is:inline set:html={homepageStyles}></style>
   </head>
   <body>
@@ -248,29 +240,11 @@ const quoteAuthor = quote.author || footer.content.author;
       </div>
     </header>
 
-    <main>
-      <div id="canvas">
-        <div id="book-zoom">
-          <div class="sj-book">
-            <div {...pageDepthAttrs} class="hard">
-              <div class="side"></div>
-            </div>
-            <div {...pageDepthAttrs} class="hard front-side">
-              <div class="depth"></div>
-            </div>
-            <div class="own-size"></div>
-            <div class="own-size even"></div>
-            <div class={`hard fixed back-side p${backPage}`}>
-              <div class="depth"></div>
-            </div>
-            <div class={`hard p${totalPages}`}></div>
-          </div>
-        </div>
-        <div id="slider-bar" class="turnjs-slider">
-          <div id="slider"></div>
-        </div>
-      </div>
-    </main>
+    <BookShell
+      runConfig={runConfig}
+      measureArticleCSS={measureArticleCSS}
+      measureTocCSS={measureTocCSS}
+    />
 
     <footer class="site-footer">
       <div class="quote">"{quoteEnglish}"</div>
@@ -281,15 +255,5 @@ const quoteAuthor = quote.author || footer.content.author;
       </div>
     </footer>
 
-    <div
-      id="book-data"
-      hidden
-      data-config={JSON.stringify(runConfig)}
-    ></div>
-
-    <script is:inline set:html={`var MEASURE_CSS={article:` + JSON.stringify(measureArticleCSS) + `,toc:` + JSON.stringify(measureTocCSS) + `};`}></script>
-    <script is:inline src="/vendor/turnjs/js/paginator.js"></script>
-    <script is:inline src="/vendor/turnjs/js/orchestrator.js"></script>
-    <script is:inline src="/vendor/turnjs/js/book-app.js"></script>
   </body>
 </html>

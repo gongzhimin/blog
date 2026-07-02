@@ -66,7 +66,8 @@ test("homepage renders the configured turnjs book shell", async () => {
   assert.ok(document.querySelector(".sj-book"));
   assert.equal(document.querySelector(".home-book-frame"), null);
   assert.equal(document.querySelector(".book-page"), null);
-  assert.equal(document.querySelector("script[src='/vendor/turnjs/js/book-app.js']") !== null, true);
+  assert.equal(document.querySelector("script[src='/book-runtime/js/book-app.js']") !== null, true);
+  assert.equal(document.querySelector("script[src='/vendor/turnjs/js/book-app.js']") === null, true);
 });
 
 test("homepage serializes dynamic book config and content pages", async () => {

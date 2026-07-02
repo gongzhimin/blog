@@ -16,10 +16,22 @@
                                   │ orchestrator.js              │
                                   │ 全局页码编排 + 目录生成        │
                                   │                              │
+                                  │ turnjs-adapter.js            │
+                                  │ Turn.js 适配 + 翻页交互       │
+                                  │                              │
                                   │ book-app.js                  │
-                                  │ Turn.js 胶水 + Hash 路由      │
+                                  │ 配置读取 + 运行时启动          │
                                   └─────────────────────────────┘
 ```
+
+运行时代码位于 `public/book-runtime/js/`。`public/vendor/turnjs/` 只保留 Turn.js、jQuery、Modernizr、Hash、示例 CSS 与图片等第三方资源，避免把自研分页/编排代码误认为对 Turn.js 的魔改。
+
+`turnjs-adapter.js` 是 Book Runtime 和 Turn.js 之间的边界：页面注入、书壳深度、滑条、鼠标滚轮、hash、键盘、移动端 single display 与桌面端 double display 都在这里处理。`book-app.js` 只读取 `#book-data`、选择分页配置、调用 `paginateAll()`，然后创建 `BookTurnAdapter`。
+
+Astro 页面通过两个组件接入运行时：
+
+- `src/book/components/BookRuntimeAssets.astro`：集中注入 Turn.js 及其第三方依赖。
+- `src/book/components/BookShell.astro`：渲染书本 DOM、`#book-data`、测量 CSS 与自研 Book Runtime 脚本。
 
 ---
 
@@ -39,9 +51,9 @@ Markdown 文章
 { title, dateStr, bodyHTML }  →  注入 index.astro 的 #book-data
 ```
 
-### Step 1：初始化（`book-app.js`）
+### Step 1：初始化（`book-app.js` + `turnjs-adapter.js`）
 
-页面加载 → `loadApp()` → `paginateAll(articles, tocHTML)` → Turn.js 初始化。
+页面加载 → `loadApp()` → `paginateAll(articles, tocHTML)` → `BookTurnAdapter.create(...).mount()` → Turn.js 初始化。
 
 ### Step 2：全局编排（`orchestrator.js`）
 

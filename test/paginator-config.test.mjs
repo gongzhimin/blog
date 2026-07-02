@@ -28,7 +28,7 @@ async function loadPaginator() {
   context.globalThis = context;
   vm.createContext(context);
   const source = await readFile(
-    new URL("../public/vendor/turnjs/js/paginator.js", import.meta.url),
+    new URL("../public/book-runtime/js/paginator.js", import.meta.url),
     "utf8",
   );
   vm.runInContext(source, context);

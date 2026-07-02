@@ -160,19 +160,30 @@ test("turnjs book config defines navigation, page geometry, and pagination", () 
   assert.equal(bookConfig.book.pagination.charsPerLine, 23);
 });
 
-test("homepage consumes book config and the shared turnjs app", async () => {
-  const [page, app] = await Promise.all([
+test("homepage consumes book config and the shared book runtime", async () => {
+  const [page, app, adapter] = await Promise.all([
     readFile(new URL("../src/pages/index.astro", import.meta.url), "utf8"),
     readFile(
-      new URL("../public/vendor/turnjs/js/book-app.js", import.meta.url),
+      new URL("../public/book-runtime/js/book-app.js", import.meta.url),
+      "utf8",
+    ),
+    readFile(
+      new URL("../public/book-runtime/js/turnjs-adapter.js", import.meta.url),
       "utf8",
     ),
   ]);
 
   assert.match(page, /import bookConfig from ['"]\.\.\/data\/book-config\.json['"]/);
+  assert.match(page, /import BookShell from ['"]\.\.\/book\/components\/BookShell\.astro['"]/);
+  assert.match(page, /import BookRuntimeAssets from ['"]\.\.\/book\/components\/BookRuntimeAssets\.astro['"]/);
   assert.match(page, /loadBookTheme\(bookConfig\.theme\?\.id/);
-  assert.match(page, /data-config=\{JSON\.stringify\(runConfig\)\}/);
-  assert.match(page, /src="\/vendor\/turnjs\/js\/book-app\.js"/);
+  assert.match(page, /<BookShell/);
+  assert.match(page, /<BookRuntimeAssets/);
+  assert.doesNotMatch(page, /data-config=\{JSON\.stringify\(runConfig\)\}/);
+  assert.doesNotMatch(page, /src="\/book-runtime\/js\/book-app\.js"/);
+  assert.doesNotMatch(page, /src="\/vendor\/turnjs\/js\/book-app\.js"/);
+  assert.doesNotMatch(page, /src="\/vendor\/turnjs\/jquery/);
+  assert.doesNotMatch(page, /href="\/vendor\/turnjs\/css\/steve-jobs\.css"/);
   assert.doesNotMatch(page, /bookContentCSS\.replace/);
   assert.doesNotMatch(page, /bookTocCSS\.replace/);
   assert.doesNotMatch(page, /createClassicPaperTheme/);
@@ -183,12 +194,21 @@ test("homepage consumes book config and the shared turnjs app", async () => {
   assert.match(app, /BOOK_CONFIG\.book\.turn\.totalPages/);
   assert.match(app, /PAGINATOR\.configure/);
   assert.match(app, /BOOK_CONFIG\.runtime\.pagination/);
-  assert.match(app, /Hash\.check\(\)\.update\(\)/);
-  assert.match(app, /nop:[\s\S]{0,140}START_PAGE/);
+  assert.match(app, /BookTurnAdapter\.create/);
+  assert.doesNotMatch(app, /Hash\.check\(\)\.update\(\)/);
+  assert.doesNotMatch(app, /function updateDepth/);
   assert.doesNotMatch(app, /ARTICLE_H/);
   assert.doesNotMatch(app, /nop:[\s\S]{0,140}turn\('page', 1\)/);
   assert.doesNotMatch(app, /\.p111\b/);
   assert.doesNotMatch(app, /turn\.html4/);
+
+  assert.match(adapter, /Hash\.check\(\)\.update\(\)/);
+  assert.match(adapter, /nop:[\s\S]{0,140}startPage/);
+  assert.match(adapter, /function updateDepth/);
+  assert.doesNotMatch(adapter, /ARTICLE_H/);
+  assert.doesNotMatch(adapter, /nop:[\s\S]{0,140}turn\('page', 1\)/);
+  assert.doesNotMatch(adapter, /\.p111\b/);
+  assert.doesNotMatch(adapter, /turn\.html4/);
 });
 
 test("directory folios consume separate component styles", async () => {

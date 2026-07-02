@@ -1,6 +1,7 @@
 ---
 import bookConfig from '../../data/book-config.json';
 import { getCollection } from 'astro:content';
+import BookRuntimeAssets from '../../book/components/BookRuntimeAssets.astro';
 
 const C = bookConfig;
 
@@ -40,13 +41,7 @@ const pageDepthAttrs = { depth: '5' };
 <meta name="viewport" content="width=1050, user-scalable=no" />
 <title>{C.nav.brand.text} · Book</title>
 
-<script is:inline src="/vendor/turnjs/jquery.min.1.7.js"></script>
-<script is:inline src="/vendor/turnjs/jquery-ui-1.8.20.custom.min.js"></script>
-<script is:inline src="/vendor/turnjs/jquery.mousewheel.min.js"></script>
-<script is:inline src="/vendor/turnjs/modernizr.2.5.3.min.js"></script>
-<script is:inline src="/vendor/turnjs/hash.js"></script>
-<link rel="stylesheet" href="/vendor/turnjs/css/jquery.ui.css" />
-<link rel="stylesheet" href="/vendor/turnjs/css/steve-jobs.css" />
+<BookRuntimeAssets />
 
 <style is:inline set:html={`
   :root {
@@ -119,7 +114,7 @@ const pageDepthAttrs = { depth: '5' };
   data-config={JSON.stringify(runConfig)}
   data-content={JSON.stringify(pages)}
 ></div>
-<script is:inline src="/vendor/turnjs/js/book-app.js"></script>
+<script is:inline src="/book-runtime/js/book-app.js"></script>
 
 </body>
 </html>

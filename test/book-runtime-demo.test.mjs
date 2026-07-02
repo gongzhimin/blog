@@ -3,6 +3,13 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { JSDOM } from "jsdom";
 
+async function loadDemoSource() {
+  return readFile(
+    new URL("../src/pages/demos/book-runtime.astro", import.meta.url),
+    "utf8",
+  );
+}
+
 async function loadDemo() {
   const html = await readFile(
     new URL("../dist/demos/book-runtime/index.html", import.meta.url),
@@ -28,8 +35,32 @@ test("book runtime demo renders a standalone JSON book", async () => {
     "Book Runtime Demo",
   );
   assert.equal(
-    document.querySelector("script[src='/vendor/turnjs/js/book-app.js']") !==
+    document.querySelector("script[src='/book-runtime/js/book-app.js']") !==
       null,
     true,
   );
+  assert.equal(
+    document.querySelector("script[src='/vendor/turnjs/js/book-app.js']") ===
+      null,
+    true,
+  );
+});
+
+test("book runtime demo delegates the reusable book shell to BookShell", async () => {
+  const source = await loadDemoSource();
+
+  assert.match(
+    source,
+    /import BookShell from ['"]\.\.\/\.\.\/book\/components\/BookShell\.astro['"]/,
+  );
+  assert.match(
+    source,
+    /import BookRuntimeAssets from ['"]\.\.\/\.\.\/book\/components\/BookRuntimeAssets\.astro['"]/,
+  );
+  assert.match(source, /<BookShell/);
+  assert.match(source, /<BookRuntimeAssets/);
+  assert.doesNotMatch(source, /id="book-data"/);
+  assert.doesNotMatch(source, /src="\/book-runtime\/js\/book-app\.js"/);
+  assert.doesNotMatch(source, /src="\/vendor\/turnjs\/jquery/);
+  assert.doesNotMatch(source, /href="\/vendor\/turnjs\/css\/steve-jobs\.css"/);
 });

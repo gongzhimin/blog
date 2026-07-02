@@ -6,6 +6,8 @@ import { renderMarkdown, stripLeadingTitle, romanTocPage } from '../../lib/book-
 import { buildBookRuntime } from '../../book/assembler/build-book-runtime.mjs';
 import { createJsonBookDocument } from '../../book/sources/json-book-source.mjs';
 import { loadBookTheme } from '../../book/themes/load-theme.mjs';
+import BookShell from '../../book/components/BookShell.astro';
+import BookRuntimeAssets from '../../book/components/BookRuntimeAssets.astro';
 import fontsCSS from '../../styles/fonts.css?raw';
 import bookContentCSS from '../../styles/book-content.css?raw';
 import codeHighlightCSS from '../../styles/code-highlight.css?raw';
@@ -33,10 +35,6 @@ const runtime = buildBookRuntime({
 });
 const runConfig = runtime.config;
 runConfig.theme = theme.runtime;
-
-const backPage = runConfig.book.turn.backPage;
-const totalPages = runConfig.book.turn.totalPages;
-const pageDepthAttrs = { depth: '5' };
 
 const homepageStyles = `
   body {
@@ -116,13 +114,7 @@ const homepageStyles = `
     <meta charset="utf-8" />
     <title>Book Runtime Demo</title>
     <meta name="viewport" content="width=1050, user-scalable=no" />
-    <script is:inline src="/vendor/turnjs/jquery.min.1.7.js"></script>
-    <script is:inline src="/vendor/turnjs/jquery-ui-1.8.20.custom.min.js"></script>
-    <script is:inline src="/vendor/turnjs/jquery.mousewheel.min.js"></script>
-    <script is:inline src="/vendor/turnjs/modernizr.2.5.3.min.js"></script>
-    <script is:inline src="/vendor/turnjs/hash.js"></script>
-    <link rel="stylesheet" href="/vendor/turnjs/css/jquery.ui.css" />
-    <link rel="stylesheet" href="/vendor/turnjs/css/steve-jobs.css" />
+    <BookRuntimeAssets />
     <style is:inline set:html={homepageStyles}></style>
   </head>
   <body>
@@ -130,26 +122,10 @@ const homepageStyles = `
       <a class="brand" href="/demos/book-runtime/">Book Runtime Demo</a>
     </header>
 
-    <main>
-      <div id="canvas">
-        <div id="book-zoom">
-          <div class="sj-book">
-            <div {...pageDepthAttrs} class="hard"><div class="side"></div></div>
-            <div {...pageDepthAttrs} class="hard front-side"><div class="depth"></div></div>
-            <div class="own-size"></div>
-            <div class="own-size even"></div>
-            <div class={`hard fixed back-side p${backPage}`}><div class="depth"></div></div>
-            <div class={`hard p${totalPages}`}></div>
-          </div>
-        </div>
-        <div id="slider-bar" class="turnjs-slider"><div id="slider"></div></div>
-      </div>
-    </main>
-
-    <div id="book-data" hidden data-config={JSON.stringify(runConfig)}></div>
-    <script is:inline set:html={`var MEASURE_CSS={article:` + JSON.stringify(theme.measurement.articleCSS) + `,toc:` + JSON.stringify(theme.measurement.tocCSS) + `};`}></script>
-    <script is:inline src="/vendor/turnjs/js/paginator.js"></script>
-    <script is:inline src="/vendor/turnjs/js/orchestrator.js"></script>
-    <script is:inline src="/vendor/turnjs/js/book-app.js"></script>
+    <BookShell
+      runConfig={runConfig}
+      measureArticleCSS={theme.measurement.articleCSS}
+      measureTocCSS={theme.measurement.tocCSS}
+    />
   </body>
 </html>
