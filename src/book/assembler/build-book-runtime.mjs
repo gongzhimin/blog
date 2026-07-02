@@ -75,6 +75,7 @@ export function buildBookRuntime({
   config.source = {
     documentId: document.id,
     documentTitle: document.title,
+    tocTitle: document.tocTitle,
     entryCount: document.entries.length,
   };
 

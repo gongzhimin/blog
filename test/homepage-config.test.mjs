@@ -147,6 +147,7 @@ test("schema and tuning fields expose component groups", () => {
 
 test("turnjs book config defines navigation, page geometry, and pagination", () => {
   assert.equal(bookConfig.theme.id, "classic-paper");
+  assert.equal(bookConfig.book.mobileBreakpoint, 800);
   assert.equal(bookConfig.nav.brand.text, "ZHIMIN");
   assert.deepEqual(
     bookConfig.nav.links.items.map((item) => item.href),
@@ -156,12 +157,23 @@ test("turnjs book config defines navigation, page geometry, and pagination", () 
   assert.equal(bookConfig.book.height, 600);
   assert.equal(bookConfig.book.contentPage.width, 460);
   assert.equal(bookConfig.book.contentPage.height, 582);
+  assert.deepEqual(bookConfig.book.mobileCanvas, {
+    width: 370,
+    paddingY: 16,
+  });
+  assert.deepEqual(bookConfig.book.mobileContentPage, {
+    width: 370,
+    height: 507,
+  });
+  assert.equal(bookConfig.book.coverSprite.image, "/vendor/turnjs/pics/book-covers.jpg");
+  assert.equal(bookConfig.book.coverSprite.backgroundSize, "2400px 600px");
+  assert.equal(bookConfig.book.coverSprite.positions.back, "-968px 0");
   assert.equal(bookConfig.book.turn.startPage, 7);
   assert.equal(bookConfig.book.pagination.charsPerLine, 23);
 });
 
 test("homepage consumes book config and the shared book runtime", async () => {
-  const [page, app, adapter] = await Promise.all([
+  const [page, app, adapter, homepageStyles] = await Promise.all([
     readFile(new URL("../src/pages/index.astro", import.meta.url), "utf8"),
     readFile(
       new URL("../public/book-runtime/js/book-app.js", import.meta.url),
@@ -171,14 +183,27 @@ test("homepage consumes book config and the shared book runtime", async () => {
       new URL("../public/book-runtime/js/turnjs-adapter.js", import.meta.url),
       "utf8",
     ),
+    readFile(
+      new URL("../src/book/homepage/build-homepage-styles.mjs", import.meta.url),
+      "utf8",
+    ),
   ]);
 
   assert.match(page, /import bookConfig from ['"]\.\.\/data\/book-config\.json['"]/);
+  assert.match(page, /from ['"]\.\.\/book\/renderers\/markdown-renderer\.mjs['"]/);
+  assert.doesNotMatch(page, /from ['"]\.\.\/lib\/book-renderer\.js['"]/);
   assert.match(page, /import BookShell from ['"]\.\.\/book\/components\/BookShell\.astro['"]/);
   assert.match(page, /import BookRuntimeAssets from ['"]\.\.\/book\/components\/BookRuntimeAssets\.astro['"]/);
+  assert.match(page, /from ['"]\.\.\/book\/homepage\/build-homepage-styles\.mjs['"]/);
   assert.match(page, /loadBookTheme\(bookConfig\.theme\?\.id/);
+  assert.match(page, /buildHomepageStyles\(\{/);
   assert.match(page, /<BookShell/);
   assert.match(page, /<BookRuntimeAssets/);
+  assert.match(page, /const mobileCanvas = bookConfig\.book\.mobileCanvas/);
+  assert.match(page, /const mobileContentPage = bookConfig\.book\.mobileContentPage/);
+  assert.match(homepageStyles, /mobileCanvas\.width/);
+  assert.match(homepageStyles, /mobileContentPage\.height/);
+  assert.doesNotMatch(page, /#canvas \{ width: 370px/);
   assert.doesNotMatch(page, /data-config=\{JSON\.stringify\(runConfig\)\}/);
   assert.doesNotMatch(page, /src="\/book-runtime\/js\/book-app\.js"/);
   assert.doesNotMatch(page, /src="\/vendor\/turnjs\/js\/book-app\.js"/);
@@ -188,10 +213,14 @@ test("homepage consumes book config and the shared book runtime", async () => {
   assert.doesNotMatch(page, /bookTocCSS\.replace/);
   assert.doesNotMatch(page, /createClassicPaperTheme/);
   assert.doesNotMatch(page, /function loadApp\(/);
+  assert.doesNotMatch(page, /const homepageStyles = `\n/);
   assert.doesNotMatch(page, /updateDepth = function/);
 
   assert.match(app, /BACK_PAGE/);
   assert.match(app, /BOOK_CONFIG\.book\.turn\.totalPages/);
+  assert.match(app, /BOOK_CONFIG\.book\.mobileBreakpoint/);
+  assert.match(app, /BOOK_CONFIG\.book\.mobileContentPage/);
+  assert.doesNotMatch(app, /width: 370, height: 507/);
   assert.match(app, /PAGINATOR\.configure/);
   assert.match(app, /BOOK_CONFIG\.runtime\.pagination/);
   assert.match(app, /BookTurnAdapter\.create/);

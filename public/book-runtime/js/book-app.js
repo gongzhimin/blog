@@ -10,12 +10,14 @@
   var ARTICLES = BOOK_CONFIG.articles || [];
   var TOC_HTML = BOOK_CONFIG.toc || '';
   var CONTENT_PAGE = BOOK_CONFIG.book.contentPage;
-  var MOBILE_CONTENT_PAGE = BOOK_CONFIG.book.mobileContentPage || {
-    width: 370, height: 507
-  };
+  var MOBILE_CONTENT_PAGE = BOOK_CONFIG.book.mobileContentPage || CONTENT_PAGE;
   var PAGINATION_CONFIG = BOOK_CONFIG.runtime && BOOK_CONFIG.runtime.pagination;
   var MOBILE_PAGINATION = BOOK_CONFIG.runtime && BOOK_CONFIG.runtime.mobilePagination;
-  var MOBILE_BREAKPOINT = 800;
+  var MOBILE_BREAKPOINT = BOOK_CONFIG.book.mobileBreakpoint || 800;
+  var pageCache = BookOrchestrator.createPageCache({
+    coverSprite: BOOK_CONFIG.book.coverSprite,
+    tocTitle: BOOK_CONFIG.source && BOOK_CONFIG.source.tocTitle || '目录'
+  });
 
   // Detect mobile via actual window width, bypassing the viewport meta lock.
   var isMobile = sessionStorage.getItem('book-mobile') === '1'
@@ -43,17 +45,18 @@
   }
 
   function runPagination() {
-    if (_paginated) return;
+    if (pageCache.isPaginated()) return;
 
     try {
       configurePagination();
-      var result = paginateAll(ARTICLES, TOC_HTML);
+      var result = pageCache.paginateAll(ARTICLES, TOC_HTML);
       TOTAL_PAGES = result.totalPages;
       BACK_PAGE = result.backPage;
       START_PAGE = 5;
     } catch(e) {
       console.error('paginateAll failed:', e);
-      _pageCache[5] = TOC_HTML + '<span class="page-number">I</span>';
+      pageCache.reset();
+      pageCache.setPageContent(5, TOC_HTML + '<span class="page-number">I</span>');
     }
   }
 
@@ -77,7 +80,7 @@
       isMobile: isMobile,
       ensurePaginated: runPagination,
       getPageContent: function(page) {
-        return _pageCache[page];
+        return pageCache.getPageContent(page);
       }
     });
   }

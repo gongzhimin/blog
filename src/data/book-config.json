@@ -48,6 +48,11 @@
 		"canvasWidth": 960,
 		"width": 960,
 		"height": 600,
+		"mobileBreakpoint": 800,
+		"mobileCanvas": {
+			"width": 370,
+			"paddingY": 16
+		},
 		"contentAreaHeight": 405,
 		"hardPage": {
 			"width": 480,
@@ -56,6 +61,10 @@
 		"contentPage": {
 			"width": 460,
 			"height": 582
+		},
+		"mobileContentPage": {
+			"width": 370,
+			"height": 507
 		},
 		"depth": {
 			"width": 16,
@@ -71,6 +80,17 @@
 			"duration": 1000,
 			"totalPages": 112,
 			"startPage": 7
+		},
+		"coverSprite": {
+			"image": "/vendor/turnjs/pics/book-covers.jpg",
+			"backgroundSize": "2400px 600px",
+			"positions": {
+				"front": "0 0",
+				"frontInside": "-483px 0",
+				"backInside": "-1936px 0",
+				"back": "-968px 0",
+				"backOuter": "-1452px 0"
+			}
 		},
 		"gap": 30,
 		"pagination": {

@@ -28,6 +28,8 @@ test("book runtime has a dedicated Turn.js adapter outside vendor", async () => 
   );
   assert.match(source, /window\.BookTurnAdapter/);
   assert.match(source, /function createTurnJsAdapter/);
+  assert.doesNotMatch(source, /destroy:/);
+  assert.doesNotMatch(source, /currentPage:/);
 });
 
 test("book shell loads the adapter before the app bootstrap", async () => {
@@ -55,4 +57,27 @@ test("book app delegates Turn.js details to the adapter", async () => {
   assert.doesNotMatch(source, /function updateDepth/);
   assert.doesNotMatch(source, /function addPage/);
   assert.doesNotMatch(source, /flipbook\.turn\(\{/);
+});
+
+test("runtime page cache is instantiated instead of read as loose globals", async () => {
+  const [app, orchestrator] = await Promise.all([
+    readFile(
+      new URL("../public/book-runtime/js/book-app.js", import.meta.url),
+      "utf8",
+    ),
+    readFile(
+      new URL("../public/book-runtime/js/orchestrator.js", import.meta.url),
+      "utf8",
+    ),
+  ]);
+
+  assert.match(orchestrator, /function createBookPageCache/);
+  assert.match(orchestrator, /setPageContent/);
+  assert.match(orchestrator, /window\.BookOrchestrator/);
+  assert.doesNotMatch(orchestrator, /var _pageCache = \{\}/);
+  assert.doesNotMatch(orchestrator, /var _paginated = false/);
+  assert.match(app, /BookOrchestrator\.createPageCache/);
+  assert.match(app, /pageCache\.setPageContent\(5/);
+  assert.doesNotMatch(app, /if \(_paginated\)/);
+  assert.doesNotMatch(app, /_pageCache\[page\]/);
 });
