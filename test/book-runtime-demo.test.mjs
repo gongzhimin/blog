@@ -18,6 +18,14 @@ async function loadDemo() {
   return new JSDOM(html).window.document;
 }
 
+async function loadStandaloneBook() {
+  const html = await readFile(
+    new URL("../dist/book/sample/index.html", import.meta.url),
+    "utf8",
+  );
+  return new JSDOM(html).window.document;
+}
+
 test("book runtime demo renders a standalone JSON book", async () => {
   const document = await loadDemo();
   const node = document.querySelector("#book-data");
@@ -63,4 +71,17 @@ test("book runtime demo delegates the reusable book shell to BookShell", async (
   assert.doesNotMatch(source, /src="\/book-runtime\/js\/book-app\.js"/);
   assert.doesNotMatch(source, /src="\/vendor\/turnjs\/jquery/);
   assert.doesNotMatch(source, /href="\/vendor\/turnjs\/css\/steve-jobs\.css"/);
+});
+
+test("standalone book route renders JSON books from src/data/books", async () => {
+  const document = await loadStandaloneBook();
+  const node = document.querySelector("#book-data");
+  assert.ok(node, "missing #book-data");
+
+  const config = JSON.parse(node.dataset.config);
+  assert.equal(config.source.documentId, "sample-json-book");
+  assert.equal(config.source.documentTitle, "一本独立的小书");
+  assert.equal(config.source.entryCount, 2);
+  assert.equal(config.articles[0].source.collection, "json");
+  assert.equal(document.title, "一本独立的小书");
 });

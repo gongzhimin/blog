@@ -6,7 +6,9 @@
     articleWidth: 380,
     articleHeight: 471,
     tocWidth: 380,
-    tocHeight: 400
+    tocHeight: 400,
+    articleCSS: '',
+    tocCSS: ''
   };
 
   function configure(options) {
@@ -15,6 +17,8 @@
     if (options.articleHeight) paginationConfig.articleHeight = options.articleHeight;
     if (options.tocWidth) paginationConfig.tocWidth = options.tocWidth;
     if (options.tocHeight) paginationConfig.tocHeight = options.tocHeight;
+    if (options.articleCSS) paginationConfig.articleCSS = options.articleCSS;
+    if (options.tocCSS) paginationConfig.tocCSS = options.tocCSS;
   }
 
   function getConfig() {
@@ -22,7 +26,9 @@
       articleWidth: paginationConfig.articleWidth,
       articleHeight: paginationConfig.articleHeight,
       tocWidth: paginationConfig.tocWidth,
-      tocHeight: paginationConfig.tocHeight
+      tocHeight: paginationConfig.tocHeight,
+      articleCSS: paginationConfig.articleCSS,
+      tocCSS: paginationConfig.tocCSS
     };
   }
 

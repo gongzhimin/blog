@@ -1,0 +1,94 @@
+/* ── Syntax highlighting — warm paper tones ─────────────────────
+ * Scoped inside .book-content and mirrored to #__bap_inner.
+ */
+
+/* Base — inherit from pre */
+.hljs {
+  color: inherit;
+  background: transparent;
+}
+
+/* Keywords, tags, types */
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-type,
+.hljs-doctag,
+.hljs-template-tag,
+.hljs-template-variable {
+  color: #8b5a2b;
+}
+
+/* Strings, attributes */
+.hljs-string,
+.hljs-attr,
+.hljs-attribute,
+.hljs-selector-attr {
+  color: #6a8759;
+}
+
+/* Numbers, literals */
+.hljs-number,
+.hljs-literal,
+.hljs-variable,
+.hljs-selector-class,
+.hljs-selector-id {
+  color: #b07c4b;
+}
+
+/* Function names, titles */
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.function_,
+.hljs-name {
+  color: #7a6644;
+}
+
+/* Comments */
+.hljs-comment,
+.hljs-formula {
+  color: #a0a0a0;
+  font-style: italic;
+}
+
+/* Built-ins, symbols */
+.hljs-built_in,
+.hljs-symbol {
+  color: #b35c44;
+}
+
+/* Regex, meta strings */
+.hljs-regexp,
+.hljs-meta .hljs-string {
+  color: #5a7a5a;
+}
+
+/* Emphasis, strong */
+.hljs-emphasis { font-style: italic; }
+.hljs-strong   { font-weight: 700; }
+
+/* Section headers */
+.hljs-section {
+  color: #5a5a3a;
+  font-weight: 700;
+}
+
+/* Bullet, quote, subst */
+.hljs-bullet,
+.hljs-quote  { color: #8b7355; }
+.hljs-subst  { color: inherit; }
+
+/* Meta, operator */
+.hljs-meta,
+.hljs-operator { color: #888; }
+
+/* Diff additions / deletions */
+.hljs-addition { color: #6a8759; background: rgba(106,135,89,0.1); }
+.hljs-deletion { color: #b35c44; background: rgba(179,92,68,0.1); }
+
+/* Code / selector pseudo */
+.hljs-code,
+.hljs-selector-pseudo { color: #666; }
+
+/* Language variable / name */
+.hljs-variable.language_,
+.hljs-name { color: #7a6644; }

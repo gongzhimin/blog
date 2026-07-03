@@ -1,0 +1,13 @@
+/* ── Font stacks ──────────────────────────────────────────────────
+ * Chinese serif: Chiron Sung HK (web, loaded via Google Fonts) →
+ *   Noto Serif SC → system Songti → STSong → SimSun.
+ * Chinese sans:  PingFang SC (macOS) → Microsoft YaHei (Windows) →
+ *   Heiti SC → Source Han Sans CN → Noto Sans CJK SC.
+ *
+ * To swap the Chinese serif, change "Chiron Sung HK" below and
+ * update the Google Fonts <link> in index.astro.
+ */
+
+/* ── Serif stack (body, h1) ──────────────────────────────────── */
+
+/* ── Sans-serif stack (h2, h3) ───────────────────────────────── */

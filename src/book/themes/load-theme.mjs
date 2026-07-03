@@ -10,11 +10,11 @@ export function listBookThemeIds() {
   return Object.keys(THEME_FACTORIES);
 }
 
-export function loadBookTheme(themeId = "classic-paper", cssSources) {
+export function loadBookTheme(themeId = "classic-paper", sharedSources = {}) {
   const id = themeId || "classic-paper";
   const factory = THEME_FACTORIES[id];
   if (!factory) {
     throw new Error(`Unknown book theme: ${id}`);
   }
-  return factory(cssSources);
+  return factory(sharedSources);
 }

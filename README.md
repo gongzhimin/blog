@@ -61,7 +61,6 @@ blog/
 │   │   ├── assembler/              # BookDocument -> runtime config
 │   │   ├── config/                 # book-config 校验
 │   │   ├── components/             # BookRuntimeAssets / BookShell
-│   │   ├── examples/               # 非博客内容源示例
 │   │   ├── homepage/               # 首页 / demo 书本外层样式构建
 │   │   ├── model/                  # BookDocument / BookEntry 模型
 │   │   ├── renderers/              # Markdown / HTML renderer
@@ -73,11 +72,13 @@ blog/
 │   ├── data/
 │   │   ├── book-config.json        # 书本、导航、页脚、主题选择
 │   │   ├── book-config.schema.json # 书本运行时配置说明
+│   │   ├── books/                  # 独立 JSON 书稿，生成 /book/<slug>/
 │   │   └── daily-quote.json        # 页脚每日引言
 │   ├── lib/
 │   │   └── book-renderer.js        # 兼容旧导入，转发到 src/book/renderers
 │   ├── pages/
 │   │   ├── index.astro             # 博客书首页
+│   │   ├── book/                   # 独立 JSON 书稿详情页
 │   │   ├── blog/                   # 技术文章列表 / 详情
 │   │   ├── life/                   # 随笔列表 / 详情
 │   │   └── demos/                  # Book Runtime 示例页

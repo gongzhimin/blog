@@ -11,6 +11,7 @@ const cssSources = {
   bookContentCSS:
     ".sj-book .book-content{font-size:16px}.sj-book .book-content p{margin:0}",
   codeHighlightCSS: ".hljs{color:#333}",
+  surfaceCSS: "/* plain-manuscript theme */ .sj-book .own-size{}",
   bookTocCSS:
     ".sj-book .table-contents{font-size:15px}.sj-book .table-contents a{color:#8b7355}",
   katexCSS: ".katex{font-size:1.21em}",

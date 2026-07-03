@@ -1,0 +1,8 @@
+/* plain-manuscript surface texture */
+
+.sj-book .own-size {
+  background: #fbfaf4 !important;
+  background-image:
+    linear-gradient(to bottom, rgba(80,70,50,.035) 0 1px, transparent 1px 27px),
+    linear-gradient(135deg, #fffdf8 0%, #f7f2e8 100%) !important;
+}

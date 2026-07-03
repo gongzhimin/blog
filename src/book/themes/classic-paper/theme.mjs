@@ -5,10 +5,6 @@ const TOC_MEASURE_BASE_CSS =
   `#__toc li{margin-bottom:8px;font-size:15px}` +
   `#__toc a{color:#8b7355;text-decoration:none}`;
 
-/**
- * Creates the current paper-book theme from the same CSS sources used by the
- * rendered page, so browser pagination measures the real visual rules.
- */
 export function createClassicPaperTheme({
   fontsCSS,
   bookContentCSS,

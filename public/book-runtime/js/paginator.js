@@ -7,7 +7,6 @@
 (function () {
   var Core = window.BookRuntime.PaginatorCore;
   var Splitters = window.BookRuntime.PaginatorSplitters;
-  var M = MEASURE_CSS;
 
   function flattenBlockquotes(elems) {
     for (var bi = 0; bi < elems.length; bi++) {
@@ -76,7 +75,7 @@
     var config = Core.getConfig();
     var maxH = config.articleHeight;
     var measurement = Core.createMeasureContainer({
-      css: M.article,
+      css: config.articleCSS,
       height: maxH,
       innerId: '__bap_inner',
       width: config.articleWidth
@@ -168,7 +167,7 @@
   function paginateTOC(html) {
     var config = Core.getConfig();
     var measurement = Core.createMeasureContainer({
-      css: M.toc,
+      css: config.tocCSS,
       height: config.tocHeight,
       innerId: '__toc',
       width: config.tocWidth

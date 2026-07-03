@@ -1,0 +1,106 @@
+---
+import { readFileSync, readdirSync } from 'fs';
+import { resolve, basename } from 'path';
+import bookConfig from '../../data/book-config.json';
+import { renderMarkdown, stripLeadingTitle, romanTocPage } from '../../book/renderers/markdown-renderer.mjs';
+import { buildBookRuntime } from '../../book/assembler/build-book-runtime.mjs';
+import { validateBookConfig } from '../../book/config/book-config.mjs';
+import { buildHomepageStyles } from '../../book/homepage/build-homepage-styles.mjs';
+import { createJsonBookDocument } from '../../book/sources/json-book-source.mjs';
+import { loadBundledBookTheme } from '../../book/themes/bundled-theme.mjs';
+import BookShell from '../../book/components/BookShell.astro';
+import BookRuntimeAssets from '../../book/components/BookRuntimeAssets.astro';
+
+export async function getStaticPaths() {
+  const dir = resolve('src/data/books');
+  let files = [];
+  try {
+    files = readdirSync(dir).filter((f) => f.endsWith('.json'));
+  } catch {
+    // No books directory — no standalone book routes.
+  }
+  return files.map((file) => {
+    const slug = basename(file, '.json');
+    return { params: { slug }, props: { file } };
+  });
+}
+
+const { file, slug } = Astro.props;
+const filePath = resolve('src/data/books', file);
+const raw = readFileSync(filePath, 'utf8');
+const data = JSON.parse(raw);
+const bookDoc = createJsonBookDocument(data);
+
+const katexCSS = readFileSync('node_modules/katex/dist/katex.min.css', 'utf8');
+validateBookConfig(bookConfig);
+
+const theme = loadBundledBookTheme(bookConfig.theme?.id, { katexCSS });
+const runtime = buildBookRuntime({
+  document: bookDoc,
+  bookConfig,
+  renderMarkdown,
+  stripLeadingTitle,
+  romanTocPage,
+});
+const runConfig = runtime.config;
+runConfig.theme = theme.runtime;
+
+const nav = bookConfig.nav;
+const footer = bookConfig.footer;
+const cover = bookConfig.book.coverSprite;
+const mobileCanvas = bookConfig.book.mobileCanvas;
+const mobileContentPage = bookConfig.book.mobileContentPage;
+const light = {
+  nav: nav.light,
+  footer: footer.light,
+  background: bookConfig.backgrounds.light,
+};
+const homepageStyles = buildHomepageStyles({
+  book: bookConfig.book,
+  cover,
+  footer,
+  light,
+  mobileCanvas,
+  mobileContentPage,
+  nav,
+  theme,
+});
+
+const pageTitle = bookDoc.title || data.title || slug;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{pageTitle}</title>
+    <meta name="viewport" content="width=1050, user-scalable=no" />
+    <BookRuntimeAssets />
+    <style is:inline set:html={homepageStyles}></style>
+  </head>
+  <body>
+    <header class="site-nav">
+      <div class="inner">
+        <a class="brand" href="/">{nav.brand.text}</a>
+        <nav class="links">
+          {nav.links.items.map((item) => (
+            <a href={item.href}>{item.label}</a>
+          ))}
+        </nav>
+      </div>
+    </header>
+
+    <BookShell
+      runConfig={runConfig}
+      measureArticleCSS={theme.measurement.articleCSS}
+      measureTocCSS={theme.measurement.tocCSS}
+    />
+
+    <footer class="site-footer">
+      <div class="copyright">
+        &copy; {new Date().getFullYear()} &middot; {footer.content.copyright}
+      </div>
+    </footer>
+  </body>
+</html>

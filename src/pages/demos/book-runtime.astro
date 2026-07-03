@@ -1,19 +1,15 @@
 ---
 import { readFileSync } from 'fs';
 import bookConfig from '../../data/book-config.json';
-import sampleBook from '../../book/examples/sample-book.json';
+import sampleBook from '../../data/books/sample.json';
 import { renderMarkdown, stripLeadingTitle, romanTocPage } from '../../book/renderers/markdown-renderer.mjs';
 import { buildBookRuntime } from '../../book/assembler/build-book-runtime.mjs';
 import { validateBookConfig } from '../../book/config/book-config.mjs';
 import { buildHomepageStyles } from '../../book/homepage/build-homepage-styles.mjs';
 import { createJsonBookDocument } from '../../book/sources/json-book-source.mjs';
-import { loadBookTheme } from '../../book/themes/load-theme.mjs';
+import { loadBundledBookTheme } from '../../book/themes/bundled-theme.mjs';
 import BookShell from '../../book/components/BookShell.astro';
 import BookRuntimeAssets from '../../book/components/BookRuntimeAssets.astro';
-import fontsCSS from '../../styles/fonts.css?raw';
-import bookContentCSS from '../../styles/book-content.css?raw';
-import codeHighlightCSS from '../../styles/code-highlight.css?raw';
-import bookTocCSS from '../../styles/book-toc.css?raw';
 
 const katexCSS = readFileSync('node_modules/katex/dist/katex.min.css', 'utf8');
 const demoConfig = JSON.parse(JSON.stringify(bookConfig));
@@ -21,13 +17,7 @@ demoConfig.theme = { id: 'plain-manuscript' };
 demoConfig.footer.content.copyright = 'Book Runtime Demo';
 validateBookConfig(demoConfig);
 
-const theme = loadBookTheme(demoConfig.theme.id, {
-  fontsCSS,
-  bookContentCSS,
-  codeHighlightCSS,
-  bookTocCSS,
-  katexCSS,
-});
+const theme = loadBundledBookTheme(demoConfig.theme.id, { katexCSS });
 const bookDocument = createJsonBookDocument(sampleBook);
 const runtime = buildBookRuntime({
   document: bookDocument,

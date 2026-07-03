@@ -169,7 +169,10 @@ test("turnjs book config defines navigation, page geometry, and pagination", () 
   assert.equal(bookConfig.book.coverSprite.backgroundSize, "2400px 600px");
   assert.equal(bookConfig.book.coverSprite.positions.back, "-968px 0");
   assert.equal(bookConfig.book.turn.startPage, 7);
-  assert.equal(bookConfig.book.pagination.charsPerLine, 23);
+  assert.equal(bookConfig.book.pagination.contentWidth, 380);
+  assert.equal(bookConfig.book.pagination.contentHeight, 471);
+  assert.equal("charsPerLine" in bookConfig.book.pagination, false);
+  assert.equal("elements" in bookConfig.book.pagination, false);
 });
 
 test("homepage consumes book config and the shared book runtime", async () => {
@@ -195,7 +198,7 @@ test("homepage consumes book config and the shared book runtime", async () => {
   assert.match(page, /import BookShell from ['"]\.\.\/book\/components\/BookShell\.astro['"]/);
   assert.match(page, /import BookRuntimeAssets from ['"]\.\.\/book\/components\/BookRuntimeAssets\.astro['"]/);
   assert.match(page, /from ['"]\.\.\/book\/homepage\/build-homepage-styles\.mjs['"]/);
-  assert.match(page, /loadBookTheme\(bookConfig\.theme\?\.id/);
+  assert.match(page, /loadBundledBookTheme\(bookConfig\.theme\?\.id/);
   assert.match(page, /buildHomepageStyles\(\{/);
   assert.match(page, /<BookShell/);
   assert.match(page, /<BookRuntimeAssets/);

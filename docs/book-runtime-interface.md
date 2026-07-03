@@ -56,7 +56,7 @@ Astro Blog Source
 
 JSON Book Source
 
-`src/book/sources/json-book-source.mjs` 把普通 JSON 转换为 `BookDocument`。这是 `/demos/book-runtime/` 使用的内容源，也是后续独立书稿、作品集或非博客内容的推荐接入方式。
+`src/book/sources/json-book-source.mjs` 把普通 JSON 转换为 `BookDocument`。`/demos/book-runtime/` 和 `/book/[slug]/` 都使用这条路径；独立书稿数据放在 `src/data/books/`。
 
 ## Assembler Boundary
 

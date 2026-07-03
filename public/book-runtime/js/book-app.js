@@ -40,6 +40,10 @@
   function configurePagination() {
     var pagination = getPaginationConfig();
     if (pagination && window.BookRuntime.Paginator.configure) {
+      if (typeof MEASURE_CSS !== 'undefined') {
+        pagination.articleCSS = MEASURE_CSS.article;
+        pagination.tocCSS = MEASURE_CSS.toc;
+      }
       window.BookRuntime.Paginator.configure(pagination);
     }
   }
