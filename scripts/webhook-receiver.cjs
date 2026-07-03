@@ -10,6 +10,17 @@ const GITHUB_BRANCH = process.env.BLOG_GITHUB_BRANCH || 'main';
 const GITHUB_TOKEN = process.env.BLOG_GITHUB_TOKEN;
 const GITHUB_API_BASE = 'https://api.github.com';
 const LIFE_POST_PREFIX = 'src/content/life/';
+const MOBILE_IMAGE_PREFIX = 'public/images/mobile/';
+const MOBILE_IMAGE_PUBLIC_PREFIX = '/images/mobile/';
+const IMAGE_PLACEHOLDER_PATTERN =
+  /\[(?:图片|图)(?:\s*[:：]\s*([^\]]+?))?\]/g;
+const MIME_EXTENSION = {
+  'image/gif': 'gif',
+  'image/jpeg': 'jpg',
+  'image/jpg': 'jpg',
+  'image/png': 'png',
+  'image/webp': 'webp',
+};
 
 const turndownService = new TurndownService({
   headingStyle: 'atx',
@@ -122,6 +133,104 @@ function addMarkdownHardBreaks(lines) {
 
     return shouldAddHardBreak ? `${trimmedEnd}  ` : trimmedEnd;
   });
+}
+
+function normalizeImageExtension(image) {
+  const mime = String(image.mime || '').trim().toLowerCase();
+  if (MIME_EXTENSION[mime]) {
+    return MIME_EXTENSION[mime];
+  }
+
+  const filename = String(image.filename || '').trim().toLowerCase();
+  const match = filename.match(/\.([a-z0-9]+)$/);
+  if (match) {
+    return match[1] === 'jpeg' ? 'jpg' : match[1];
+  }
+
+  throw new Error('Missing mobile image mime type or filename extension');
+}
+
+function decodeMobileImage(image, index) {
+  const rawBase64 = String(image.base64 || '').trim();
+  if (!rawBase64) {
+    throw new Error(`Missing base64 content for mobile image ${index + 1}`);
+  }
+
+  const dataUrlMatch = rawBase64.match(
+    /^data:(image\/[\w.+-]+);base64,(.+)$/i
+  );
+  return Buffer.from(dataUrlMatch ? dataUrlMatch[2] : rawBase64, 'base64');
+}
+
+function buildMobileImagePath({ date, extension, imageTimestamp, suffix }) {
+  const [year, month] = String(date).split('-');
+  if (!year || !month) {
+    throw new Error(`Invalid mobile image date: ${date}`);
+  }
+
+  const fileName = `img-${imageTimestamp}-${String(suffix).padStart(
+    3,
+    '0'
+  )}.${extension}`;
+  return {
+    repoPath: `${MOBILE_IMAGE_PREFIX}${year}/${month}/${fileName}`,
+    publicPath: `${MOBILE_IMAGE_PUBLIC_PREFIX}${year}/${month}/${fileName}`,
+  };
+}
+
+function replaceMobileImagePlaceholders({
+  markdown,
+  images = [],
+  date,
+  randomSuffix,
+  imageTimestamp,
+}) {
+  if (images !== undefined && !Array.isArray(images)) {
+    throw new Error('Mobile images must be an array');
+  }
+
+  const normalizedImages = Array.isArray(images) ? images : [];
+  const placeholders = [...String(markdown).matchAll(IMAGE_PLACEHOLDER_PATTERN)];
+  if (placeholders.length !== normalizedImages.length) {
+    throw new Error(
+      `Image placeholder count (${placeholders.length}) does not match image count (${normalizedImages.length})`
+    );
+  }
+
+  if (normalizedImages.length === 0) {
+    return {
+      markdown,
+      files: [],
+    };
+  }
+
+  const files = normalizedImages.map((image, index) => {
+    const extension = normalizeImageExtension(image);
+    const suffix = (randomSuffix + index) % 1000;
+    const { repoPath, publicPath } = buildMobileImagePath({
+      date,
+      extension,
+      imageTimestamp,
+      suffix,
+    });
+
+    return {
+      alt: String(placeholders[index][1] || '').trim(),
+      publicPath,
+      repoPath,
+      content: decodeMobileImage(image, index),
+    };
+  });
+
+  let imageIndex = 0;
+  return {
+    markdown: String(markdown).replace(IMAGE_PLACEHOLDER_PATTERN, () => {
+      const file = files[imageIndex];
+      imageIndex += 1;
+      return `![${file.alt}](${file.publicPath})`;
+    }),
+    files: files.map(({ repoPath, content }) => ({ repoPath, content })),
+  };
 }
 
 function parseShortcutRaw(raw, explicitTitle) {
@@ -321,6 +430,18 @@ function buildMobilePublication({
   }
 
   const files = [];
+  if (markdown || data.images) {
+    const mobileImages = replaceMobileImagePlaceholders({
+      markdown,
+      images: data.images,
+      date,
+      randomSuffix,
+      imageTimestamp,
+    });
+    markdown = mobileImages.markdown;
+    files.push(...mobileImages.files);
+  }
+
   if (htmlContent) {
     const dom = new JSDOM(htmlContent);
     const document = dom.window.document;
@@ -513,5 +634,6 @@ module.exports = {
   parseShortcutRaw,
   parseShortcutMarkdown,
   publishFilesToGitHub,
+  replaceMobileImagePlaceholders,
   toBase64,
 };

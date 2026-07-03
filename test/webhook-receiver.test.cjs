@@ -253,6 +253,112 @@ test('converts raw shortcut text directly to markdown without escaping syntax', 
   assert.doesNotMatch(content, /\\>|\\\*\\\*/);
 });
 
+test('replaces raw image placeholders with uploaded mobile image files', () => {
+  const firstImage = Buffer.from('first-image').toString('base64');
+  const secondImage = Buffer.from('second-image').toString('base64');
+  const publication = buildMobilePublication({
+    data: {
+      raw: [
+        '海边',
+        '',
+        '今天去了海边。',
+        '',
+        '[图片: 海边的风]',
+        '',
+        '后来天暗下来。',
+        '',
+        '[图：傍晚的云]',
+      ].join('\n'),
+      images: [
+        {
+          filename: 'sea view.JPG',
+          mime: 'image/jpeg',
+          base64: firstImage,
+        },
+        {
+          filename: 'cloud.png',
+          mime: 'image/png',
+          base64: secondImage,
+        },
+      ],
+    },
+    repositoryState: {
+      posts: [],
+    },
+    date: '2026-07-04',
+    randomSuffix: 12,
+    imageTimestamp: 999,
+  });
+
+  assert.deepEqual(
+    publication.files.map((file) => file.repoPath),
+    [
+      'public/images/mobile/2026/07/img-999-012.jpg',
+      'public/images/mobile/2026/07/img-999-013.png',
+      'src/content/life/2026-07-04-post-12.md',
+    ]
+  );
+  assert.equal(publication.files[0].content.toString('utf8'), 'first-image');
+  assert.equal(publication.files[1].content.toString('utf8'), 'second-image');
+  const content = publication.files[2].content.toString('utf8');
+  assert.match(
+    content,
+    /!\[海边的风\]\(\/images\/mobile\/2026\/07\/img-999-012\.jpg\)/
+  );
+  assert.match(
+    content,
+    /!\[傍晚的云\]\(\/images\/mobile\/2026\/07\/img-999-013\.png\)/
+  );
+  assert.doesNotMatch(content, /\[图片/);
+  assert.doesNotMatch(content, /\[图/);
+});
+
+test('rejects raw mobile images when placeholder count does not match image count', () => {
+  assert.throws(
+    () =>
+      buildMobilePublication({
+        data: {
+          raw: ['海边', '', '[图片: 海边的风]', '', '[图: 傍晚的云]'].join(
+            '\n'
+          ),
+          images: [
+            {
+              filename: 'sea.jpg',
+              mime: 'image/jpeg',
+              base64: Buffer.from('sea').toString('base64'),
+            },
+          ],
+        },
+        repositoryState: {
+          posts: [],
+        },
+        date: '2026-07-04',
+      }),
+    /Image placeholder count \(2\) does not match image count \(1\)/
+  );
+});
+
+test('rejects malformed mobile image payloads', () => {
+  assert.throws(
+    () =>
+      buildMobilePublication({
+        data: {
+          raw: ['海边', '', '[图片: 海边的风]'].join('\n'),
+          images: {
+            filename: 'sea.jpg',
+            mime: 'image/jpeg',
+            base64: Buffer.from('sea').toString('base64'),
+          },
+        },
+        repositoryState: {
+          posts: [],
+        },
+        date: '2026-07-04',
+      }),
+    /Mobile images must be an array/
+  );
+});
+
 test('does not submit deletion entries for paths missing from the GitHub tree', async () => {
   const requests = [];
   const request = async (method, pathname, body) => {

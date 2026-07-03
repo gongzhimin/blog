@@ -27,6 +27,17 @@ test("pagination workflow documents the split paginator modules", async () => {
   assert.doesNotMatch(workflow, /单文件分页器/);
 });
 
+test("book runtime interface is documented as content-source agnostic", async () => {
+  const contract = await read("../docs/book-runtime-interface.md");
+
+  assert.match(contract, /BookDocument/);
+  assert.match(contract, /buildBookRuntime\(\)/);
+  assert.match(contract, /BookShell/);
+  assert.match(contract, /window\.BookRuntime/);
+  assert.match(contract, /Astro Blog Source/);
+  assert.match(contract, /JSON Book Source/);
+});
+
 test("demo page uses the same renderer and book style builder as the homepage", async () => {
   const source = await read("../src/pages/demos/book-runtime.astro");
 

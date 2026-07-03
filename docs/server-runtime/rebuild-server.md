@@ -198,6 +198,7 @@ curl -I https://zhimin.ink/
 ```bash
 scp -i LightsailDefaultKey-ap-northeast-2.pem \
   scripts/webhook-receiver.cjs \
+  scripts/server-health-check.cjs \
   scripts/blog-webhook.service \
   ubuntu@13.193.240.51:/tmp/
 ```
@@ -206,6 +207,7 @@ scp -i LightsailDefaultKey-ap-northeast-2.pem \
 
 ```bash
 sudo install -m 0644 /tmp/webhook-receiver.cjs /var/www/blog/scripts/webhook-receiver.cjs
+sudo install -m 0755 /tmp/server-health-check.cjs /var/www/blog/scripts/server-health-check.cjs
 sudo install -m 0644 /tmp/blog-webhook.service /etc/systemd/system/blog-webhook.service
 ```
 
@@ -315,6 +317,14 @@ curl -sS -o /tmp/blog-webhook-public-bad-token.out -w '%{http_code}\n' \
 iOS Shortcuts -> /webhook -> GitHub commit -> GitHub Actions -> 网站更新
 ```
 
+也可以在服务器上运行自动健康检查：
+
+```bash
+node /var/www/blog/scripts/server-health-check.cjs
+```
+
+所有检查都应返回 `PASS`。
+
 ## 11. GitHub Actions 自动部署检查
 
 在 GitHub Actions 页面确认：
@@ -352,6 +362,7 @@ iOS Shortcuts -> /webhook -> GitHub commit -> GitHub Actions -> 网站更新
 ```text
 /var/www/blog/dist
 /var/www/blog/scripts/webhook-receiver.cjs
+/var/www/blog/scripts/server-health-check.cjs
 /etc/systemd/system/blog-webhook.service
 /etc/blog-webhook.env
 /etc/nginx/sites-available/blog
@@ -373,6 +384,7 @@ git init --bare /home/ubuntu/blog.git
 - `curl -I https://zhimin.ink/` 返回 `200` 或 `304`。
 - `systemctl is-active blog-webhook.service` 返回 `active`。
 - `ss -ltn | grep ':9000'` 显示 `127.0.0.1:9000`。
+- `node /var/www/blog/scripts/server-health-check.cjs` 全部返回 `PASS`。
 - `POST https://zhimin.ink/webhook` 使用错误 token 返回 `403`。
 - iOS Shortcuts 使用正确 token 能发布测试文章。
 - GitHub Actions 能自动部署最新页面。

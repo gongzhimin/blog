@@ -6,6 +6,7 @@ on:
     paths:
       - 'scripts/webhook-receiver.cjs'
       - 'scripts/blog-webhook.service'
+      - 'scripts/server-health-check.cjs'
 
 jobs:
   deploy-webhook:
@@ -20,7 +21,7 @@ jobs:
           host: 13.193.240.51
           username: ubuntu
           key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
-          source: "scripts/webhook-receiver.cjs,scripts/blog-webhook.service"
+          source: "scripts/webhook-receiver.cjs,scripts/blog-webhook.service,scripts/server-health-check.cjs"
           target: /tmp/blog-webhook-deploy
 
       - name: Install and restart service
@@ -31,7 +32,9 @@ jobs:
           key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
           script: |
             sudo install -m 0644 /tmp/blog-webhook-deploy/scripts/webhook-receiver.cjs /var/www/blog/scripts/webhook-receiver.cjs
+            sudo install -m 0755 /tmp/blog-webhook-deploy/scripts/server-health-check.cjs /var/www/blog/scripts/server-health-check.cjs
             sudo install -m 0644 /tmp/blog-webhook-deploy/scripts/blog-webhook.service /etc/systemd/system/blog-webhook.service
             sudo systemctl daemon-reload
             sudo systemctl restart blog-webhook.service
             sudo systemctl status blog-webhook.service --no-pager -l | sed -n '1,40p'
+            node /var/www/blog/scripts/server-health-check.cjs

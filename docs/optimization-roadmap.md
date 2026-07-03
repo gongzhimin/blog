@@ -12,42 +12,46 @@
   - `paginator-splitters.js`：段落、代码、列表、表格拆分策略。
   - `paginator.js`：正文/目录分页调度与公开 API。
 - `book-config.json` 已有 schema 与构建期校验。
+- iOS 图片发布已支持 `raw + images[] + 图片占位符` 协议。
+- 服务器运行态已有 `scripts/server-health-check.cjs` 只读检查脚本。
+- Book Runtime 稳定接口已记录在 `docs/book-runtime-interface.md`。
 
-## 下一阶段一：iOS 图片发布增强
+## 已完成：iOS 图片发布增强
 
 目标：让 iOS 备忘录正文和用户手动选择的图片一起发布，生成稳定的 Markdown 图片语法。
 
-建议分两步做：
+当前协议：
 
-1. 协议稳定
-   - 请求字段：`raw`、`images[]`、`token`。
-   - 每张图片包含：`filename`、`mime`、`base64`。
-   - 正文占位符：`[图片]`、`[图片: 标题]`、`[图]`、`[图: 标题]`。
-   - 服务端按占位符顺序替换成 `![标题](/images/mobile/...)`。
-
-2. 服务端实现
-   - 解码图片并写入 GitHub：`public/images/mobile/YYYY/MM/...`。
-   - Markdown 与图片用一次 GitHub commit 原子提交。
-   - 占位符数量和图片数量不一致时返回明确错误。
+- 请求字段：`raw`、`images[]`、`token`。
+- 每张图片包含：`filename`、`mime`、`base64`。
+- 正文占位符：`[图片]`、`[图片: 标题]`、`[图]`、`[图: 标题]`。
+- 服务端按占位符顺序替换成 `![标题](/images/mobile/YYYY/MM/...)`。
+- 图片写入 GitHub：`public/images/mobile/YYYY/MM/...`。
+- Markdown 与图片用一次 GitHub commit 原子提交。
+- 占位符数量和图片数量不一致时返回明确错误。
 
 暂不建议直接依赖 iOS 备忘录导出的 HTML，因为分享表单不会稳定携带内嵌图片。
 
-## 下一阶段二：服务器运行态观测
+## 已完成：服务器运行态观测
 
 目标：服务器出问题时，不再靠猜。
 
-建议新增：
+已新增：
 
-- `/webhook/health` 或独立 healthcheck 脚本。
 - `scripts/server-health-check.cjs`：检查 nginx、webhook service、env 文件、GitHub token 可用性。
-- `docs/server-runtime/troubleshooting.md`：常见故障和对应命令。
 - GitHub Actions 部署后访问 `https://zhimin.ink/` 验证首页可达。
+- `Deploy Webhook` 上传并安装 health-check 脚本，重启后执行一次服务器检查。
 
-## 下一阶段三：主题与内容产品化
+后续可补：
+
+- `docs/server-runtime/troubleshooting.md`：常见故障和对应命令。
+- 如果需要 HTTP 级健康端点，再新增 `/webhook/health`。
+
+## 已完成：主题与内容产品化边界
 
 目标：Book Runtime 不只服务博客 Markdown，也能服务独立书稿、作品集或文档。
 
-建议新增稳定接口文档：
+稳定接口文档：`docs/book-runtime-interface.md`
 
 ```text
 BookDocument

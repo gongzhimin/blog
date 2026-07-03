@@ -13,9 +13,10 @@
   -> GitHub Actions 构建并部署网站
 ```
 
-注意：这份文档描述的是 `raw + images + 图片占位符` 方案。服务端需要实现该协议后，
-快捷指令才能真正发布图片。现有 `html + data:image/...;base64,...` 链路可以处理图片，
-但 iOS 备忘录分享时通常不会稳定导出带内嵌图片的 HTML，所以不作为主方案。
+注意：这份文档描述的是当前推荐的 `raw + images + 图片占位符` 方案。服务端会把
+图片和 Markdown 放进同一次 GitHub commit，因此文章内容与图片资源会一起更新。
+现有 `html + data:image/...;base64,...` 链路仍然保留兼容，但 iOS 备忘录分享时通常
+不会稳定导出带内嵌图片的 HTML，所以不作为主方案。
 
 ## 为什么不是直接从备忘录导出图片
 
@@ -73,11 +74,11 @@ iOS 备忘录分享给快捷指令时，正文通常能以文本形式传出，�
 ```markdown
 今天去了海边。
 
-![海边的风很大](/images/mobile/img-20260701-001.jpg)
+![海边的风很大](/images/mobile/2026/07/img-20260701-001.jpg)
 
 风很大，天很蓝。
 
-![傍晚的云](/images/mobile/img-20260701-002.jpg)
+![傍晚的云](/images/mobile/2026/07/img-20260701-002.jpg)
 
 最后吃了晚饭。
 ```
@@ -294,7 +295,8 @@ base64Image
 
 ```json
 {
-  "type": "image/jpeg",
+  "filename": "image.jpg",
+  "mime": "image/jpeg",
   "base64": "base64Image"
 }
 ```
@@ -302,6 +304,8 @@ base64Image
 把这个字典添加到 `images` 列表。
 
 如果希望保留 PNG，也可以不统一转 JPEG，但 JPEG 对手机照片更省空间。
+如果快捷指令不方便拿到原文件名，可以固定填写 `image.jpg`；服务端会优先使用
+`mime` 判断扩展名。
 
 ### 7. 组装请求 JSON
 
@@ -318,6 +322,8 @@ base64Image
 注意：
 
 - `raw` 是正文变量，不是字符串 `"raw"`。
+- `images` 是图片字典列表；没有图片时可以不传。
+- 图片数量必须和正文里的 `[图片]` / `[图]` 占位符数量一致，否则服务器会拒绝发布。
 - `images` 是图片字典列表，不是字符串 `"images"`。
 - 图片标题不放在 `images` 里，标题已经写在正文占位符中。
 
@@ -329,11 +335,13 @@ base64Image
   "raw": "海边的下午\n\n[图片: 海边的风很大]\n\n正文...",
   "images": [
     {
-      "type": "image/jpeg",
+      "filename": "image.jpg",
+      "mime": "image/jpeg",
       "base64": "/9j/4AAQSkZJRgABAQ..."
     },
     {
-      "type": "image/jpeg",
+      "filename": "image.jpg",
+      "mime": "image/jpeg",
       "base64": "/9j/4AAQSkZJRgABAQ..."
     }
   ]
@@ -384,7 +392,7 @@ Success
 
 ```text
 Missing content
-Image placeholder count does not match images count
+Image placeholder count (2) does not match image count (1)
 Missing BLOG_GITHUB_TOKEN
 ```
 
@@ -398,7 +406,8 @@ Missing BLOG_GITHUB_TOKEN
   "raw": "正文\n\n[图片: 标题]\n\n正文",
   "images": [
     {
-      "type": "image/jpeg",
+      "filename": "image.jpg",
+      "mime": "image/jpeg",
       "base64": "..."
     }
   ]
@@ -413,7 +422,7 @@ Missing BLOG_GITHUB_TOKEN
 3. 校验占位符数量和 images 数量一致。
 4. 为每张图片生成文件名。
 5. 把图片写入 GitHub tree:
-   public/images/mobile/img-<timestamp>-<index>.jpg
+   public/images/mobile/YYYY/MM/img-<timestamp>-<index>.jpg
 6. 把 raw 中的占位符按顺序替换为 Markdown 图片语法。
 7. 创建或覆盖同名 life 文章。
 8. Markdown 和图片在同一个 GitHub commit 中提交。
@@ -428,7 +437,7 @@ Missing BLOG_GITHUB_TOKEN
 替换为：
 
 ```markdown
-![海边的风很大](/images/mobile/img-20260701-001.jpg)
+![海边的风很大](/images/mobile/2026/07/img-20260701-001.jpg)
 ```
 
 无标题示例：
@@ -440,7 +449,7 @@ Missing BLOG_GITHUB_TOKEN
 替换为：
 
 ```markdown
-![](/images/mobile/img-20260701-001.jpg)
+![](/images/mobile/2026/07/img-20260701-001.jpg)
 ```
 
 ## 图片标题如何显示
@@ -448,7 +457,7 @@ Missing BLOG_GITHUB_TOKEN
 第一阶段可以只生成 Markdown 图片 alt：
 
 ```markdown
-![海边的风很大](/images/mobile/img-xxx.jpg)
+![海边的风很大](/images/mobile/YYYY/MM/img-xxx.jpg)
 ```
 
 浏览器会显示图片，但不一定显示标题文字。
@@ -457,7 +466,7 @@ Missing BLOG_GITHUB_TOKEN
 
 ```html
 <figure>
-  <img src="/images/mobile/img-xxx.jpg" alt="海边的风很大">
+  <img src="/images/mobile/YYYY/MM/img-xxx.jpg" alt="海边的风很大">
   <figcaption>海边的风很大</figcaption>
 </figure>
 ```
@@ -494,7 +503,7 @@ Missing BLOG_GITHUB_TOKEN
 会生成：
 
 ```markdown
-![](/images/mobile/img-xxx.jpg)
+![](/images/mobile/YYYY/MM/img-xxx.jpg)
 ```
 
 ### 图片太大怎么办
@@ -560,13 +569,13 @@ iOS 备忘录分享时不会稳定把内嵌图片交给快捷指令。当前方�
 
 ```text
 src/content/life/<date>-*.md
-public/images/mobile/img-*.jpg
+public/images/mobile/YYYY/MM/img-*.jpg
 ```
 
 文章 Markdown 应包含：
 
 ```markdown
-![第一张测试图](/images/mobile/img-*.jpg)
+![第一张测试图](/images/mobile/YYYY/MM/img-*.jpg)
 ```
 
 网站构建后应显示图片。

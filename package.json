@@ -14,6 +14,7 @@
     "test:homepage": "npm run build && node --test test/homepage-*.test.mjs",
     "test:e2e": "playwright test",
     "update:daily-quote": "node scripts/update-daily-quote.mjs",
+    "server:health": "node scripts/server-health-check.cjs",
     "astro": "astro"
   },
   "dependencies": {

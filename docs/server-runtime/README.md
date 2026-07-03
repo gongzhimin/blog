@@ -22,6 +22,12 @@ working tree and should not be treated as the source of truth.
 Node.js webhook receiver used by iOS Shortcuts. The running server copy matched
 the repository copy when this backup was created.
 
+`/var/www/blog/scripts/server-health-check.cjs`
+
+Read-only health check script for the server runtime. It checks nginx,
+`blog-webhook.service`, `/etc/blog-webhook.env`, the local webhook port, and
+the public homepage. It does not print secret values.
+
 `/etc/systemd/system/blog-webhook.service`
 
 Systemd service that runs the webhook receiver.
@@ -49,3 +55,19 @@ as `/home/ubuntu/blog.git` instead of using `/var/www/blog`.
 - Real tokens are intentionally excluded.
 - The committed systemd service uses `EnvironmentFile=-/etc/blog-webhook.env`.
 - Keep `BLOG_WEBHOOK_TOKEN` and `BLOG_GITHUB_TOKEN` only on the server.
+
+## Health Check
+
+After rebuilding or changing the server runtime, run:
+
+```bash
+node /var/www/blog/scripts/server-health-check.cjs
+```
+
+From a repository checkout you can also run:
+
+```bash
+npm run server:health
+```
+
+The script returns exit code `0` only when every check passes.

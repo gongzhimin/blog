@@ -153,7 +153,6 @@ blog/
 
 自研运行时代码位于 `public/book-runtime/js/`：
 
-- `paginator.js`：在隐藏 DOM 中测量 `scrollHeight`，拆分内容页。
 - `paginator-core.js`：维护分页尺寸配置，并创建与真实书页 CSS 同源的隐藏测量容器。
 - `paginator-splitters.js`：实现段落、代码块、列表、表格等跨页拆分策略。
 - `paginator.js`：编排正文和目录分页流程，并暴露 `BookRuntime.Paginator` API。
@@ -181,7 +180,8 @@ blog/
 
 测量 CSS 由主题生成，和最终书页 CSS 同源，避免“测量能放下、实际显示溢出”的问题。
 
-更多细节见 [`docs/pagination-workflow.md`](docs/pagination-workflow.md)。
+更多细节见 [`docs/pagination-workflow.md`](docs/pagination-workflow.md) 和
+[`docs/book-runtime-interface.md`](docs/book-runtime-interface.md)。
 
 ---
 
@@ -203,6 +203,12 @@ git push
 图片发布方案见 [`docs/ios-shortcuts-image-publishing.md`](docs/ios-shortcuts-image-publishing.md)。
 
 服务器重建方案见 [`docs/server-runtime/rebuild-server.md`](docs/server-runtime/rebuild-server.md)。
+
+服务器运行态检查可在服务器上执行：
+
+```bash
+node /var/www/blog/scripts/server-health-check.cjs
+```
 
 后续优化边界见 [`docs/optimization-roadmap.md`](docs/optimization-roadmap.md)。
 
