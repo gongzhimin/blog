@@ -27,11 +27,14 @@ async function loadPaginator() {
   };
   context.globalThis = context;
   vm.createContext(context);
-  const source = await readFile(
-    new URL("../public/book-runtime/js/paginator.js", import.meta.url),
-    "utf8",
-  );
-  vm.runInContext(source, context);
+  for (const path of [
+    "../public/book-runtime/js/paginator-core.js",
+    "../public/book-runtime/js/paginator-splitters.js",
+    "../public/book-runtime/js/paginator.js",
+  ]) {
+    const source = await readFile(new URL(path, import.meta.url), "utf8");
+    vm.runInContext(source, context);
+  }
   return context;
 }
 

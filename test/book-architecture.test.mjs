@@ -12,8 +12,19 @@ test("README describes the current book runtime architecture", async () => {
   assert.match(readme, /src\/book\/renderers\/markdown-renderer\.mjs/);
   assert.match(readme, /BookRuntime\.Orchestrator\.createPageCache\(\)/);
   assert.match(readme, /window\.BookRuntime/);
+  assert.match(readme, /paginator-core\.js/);
+  assert.match(readme, /paginator-splitters\.js/);
   assert.doesNotMatch(readme, /填充 `_pageCache`/);
   assert.doesNotMatch(readme, /src\/lib\/book-renderer\.js\s+# Markdown -> HTML/);
+});
+
+test("pagination workflow documents the split paginator modules", async () => {
+  const workflow = await read("../docs/pagination-workflow.md");
+
+  assert.match(workflow, /paginator-core\.js/);
+  assert.match(workflow, /paginator-splitters\.js/);
+  assert.match(workflow, /paginator\.js/);
+  assert.doesNotMatch(workflow, /单文件分页器/);
 });
 
 test("demo page uses the same renderer and book style builder as the homepage", async () => {
@@ -45,17 +56,36 @@ test("markdown renderer implementation lives under the book module", async () =>
 });
 
 test("browser runtime is exposed through a BookRuntime namespace", async () => {
-  const [paginator, orchestrator, adapter, app] = await Promise.all([
+  const [core, splitters, paginator, orchestrator, adapter, app] = await Promise.all([
+    read("../public/book-runtime/js/paginator-core.js"),
+    read("../public/book-runtime/js/paginator-splitters.js"),
     read("../public/book-runtime/js/paginator.js"),
     read("../public/book-runtime/js/orchestrator.js"),
     read("../public/book-runtime/js/turnjs-adapter.js"),
     read("../public/book-runtime/js/book-app.js"),
   ]);
 
+  assert.match(core, /window\.BookRuntime\.PaginatorCore/);
+  assert.match(splitters, /window\.BookRuntime\.PaginatorSplitters/);
   assert.match(paginator, /window\.BookRuntime\.Paginator/);
   assert.match(orchestrator, /window\.BookRuntime\.Orchestrator/);
   assert.match(adapter, /window\.BookRuntime\.TurnAdapter/);
   assert.match(app, /window\.BookRuntime\.Paginator/);
   assert.match(app, /window\.BookRuntime\.Orchestrator\.createPageCache/);
   assert.match(app, /window\.BookRuntime\.TurnAdapter\.create/);
+});
+
+test("BookShell loads paginator modules before the orchestration runtime", async () => {
+  const shell = await read("../src/book/components/BookShell.astro");
+  const coreIndex = shell.indexOf('src="/book-runtime/js/paginator-core.js"');
+  const splittersIndex = shell.indexOf('src="/book-runtime/js/paginator-splitters.js"');
+  const paginatorIndex = shell.indexOf('src="/book-runtime/js/paginator.js"');
+  const orchestratorIndex = shell.indexOf('src="/book-runtime/js/orchestrator.js"');
+
+  assert.ok(coreIndex > -1, "missing paginator-core.js");
+  assert.ok(splittersIndex > -1, "missing paginator-splitters.js");
+  assert.ok(paginatorIndex > -1, "missing paginator.js");
+  assert.ok(coreIndex < splittersIndex, "core must load before splitters");
+  assert.ok(splittersIndex < paginatorIndex, "splitters must load before paginator");
+  assert.ok(paginatorIndex < orchestratorIndex, "paginator must load before orchestrator");
 });

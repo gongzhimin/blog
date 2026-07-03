@@ -10,8 +10,14 @@
 │ markdown-renderer    │          │ MEASURE_CSS                  │
 │ MD + KaTeX → HTML    │  ───→    │ 测量容器样式单源              │
 │ 图片尺寸注入          │          │                              │
-└──────────────────────┘          │ paginator.js                 │
-                                  │ 运行时 DOM 测量分页引擎        │
+└──────────────────────┘          │ paginator-core.js            │
+                                  │ 分页配置 + 隐藏测量容器        │
+                                  │                              │
+                                  │ paginator-splitters.js       │
+                                  │ 段落/代码/列表/表格拆分        │
+                                  │                              │
+                                  │ paginator.js                 │
+                                  │ 正文/目录分页调度              │
                                   │                              │
                                   │ orchestrator.js              │
                                   │ page-cache 实例 + 目录生成     │
@@ -25,6 +31,12 @@
 ```
 
 运行时代码位于 `public/book-runtime/js/`。`public/vendor/turnjs/` 只保留 Turn.js、jQuery、Modernizr、Hash、示例 CSS 与图片等第三方资源，避免把自研分页/编排代码误认为对 Turn.js 的魔改。
+
+分页器拆成三层：
+
+- `paginator-core.js`：维护分页尺寸配置，创建隐藏测量容器。
+- `paginator-splitters.js`：提供 `splitText`、`splitPre`、`splitList`、`splitTable` 等元素拆分策略。
+- `paginator.js`：编排正文分页、目录分页和公开 `BookRuntime.Paginator` API。
 
 `turnjs-adapter.js` 是 Book Runtime 和 Turn.js 之间的边界：页面注入、书壳深度、滑条、鼠标滚轮、hash、键盘、移动端 single display 与桌面端 double display 都在这里处理。`book-app.js` 只读取 `#book-data`、选择分页配置，通过 `BookRuntime.Orchestrator.createPageCache()` 创建分页缓存实例，然后创建 `BookRuntime.TurnAdapter`。
 
@@ -102,7 +114,7 @@ var MEASURE_CSS = {
 };
 ```
 
-`paginator.js` 读取 `BookShell.astro` 注入的 `MEASURE_CSS`。测量 CSS 由主题模块和页面 CSS 同源生成，杜绝手动同步出错。此前曾因缺少 `word-break: break-word` 导致测量比实际渲染偏矮，修复后统一管理。
+`paginator-core.js` 读取 `BookShell.astro` 注入的 `MEASURE_CSS` 并创建测量容器。测量 CSS 由主题模块和页面 CSS 同源生成，杜绝手动同步出错。此前曾因缺少 `word-break: break-word` 导致测量比实际渲染偏矮，修复后统一管理。
 
 ### 可用高度计算
 

@@ -86,7 +86,9 @@ blog/
 ├── public/
 │   ├── book-runtime/
 │   │   └── js/
-│   │       ├── paginator.js        # DOM 测量分页引擎，注册到 BookRuntime.Paginator
+│   │       ├── paginator-core.js   # 分页配置与隐藏测量容器
+│   │       ├── paginator-splitters.js # 段落/代码/列表/表格拆分策略
+│   │       ├── paginator.js        # 分页调度，注册到 BookRuntime.Paginator
 │   │       ├── orchestrator.js     # 页码编排与 page-cache 实例
 │   │       ├── turnjs-adapter.js   # Turn.js 适配层，注册到 BookRuntime.TurnAdapter
 │   │       └── book-app.js         # 配置读取与运行时启动
@@ -152,6 +154,9 @@ blog/
 自研运行时代码位于 `public/book-runtime/js/`：
 
 - `paginator.js`：在隐藏 DOM 中测量 `scrollHeight`，拆分内容页。
+- `paginator-core.js`：维护分页尺寸配置，并创建与真实书页 CSS 同源的隐藏测量容器。
+- `paginator-splitters.js`：实现段落、代码块、列表、表格等跨页拆分策略。
+- `paginator.js`：编排正文和目录分页流程，并暴露 `BookRuntime.Paginator` API。
 - `orchestrator.js`：通过 `BookRuntime.Orchestrator.createPageCache()` 创建 page-cache 实例，生成目录、计算正文起始页、按物理页号提供 HTML。
 - `turnjs-adapter.js`：隔离 Turn.js 细节，处理翻页、hash、滑条、键盘、单页/双页模式。
 - `book-app.js`：读取配置、选择分页参数，经由 `window.BookRuntime` 启动分页和 adapter。
@@ -164,7 +169,7 @@ blog/
 
 ## 排版引擎
 
-`paginator.js` 在浏览器中创建隐藏测量容器，通过真实 CSS 布局判断内容是否溢出。
+分页器由 `paginator-core.js`、`paginator-splitters.js`、`paginator.js` 三个运行时脚本组成。`paginator-core.js` 创建隐藏测量容器，`paginator-splitters.js` 负责元素拆分，`paginator.js` 负责分页调度。它们都运行在浏览器中，通过真实 CSS 布局判断内容是否溢出。
 
 | 元素 | 跨页策略 |
 |---|---|
@@ -198,6 +203,8 @@ git push
 图片发布方案见 [`docs/ios-shortcuts-image-publishing.md`](docs/ios-shortcuts-image-publishing.md)。
 
 服务器重建方案见 [`docs/server-runtime/rebuild-server.md`](docs/server-runtime/rebuild-server.md)。
+
+后续优化边界见 [`docs/optimization-roadmap.md`](docs/optimization-roadmap.md)。
 
 ---
 
