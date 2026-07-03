@@ -190,7 +190,9 @@
     };
   }
 
-  window.BookTurnAdapter = {
+  window.BookRuntime = window.BookRuntime || {};
+  window.BookRuntime.TurnAdapter = {
     create: createTurnJsAdapter
   };
+  window.BookTurnAdapter = window.BookRuntime.TurnAdapter;
 })();

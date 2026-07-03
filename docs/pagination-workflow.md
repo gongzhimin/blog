@@ -7,14 +7,14 @@
 ```
 服务端 (Astro build)                    浏览器端 (runtime)
 ┌──────────────────────┐          ┌─────────────────────────────┐
-│ book-renderer.js     │          │ measurement-css.js           │
+│ markdown-renderer    │          │ MEASURE_CSS                  │
 │ MD + KaTeX → HTML    │  ───→    │ 测量容器样式单源              │
 │ 图片尺寸注入          │          │                              │
 └──────────────────────┘          │ paginator.js                 │
                                   │ 运行时 DOM 测量分页引擎        │
                                   │                              │
                                   │ orchestrator.js              │
-                                  │ 全局页码编排 + 目录生成        │
+                                  │ page-cache 实例 + 目录生成     │
                                   │                              │
                                   │ turnjs-adapter.js            │
                                   │ Turn.js 适配 + 翻页交互       │
@@ -26,7 +26,7 @@
 
 运行时代码位于 `public/book-runtime/js/`。`public/vendor/turnjs/` 只保留 Turn.js、jQuery、Modernizr、Hash、示例 CSS 与图片等第三方资源，避免把自研分页/编排代码误认为对 Turn.js 的魔改。
 
-`turnjs-adapter.js` 是 Book Runtime 和 Turn.js 之间的边界：页面注入、书壳深度、滑条、鼠标滚轮、hash、键盘、移动端 single display 与桌面端 double display 都在这里处理。`book-app.js` 只读取 `#book-data`、选择分页配置、调用 `paginateAll()`，然后创建 `BookTurnAdapter`。
+`turnjs-adapter.js` 是 Book Runtime 和 Turn.js 之间的边界：页面注入、书壳深度、滑条、鼠标滚轮、hash、键盘、移动端 single display 与桌面端 double display 都在这里处理。`book-app.js` 只读取 `#book-data`、选择分页配置，通过 `BookRuntime.Orchestrator.createPageCache()` 创建分页缓存实例，然后创建 `BookRuntime.TurnAdapter`。
 
 Astro 页面通过两个组件接入运行时：
 
@@ -37,7 +37,7 @@ Astro 页面通过两个组件接入运行时：
 
 ## 数据流
 
-### Step 0：服务端预处理（`book-renderer.js`）
+### Step 0：服务端预处理（`markdown-renderer.mjs`）
 
 ```
 Markdown 文章
@@ -53,11 +53,11 @@ Markdown 文章
 
 ### Step 1：初始化（`book-app.js` + `turnjs-adapter.js`）
 
-页面加载 → `loadApp()` → `paginateAll(articles, tocHTML)` → `BookTurnAdapter.create(...).mount()` → Turn.js 初始化。
+页面加载 → `loadApp()` → `pageCache.paginateAll(articles, tocHTML)` → `BookRuntime.TurnAdapter.create(...).mount()` → Turn.js 初始化。
 
 ### Step 2：全局编排（`orchestrator.js`）
 
-`paginateAll()` 按五步执行：
+`pageCache.paginateAll()` 按五步执行：
 
 ```
 Step 1 ─ 逐篇文章调用 paginateArticle()，缓存每篇文章的页面数组
@@ -68,15 +68,15 @@ Step 2 ─ 用估算页码构建目录 HTML，调用 paginateTOC() 得到目录�
 Step 3 ─ 计算 shift = (5 + tocLen) - 7
          用真实物理页码重建目录，显示页码 = 物理页 - 正文起始页 + 1
          ↓
-Step 4 ─ 将目录页存入 _pageCache[5..5+tocLen-1]，页脚为罗马数字
+Step 4 ─ 将目录页存入 pageCache[5..5+tocLen-1]，页脚为罗马数字
          ↓
-Step 5 ─ 将文章页存入 _pageCache[正文起始页..]，页脚为阿拉伯数字（从 1 开始）
+Step 5 ─ 将文章页存入 pageCache[正文起始页..]，页脚为阿拉伯数字（从 1 开始）
          计算总页数 TOTAL_PAGES，确保偶数（背面封面在奇数页）
 ```
 
 ### Step 3：按需取页（`book-app.js`）
 
-Turn.js 翻页时触发 `missing` 回调 → `addPage(page)` → 从 `_pageCache[page]` 取 HTML → 创建 `.own-size` 元素。
+Turn.js 翻页时触发 `missing` 回调 → `addPage(page)` → 从 `pageCache.getPageContent(page)` 取 HTML → 创建 `.own-size` 元素。
 
 ---
 
@@ -93,7 +93,7 @@ Turn.js 翻页时触发 `missing` 回调 → `addPage(page)` → 从 `_pageCache
 - 浏览器原生 `scrollHeight` 精确到亚像素，速度极快
 - 测量结果与最终渲染完全一致（同一个浏览器，同一套 CSS）
 
-### CSS 单源（`measurement-css.js`）
+### CSS 单源（`MEASURE_CSS`）
 
 ```js
 var MEASURE_CSS = {
@@ -102,7 +102,7 @@ var MEASURE_CSS = {
 };
 ```
 
-`paginator.js` 和 `index.astro` 都从这里取样式定义，杜绝手动同步出错。此前曾因缺少 `word-break: break-word` 导致测量比实际渲染偏矮，修复后统一管理。
+`paginator.js` 读取 `BookShell.astro` 注入的 `MEASURE_CSS`。测量 CSS 由主题模块和页面 CSS 同源生成，杜绝手动同步出错。此前曾因缺少 `word-break: break-word` 导致测量比实际渲染偏矮，修复后统一管理。
 
 ### 可用高度计算
 

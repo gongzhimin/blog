@@ -2,8 +2,10 @@
 import { readFileSync } from 'fs';
 import bookConfig from '../../data/book-config.json';
 import sampleBook from '../../book/examples/sample-book.json';
-import { renderMarkdown, stripLeadingTitle, romanTocPage } from '../../lib/book-renderer.js';
+import { renderMarkdown, stripLeadingTitle, romanTocPage } from '../../book/renderers/markdown-renderer.mjs';
 import { buildBookRuntime } from '../../book/assembler/build-book-runtime.mjs';
+import { validateBookConfig } from '../../book/config/book-config.mjs';
+import { buildHomepageStyles } from '../../book/homepage/build-homepage-styles.mjs';
 import { createJsonBookDocument } from '../../book/sources/json-book-source.mjs';
 import { loadBookTheme } from '../../book/themes/load-theme.mjs';
 import BookShell from '../../book/components/BookShell.astro';
@@ -17,6 +19,7 @@ const katexCSS = readFileSync('node_modules/katex/dist/katex.min.css', 'utf8');
 const demoConfig = JSON.parse(JSON.stringify(bookConfig));
 demoConfig.theme = { id: 'plain-manuscript' };
 demoConfig.footer.content.copyright = 'Book Runtime Demo';
+validateBookConfig(demoConfig);
 
 const theme = loadBookTheme(demoConfig.theme.id, {
   fontsCSS,
@@ -36,76 +39,20 @@ const runtime = buildBookRuntime({
 const runConfig = runtime.config;
 runConfig.theme = theme.runtime;
 
-const homepageStyles = `
-  body {
-    min-height: 100vh;
-    overflow-x: auto !important;
-    overflow-y: auto !important;
-    background: #e8e4de;
-    color: #3a3a3a;
-  }
-
-  .site-nav {
-    height: 56px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-bottom: 1px solid rgba(0,0,0,.08);
-  }
-
-  .site-nav .brand {
-    color: #555;
-    font-size: 15px;
-    letter-spacing: .08em;
-    text-decoration: none;
-  }
-
-  #canvas {
-    visibility: hidden;
-    width: ${demoConfig.book.canvasWidth}px !important;
-    height: ${demoConfig.book.height}px !important;
-    margin: 0 auto !important;
-    padding: ${demoConfig.book.gap}px 0 !important;
-  }
-
-  .sj-book {
-    width: ${demoConfig.book.width}px !important;
-    height: ${demoConfig.book.height}px !important;
-  }
-
-  .sj-book .hard {
-    width: ${demoConfig.book.hardPage.width}px;
-    height: ${demoConfig.book.hardPage.height}px;
-  }
-
-  .sj-book .own-size {
-    width: ${demoConfig.book.contentPage.width}px;
-    height: ${demoConfig.book.contentPage.height}px;
-  }
-
-  .sj-book .p1 .side {
-    width: ${demoConfig.book.spineStrip.width}px !important;
-    left: ${demoConfig.book.spineStrip.left}px !important;
-  }
-
-  .sj-book .depth {
-    top: ${demoConfig.book.depth.top}px;
-    height: ${demoConfig.book.depth.height}px;
-  }
-
-  .sj-book .p1,
-  .sj-book .p2,
-  .sj-book .p3 {
-    background-color: white;
-    background-image: url(/vendor/turnjs/pics/book-covers.jpg) !important;
-    background-repeat: no-repeat;
-    background-size: 2400px 600px;
-  }
-
-  .sj-book .p1 { background-position: 0 0 !important; }
-  .sj-book .p2 { background-position: -483px 0 !important; }
-  .sj-book .p3 { background-position: -1936px 0 !important; }
-` + theme.styles.visualCSS;
+const homepageStyles = buildHomepageStyles({
+  book: demoConfig.book,
+  cover: demoConfig.book.coverSprite,
+  footer: demoConfig.footer,
+  light: {
+    nav: demoConfig.nav.light,
+    footer: demoConfig.footer.light,
+    background: demoConfig.backgrounds.light,
+  },
+  mobileCanvas: demoConfig.book.mobileCanvas,
+  mobileContentPage: demoConfig.book.mobileContentPage,
+  nav: demoConfig.nav,
+  theme,
+});
 ---
 
 <!doctype html>

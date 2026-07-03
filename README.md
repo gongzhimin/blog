@@ -59,9 +59,12 @@ blog/
 ├── src/
 │   ├── book/
 │   │   ├── assembler/              # BookDocument -> runtime config
+│   │   ├── config/                 # book-config 校验
 │   │   ├── components/             # BookRuntimeAssets / BookShell
 │   │   ├── examples/               # 非博客内容源示例
+│   │   ├── homepage/               # 首页 / demo 书本外层样式构建
 │   │   ├── model/                  # BookDocument / BookEntry 模型
+│   │   ├── renderers/              # Markdown / HTML renderer
 │   │   ├── sources/                # Astro blog source / JSON source
 │   │   └── themes/                 # classic-paper / plain-manuscript
 │   ├── content/
@@ -69,9 +72,10 @@ blog/
 │   │   └── life/                   # 生活随笔
 │   ├── data/
 │   │   ├── book-config.json        # 书本、导航、页脚、主题选择
+│   │   ├── book-config.schema.json # 书本运行时配置说明
 │   │   └── daily-quote.json        # 页脚每日引言
 │   ├── lib/
-│   │   └── book-renderer.js        # Markdown -> HTML
+│   │   └── book-renderer.js        # 兼容旧导入，转发到 src/book/renderers
 │   ├── pages/
 │   │   ├── index.astro             # 博客书首页
 │   │   ├── blog/                   # 技术文章列表 / 详情
@@ -82,9 +86,9 @@ blog/
 ├── public/
 │   ├── book-runtime/
 │   │   └── js/
-│   │       ├── paginator.js        # DOM 测量分页引擎
-│   │       ├── orchestrator.js     # 全局页码编排与 page cache
-│   │       ├── turnjs-adapter.js   # Turn.js 适配层
+│   │       ├── paginator.js        # DOM 测量分页引擎，注册到 BookRuntime.Paginator
+│   │       ├── orchestrator.js     # 页码编排与 page-cache 实例
+│   │       ├── turnjs-adapter.js   # Turn.js 适配层，注册到 BookRuntime.TurnAdapter
 │   │       └── book-app.js         # 配置读取与运行时启动
 │   ├── vendor/turnjs/              # 第三方 Turn.js / jQuery / CSS / 图片
 │   └── images/
@@ -107,7 +111,7 @@ blog/
 
 ### 2. 渲染与组装
 
-`src/lib/book-renderer.js` 负责 Markdown 到 HTML：
+`src/book/renderers/markdown-renderer.mjs` 负责 Markdown 到 HTML：
 
 - marked 渲染 Markdown。
 - KaTeX 预渲染公式。
@@ -116,7 +120,11 @@ blog/
 - 中西文间距处理。
 - 去掉正文中重复的一级标题。
 
+`src/lib/book-renderer.js` 只保留兼容转发，新的页面和 demo 都从 `src/book/renderers/markdown-renderer.mjs` 引入。
+
 `src/book/assembler/build-book-runtime.mjs` 负责把 `BookDocument`、主题和配置组装成浏览器端 `#book-data`。
+
+`src/book/config/book-config.mjs` 在构建入口校验 `book-config.json`，避免页面尺寸、封面精灵图或分页参数缺失后才在浏览器运行时暴露问题。
 
 ### 3. 主题
 
@@ -144,9 +152,11 @@ blog/
 自研运行时代码位于 `public/book-runtime/js/`：
 
 - `paginator.js`：在隐藏 DOM 中测量 `scrollHeight`，拆分内容页。
-- `orchestrator.js`：生成目录、计算正文起始页、填充 `_pageCache`。
+- `orchestrator.js`：通过 `BookRuntime.Orchestrator.createPageCache()` 创建 page-cache 实例，生成目录、计算正文起始页、按物理页号提供 HTML。
 - `turnjs-adapter.js`：隔离 Turn.js 细节，处理翻页、hash、滑条、键盘、单页/双页模式。
-- `book-app.js`：读取配置、选择分页参数、启动分页和 adapter。
+- `book-app.js`：读取配置、选择分页参数，经由 `window.BookRuntime` 启动分页和 adapter。
+
+运行时统一挂在 `window.BookRuntime` 命名空间下：`Paginator`、`Orchestrator`、`TurnAdapter`。旧的 `PAGINATOR`、`BookOrchestrator`、`BookTurnAdapter` 仍保留为兼容别名，但新代码不再直接依赖它们。
 
 `public/vendor/turnjs/` 只保留第三方资源，不存放自研分页或启动逻辑。
 

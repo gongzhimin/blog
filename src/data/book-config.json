@@ -1,4 +1,5 @@
 {
+	"$schema": "./book-config.schema.json",
 	"theme": {
 		"id": "classic-paper"
 	},

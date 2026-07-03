@@ -221,9 +221,9 @@ test("homepage consumes book config and the shared book runtime", async () => {
   assert.match(app, /BOOK_CONFIG\.book\.mobileBreakpoint/);
   assert.match(app, /BOOK_CONFIG\.book\.mobileContentPage/);
   assert.doesNotMatch(app, /width: 370, height: 507/);
-  assert.match(app, /PAGINATOR\.configure/);
+  assert.match(app, /window\.BookRuntime\.Paginator\.configure/);
   assert.match(app, /BOOK_CONFIG\.runtime\.pagination/);
-  assert.match(app, /BookTurnAdapter\.create/);
+  assert.match(app, /window\.BookRuntime\.TurnAdapter\.create/);
   assert.doesNotMatch(app, /Hash\.check\(\)\.update\(\)/);
   assert.doesNotMatch(app, /function updateDepth/);
   assert.doesNotMatch(app, /ARTICLE_H/);

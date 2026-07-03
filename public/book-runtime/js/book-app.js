@@ -2,7 +2,7 @@
  * book-app.js — runtime bootstrap.
  *
  * Reads the server-injected #book-data config, prepares pagination, and
- * delegates Turn.js details to BookTurnAdapter.
+ * delegates Turn.js details to BookRuntime.TurnAdapter.
  */
 (function () {
   var _bookData = document.getElementById('book-data');
@@ -14,7 +14,7 @@
   var PAGINATION_CONFIG = BOOK_CONFIG.runtime && BOOK_CONFIG.runtime.pagination;
   var MOBILE_PAGINATION = BOOK_CONFIG.runtime && BOOK_CONFIG.runtime.mobilePagination;
   var MOBILE_BREAKPOINT = BOOK_CONFIG.book.mobileBreakpoint || 800;
-  var pageCache = BookOrchestrator.createPageCache({
+  var pageCache = window.BookRuntime.Orchestrator.createPageCache({
     coverSprite: BOOK_CONFIG.book.coverSprite,
     tocTitle: BOOK_CONFIG.source && BOOK_CONFIG.source.tocTitle || '目录'
   });
@@ -39,8 +39,8 @@
 
   function configurePagination() {
     var pagination = getPaginationConfig();
-    if (pagination && PAGINATOR.configure) {
-      PAGINATOR.configure(pagination);
+    if (pagination && window.BookRuntime.Paginator.configure) {
+      window.BookRuntime.Paginator.configure(pagination);
     }
   }
 
@@ -67,7 +67,7 @@
   }
 
   function createAdapter() {
-    return BookTurnAdapter.create({
+    return window.BookRuntime.TurnAdapter.create({
       bookSelector: '.sj-book',
       zoomSelector: '#book-zoom',
       sliderSelector: '#slider',

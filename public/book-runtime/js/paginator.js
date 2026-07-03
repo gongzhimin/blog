@@ -471,3 +471,5 @@ var PAGINATOR = (function () {
     paginateTOC: paginateTOC
   };
 })();
+window.BookRuntime = window.BookRuntime || {};
+window.BookRuntime.Paginator = PAGINATOR;

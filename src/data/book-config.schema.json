@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Book Runtime Config",
+  "description": "博客书运行时配置：主题、导航、书本几何尺寸、封面精灵图、分页参数、页脚与背景。",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "theme",
+    "nav",
+    "book",
+    "footer",
+    "backgrounds"
+  ],
+  "properties": {
+    "theme": {
+      "type": "object",
+      "description": "当前使用的书本主题。",
+      "required": ["id"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "主题 ID，对应 src/book/themes 下注册的主题。"
+        }
+      }
+    },
+    "nav": {
+      "type": "object",
+      "description": "首页导航栏配置。"
+    },
+    "book": {
+      "type": "object",
+      "description": "书本几何尺寸、Turn.js 参数、封面精灵图和分页配置。",
+      "required": [
+        "canvasWidth",
+        "width",
+        "height",
+        "mobileBreakpoint",
+        "mobileCanvas",
+        "contentPage",
+        "mobileContentPage",
+        "turn",
+        "coverSprite",
+        "pagination"
+      ],
+      "properties": {
+        "canvasWidth": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "桌面端书本外层画布宽度。"
+        },
+        "width": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "桌面端书本宽度。"
+        },
+        "height": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "桌面端书本高度。"
+        },
+        "mobileBreakpoint": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "切换移动端单页模式的窗口宽度断点。"
+        },
+        "mobileCanvas": {
+          "type": "object",
+          "description": "移动端书本外层画布尺寸与留白。",
+          "required": ["width", "paddingY"]
+        },
+        "contentPage": {
+          "type": "object",
+          "description": "桌面端正文页尺寸。",
+          "required": ["width", "height"]
+        },
+        "mobileContentPage": {
+          "type": "object",
+          "description": "移动端单页正文页尺寸。",
+          "required": ["width", "height"]
+        },
+        "turn": {
+          "type": "object",
+          "description": "Turn.js 初始化参数。",
+          "required": ["elevation", "duration", "totalPages", "startPage"]
+        },
+        "coverSprite": {
+          "type": "object",
+          "description": "封面精灵图路径、背景尺寸和各封面位置。",
+          "required": ["image", "backgroundSize", "positions"],
+          "properties": {
+            "image": {
+              "type": "string",
+              "description": "封面精灵图 URL。"
+            },
+            "backgroundSize": {
+              "type": "string",
+              "description": "CSS background-size 值。"
+            },
+            "positions": {
+              "type": "object",
+              "description": "封面、内封、封底对应的 background-position。",
+              "required": [
+                "front",
+                "frontInside",
+                "backInside",
+                "back",
+                "backOuter"
+              ]
+            }
+          }
+        },
+        "pagination": {
+          "type": "object",
+          "description": "分页测量参数，决定浏览器端正文、目录和移动端分页尺寸。",
+          "required": [
+            "contentWidth",
+            "contentHeight",
+            "tocWidth",
+            "tocHeight"
+          ]
+        }
+      }
+    },
+    "footer": {
+      "type": "object",
+      "description": "页脚与每日一句默认文案。"
+    },
+    "backgrounds": {
+      "type": "object",
+      "description": "页面背景材质。"
+    }
+  }
+}

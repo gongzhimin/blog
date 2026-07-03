@@ -1,7 +1,7 @@
 /**
  * orchestrator.js — Global pagination orchestration.
  *
- * BookOrchestrator.createPageCache() creates one runtime page-cache instance:
+ * BookRuntime.Orchestrator.createPageCache() creates one page-cache instance:
  * it paginates every article, measures the TOC, computes display page numbers,
  * and serves physical pages to the Turn.js adapter.
  */
@@ -73,7 +73,7 @@
       var pg = 7;
       for (var a = 0; a < articles.length; a++) {
         articleStarts.push(pg);
-        var pages = PAGINATOR.paginateArticle(articles[a]);
+        var pages = window.BookRuntime.Paginator.paginateArticle(articles[a]);
         articleCache.push(pages);
         pg += pages.length;
       }
@@ -86,7 +86,7 @@
       }
       var tocHTML = '<div class="table-contents"><h1>' + tocTitle + '</h1><ul>' + tocItems +
         '</ul></div><span class="page-number">i</span>';
-      var tocLen = PAGINATOR.paginateTOC(tocHTML).length;
+      var tocLen = window.BookRuntime.Paginator.paginateTOC(tocHTML).length;
 
       // ── Step 3: compute real starts, rebuild TOC with display numbers ──
       var shift = (5 + tocLen) - 7;
@@ -100,7 +100,7 @@
       }
       tocHTML = '<div class="table-contents"><h1>' + tocTitle + '</h1><ul>' + tocItems +
         '</ul></div><span class="page-number">i</span>';
-      var tocPages = PAGINATOR.paginateTOC(tocHTML);
+      var tocPages = window.BookRuntime.Paginator.paginateTOC(tocHTML);
 
       // ── Step 4: store TOC pages (Roman numeral footer) ──
       pg = 5;
@@ -162,8 +162,10 @@
     };
   }
 
-  window.BookOrchestrator = {
+  window.BookRuntime = window.BookRuntime || {};
+  window.BookRuntime.Orchestrator = {
     createPageCache: createBookPageCache,
     toRoman: toRoman
   };
+  window.BookOrchestrator = window.BookRuntime.Orchestrator;
 })();

@@ -26,7 +26,7 @@ test("book runtime has a dedicated Turn.js adapter outside vendor", async () => 
     new URL("../public/book-runtime/js/turnjs-adapter.js", import.meta.url),
     "utf8",
   );
-  assert.match(source, /window\.BookTurnAdapter/);
+  assert.match(source, /window\.BookRuntime\.TurnAdapter/);
   assert.match(source, /function createTurnJsAdapter/);
   assert.doesNotMatch(source, /destroy:/);
   assert.doesNotMatch(source, /currentPage:/);
@@ -53,7 +53,7 @@ test("book app delegates Turn.js details to the adapter", async () => {
     "utf8",
   );
 
-  assert.match(source, /BookTurnAdapter\.create/);
+  assert.match(source, /window\.BookRuntime\.TurnAdapter\.create/);
   assert.doesNotMatch(source, /function updateDepth/);
   assert.doesNotMatch(source, /function addPage/);
   assert.doesNotMatch(source, /flipbook\.turn\(\{/);
@@ -73,10 +73,10 @@ test("runtime page cache is instantiated instead of read as loose globals", asyn
 
   assert.match(orchestrator, /function createBookPageCache/);
   assert.match(orchestrator, /setPageContent/);
-  assert.match(orchestrator, /window\.BookOrchestrator/);
+  assert.match(orchestrator, /window\.BookRuntime\.Orchestrator/);
   assert.doesNotMatch(orchestrator, /var _pageCache = \{\}/);
   assert.doesNotMatch(orchestrator, /var _paginated = false/);
-  assert.match(app, /BookOrchestrator\.createPageCache/);
+  assert.match(app, /window\.BookRuntime\.Orchestrator\.createPageCache/);
   assert.match(app, /pageCache\.setPageContent\(5/);
   assert.doesNotMatch(app, /if \(_paginated\)/);
   assert.doesNotMatch(app, /_pageCache\[page\]/);

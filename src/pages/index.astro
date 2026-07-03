@@ -6,6 +6,7 @@ import bookConfig from '../data/book-config.json';
 import { renderMarkdown, stripLeadingTitle, romanTocPage } from '../book/renderers/markdown-renderer.mjs';
 import { createAstroBlogDocument } from '../book/sources/astro-blog-source.mjs';
 import { buildBookRuntime } from '../book/assembler/build-book-runtime.mjs';
+import { validateBookConfig } from '../book/config/book-config.mjs';
 import { buildHomepageStyles } from '../book/homepage/build-homepage-styles.mjs';
 import { loadBookTheme } from '../book/themes/load-theme.mjs';
 import BookShell from '../book/components/BookShell.astro';
@@ -17,6 +18,7 @@ import bookTocCSS from '../styles/book-toc.css?raw';
 
 const SITE_TITLE = bookConfig.footer.content.copyright;
 const SITE_DESC = '文字留住瞬间。技术笔记与生活随笔。';
+validateBookConfig(bookConfig);
 
 // KaTeX CSS is included in the measurement container so pagination uses the
 // same formula metrics that the visible book pages use.
