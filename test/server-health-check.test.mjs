@@ -77,3 +77,38 @@ test('server health checks report pass and fail without throwing early', async (
   );
   assert.equal(result.results[2].error, 'failed');
 });
+
+test('server health checks retry transient startup failures', async () => {
+  let attempts = 0;
+  const result = await runHealthChecks({
+    checks: [
+      {
+        id: 'local-webhook-port',
+        label: 'local webhook port responds',
+        command: 'curl local webhook',
+        retries: 2,
+        retryDelayMs: 0,
+        validate: ({ stdout }) => stdout.trim() === '404',
+      },
+    ],
+    runner: async () => {
+      attempts += 1;
+      if (attempts === 1) {
+        return {
+          code: 7,
+          stdout: '',
+          stderr: "Couldn't connect to server",
+        };
+      }
+      return {
+        code: 0,
+        stdout: '404',
+        stderr: '',
+      };
+    },
+  });
+
+  assert.equal(attempts, 2);
+  assert.equal(result.ok, true);
+  assert.equal(result.results[0].ok, true);
+});

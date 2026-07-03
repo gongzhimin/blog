@@ -34,6 +34,8 @@ function buildHealthChecks() {
       label: 'local webhook port responds',
       command:
         "curl -sS --max-time 5 -o /dev/null -w '%{http_code}' http://127.0.0.1:9000/webhook",
+      retries: 8,
+      retryDelayMs: 500,
       validate: ({ stdout }) => stdout.trim() === '404',
     },
     {
@@ -42,6 +44,12 @@ function buildHealthChecks() {
       command: 'curl -fsS --max-time 10 https://zhimin.ink/ >/dev/null',
     },
   ];
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
 }
 
 function runShellCommand(command) {
@@ -68,10 +76,21 @@ async function runHealthChecks({
   const results = [];
 
   for (const check of checks) {
-    const result = await runner(check.command);
-    const ok =
-      result.code === 0 &&
-      (typeof check.validate === 'function' ? check.validate(result) : true);
+    const attempts = Math.max(1, Number(check.retries || 0) + 1);
+    let result = null;
+    let ok = false;
+
+    for (let attempt = 1; attempt <= attempts; attempt += 1) {
+      result = await runner(check.command);
+      ok =
+        result.code === 0 &&
+        (typeof check.validate === 'function' ? check.validate(result) : true);
+      if (ok || attempt === attempts) {
+        break;
+      }
+      await sleep(Number(check.retryDelayMs || 0));
+    }
+
     const error = ok
       ? ''
       : (result.stderr || result.stdout || `exit code ${result.code}`).trim();
