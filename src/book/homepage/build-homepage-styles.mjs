@@ -114,90 +114,26 @@ export function buildHomepageStyles({
   /* Back-cover pages are injected at runtime by orchestrator.js to avoid stale
      estimated page numbers. */
 
-  /* ── Soft matte paper material ───────────────────────────── */
-  :root {
-    --paper-base: #fbf8f1;
-    --paper-warm: #f5eee3;
-    --paper-edge: #e7dccb;
-    --paper-edge-deep: #d4c5af;
-    --paper-fiber: rgba(86, 68, 46, 0.072);
-    --paper-speck: rgba(70, 52, 34, 0.082);
-    --paper-light: rgba(255, 255, 255, 0.22);
-    --paper-shadow-soft: rgba(64, 48, 32, 0.12);
-    --paper-shadow-thin: rgba(64, 48, 32, 0.07);
-  }
-
-  .sj-book .page {
-    box-shadow:
-      0 0 14px rgba(64, 48, 32, 0.12),
-      inset 0 0 0 1px rgba(92, 72, 48, 0.035);
-  }
-
+  /* ── Paper texture ──────────────────────────────────────── */
   .sj-book .own-size {
-    position: relative;
-    overflow: hidden;
-    background-color: var(--paper-base);
+    background-color: #f2f1ec;
     background-image:
-      linear-gradient(180deg,
-        var(--paper-light) 0%,
-        rgba(255,255,255,0.06) 28%,
-        transparent 54%),
-      linear-gradient(90deg,
-        rgba(82,58,34,0.034) 0%,
+      linear-gradient(to bottom,
+        rgba(60,55,48,0.035) 0%,
         transparent 10%,
-        transparent 90%,
-        rgba(82,58,34,0.028) 100%),
+        transparent 88%,
+        rgba(60,55,48,0.032) 100%),
+      radial-gradient(ellipse at 48% 36%,
+        rgba(255,255,255,0.48) 0%,
+        rgba(255,255,255,0.16) 38%,
+        transparent 72%),
       linear-gradient(135deg,
-        var(--paper-base) 0%,
-        var(--paper-warm) 58%,
-        var(--paper-edge) 100%);
+        #fbfaf5 0%,
+        #f2f1ec 48%,
+        #e8e5dc 100%);
   }
-
-  .sj-book .own-size::before,
-  .sj-book .own-size::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  .sj-book .own-size::before {
-    opacity: 0.052;
-    mix-blend-mode: multiply;
-    background-image:
-      radial-gradient(circle at 20% 30%, var(--paper-speck) 0 1px, transparent 1.45px),
-      radial-gradient(circle at 70% 62%, rgba(70,52,34,0.06) 0 1px, transparent 1.4px),
-      radial-gradient(circle at 42% 78%, rgba(255,255,255,0.72) 0 1px, transparent 1.55px);
-    background-size: 38px 42px, 54px 48px, 46px 52px;
-  }
-
-  .sj-book .own-size::after {
-    opacity: 0.038;
-    background:
-      repeating-linear-gradient(
-        92deg,
-        transparent 0 9px,
-        var(--paper-fiber) 10px,
-        transparent 11px
-      );
-  }
-
-  .sj-book .book-content,
-  .sj-book .table-contents {
-    position: relative;
-    z-index: 1;
-  }
-  .sj-book .own-size.odd  { background-image: linear-gradient(to left, var(--paper-edge) 0, transparent 7%, transparent 95%, var(--paper-edge-deep) 100%), linear-gradient(180deg, var(--paper-light) 0%, rgba(255,255,255,0.06) 28%, transparent 54%), linear-gradient(135deg, var(--paper-base) 0%, var(--paper-warm) 58%, var(--paper-edge) 100%); }
-  .sj-book .own-size.even { background-image: linear-gradient(to right, var(--paper-edge) 0, transparent 7%, transparent 95%, var(--paper-edge-deep) 100%), linear-gradient(180deg, var(--paper-light) 0%, rgba(255,255,255,0.06) 28%, transparent 54%), linear-gradient(135deg, var(--paper-base) 0%, var(--paper-warm) 58%, var(--paper-edge) 100%); }
-
-  .sj-book .depth {
-    background-color: var(--paper-edge);
-    background-image:
-      linear-gradient(90deg, rgba(74,54,34,0.18), rgba(255,255,255,0.14), rgba(74,54,34,0.1)),
-      repeating-linear-gradient(180deg, rgba(86,68,46,0.16) 0 1px, transparent 1px 3px);
-    opacity: 0.74;
-  }
+  .sj-book .own-size.odd  { background-image: linear-gradient(to left,  #e8e5dc 95%, #cdc8bc 100%), linear-gradient(to bottom, rgba(60,55,48,0.035) 0%, transparent 10%, transparent 88%, rgba(60,55,48,0.032) 100%), radial-gradient(ellipse at 48% 36%, rgba(255,255,255,0.48) 0%, rgba(255,255,255,0.16) 38%, transparent 72%), linear-gradient(135deg, #fbfaf5 0%, #f2f1ec 48%, #e8e5dc 100%); }
+  .sj-book .own-size.even { background-image: linear-gradient(to right, #e8e5dc 95%, #cdc8bc 100%), linear-gradient(to bottom, rgba(60,55,48,0.035) 0%, transparent 10%, transparent 88%, rgba(60,55,48,0.032) 100%), radial-gradient(ellipse at 48% 36%, rgba(255,255,255,0.48) 0%, rgba(255,255,255,0.16) 38%, transparent 72%), linear-gradient(135deg, #fbfaf5 0%, #f2f1ec 48%, #e8e5dc 100%); }
 
   .site-footer {
     text-align: center;
