@@ -46,7 +46,9 @@ export function buildHomepageStyles({
   return `
   html {
     min-height: 100%;
-    background: ${light.background.fabric};
+    background:
+      url("/website-bg.jpg") center / cover no-repeat fixed,
+      ${light.background.fabric};
   }
 
   body {
