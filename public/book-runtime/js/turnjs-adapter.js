@@ -219,7 +219,7 @@
         display: isMobile ? 'single' : 'double',
         elevation: turnOptions.elevation,
         acceleration: !isChrome(),
-        autoCenter: true,
+        autoCenter: false,
         gradients: true,
         duration: turnOptions.duration,
         pages: totalPages,
