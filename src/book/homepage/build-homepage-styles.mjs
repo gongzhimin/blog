@@ -185,7 +185,6 @@ ${paperTextureCSS}
   .site-footer .footer-inner {
     width: ${book.canvasWidth}px;
     margin: 0 auto;
-    text-align: left;
   }
 
   .site-footer .quote {
