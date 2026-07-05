@@ -113,13 +113,16 @@ export function buildHomepageStyles({
     color: ${light.nav.linkHover};
   }
 
+  main {
+    background: url("/website-bg.jpg") center / cover no-repeat;
+  }
+
   #canvas {
     visibility: hidden;
     width: ${book.canvasWidth}px !important;
     height: ${book.height}px !important;
     margin: 0 auto !important;
     padding: ${book.gap}px 0 !important;
-    background: url("/website-bg.jpg") center / cover no-repeat;
   }
 
   .sj-book {
