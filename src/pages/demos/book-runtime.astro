@@ -58,7 +58,10 @@ const homepageStyles = buildHomepageStyles({
   </head>
   <body>
     <header class="site-nav">
-      <a class="brand" href="/demos/book-runtime/">Book Runtime Demo</a>
+      <div class="inner">
+        <a class="brand" href="/demos/book-runtime/">Book Runtime Demo</a>
+        <span class="nav-slogan">{demoConfig.nav.slogan}</span>
+      </div>
     </header>
 
     <BookShell

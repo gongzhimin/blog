@@ -1,6 +1,7 @@
 const REQUIRED_PATHS = [
   "theme.id",
   "nav.brand.text",
+  "nav.slogan",
   "nav.links.items",
   "book.canvasWidth",
   "book.width",

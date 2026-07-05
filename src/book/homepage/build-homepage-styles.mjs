@@ -73,11 +73,21 @@ export function buildHomepageStyles({
   }
 
   .site-nav .inner {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: space-between;
     width: ${book.canvasWidth}px;
     margin: 0 auto;
+  }
+
+  .nav-slogan {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    color: ${light.nav.sloganText};
+    font-size: ${nav.sloganFontSize}px;
   }
 
   .site-nav .brand {
@@ -211,6 +221,7 @@ ${paperTextureCSS}
 
     .site-nav { height: 44px; padding: 0; }
     .site-nav .inner { width: ${mobileCanvas.width}px; }
+    .nav-slogan { display: none; }
     .site-nav .brand { font-size: 13px; }
     .site-nav .links { gap: 12px; }
     .site-nav .links a { font-size: 11px; }
