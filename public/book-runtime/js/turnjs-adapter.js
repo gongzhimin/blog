@@ -163,112 +163,54 @@
       });
     }
 
-    function mountTouch() {
+    function mountTapToTurn() {
       if (!isMobile) return;
 
-      var zoom = document.querySelector(zoomSelector);
-      if (!zoom) return;
+      var bookEl = document.querySelector(bookSelector);
+      if (!bookEl) return;
 
-      var startX = 0, startY = 0, lastX = 0, lastY = 0, startTime = 0;
-      var currentPage = 1, gesture = 'idle', baseTransform = '', baseTransition = '';
-      var resetTimer = null;
-      var SWIPE_THRESHOLD = 40;
-      var FLICK_MIN_DISTANCE = 24;
-      var VELOCITY_THRESHOLD = 0.45;
-      var DIRECTION_LOCK = 1.2;
-      var MAX_DRAG = 50;
+      var startX = 0, startY = 0, startTime = 0;
+      var TAP_MAX_MOVE = 10;
+      var TAP_MAX_TIME = 300;
 
-      function isInteractiveTarget(target) {
-        while (target && target !== zoom) {
-          if (target.id === 'slider-bar' || target.id === 'slider') return true;
+      bookEl.addEventListener('touchstart', function(e) {
+        if (e.touches.length !== 1) return;
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        startTime = Date.now();
+      }, { passive: true });
+
+      bookEl.addEventListener('touchend', function(e) {
+        var book = $(bookSelector);
+        if (!book.turn('is') || isTurning) return;
+
+        var dx = (e.changedTouches[0] ? e.changedTouches[0].clientX : startX) - startX;
+        var dy = (e.changedTouches[0] ? e.changedTouches[0].clientY : startY) - startY;
+        var moved = Math.sqrt(dx * dx + dy * dy);
+        var elapsed = Date.now() - startTime;
+
+        // Only handle taps (minimal movement, short duration) — swipes are
+        // handled by Turn.js's native touch support in single mode.
+        if (moved > TAP_MAX_MOVE || elapsed > TAP_MAX_TIME) return;
+
+        // Ignore taps on interactive elements
+        var target = e.target;
+        while (target && target !== bookEl) {
+          if (target.tagName === 'A' || target.id === 'slider-bar' || target.id === 'slider') return;
           target = target.parentNode;
         }
-        return false;
-      }
 
-      function resistedOffset(dx) {
-        var offset = dx * 0.5;
-        return Math.max(-MAX_DRAG, Math.min(MAX_DRAG, offset));
-      }
+        // Left third → previous, right two-thirds → next
+        var relX = (e.changedTouches[0] || e.touches[0] || {}).clientX || startX;
+        var rect = bookEl.getBoundingClientRect();
+        var ratio = (relX - rect.left) / rect.width;
 
-      function withBaseTransform(dx) {
-        var translate = 'translateX(' + resistedOffset(dx) + 'px)';
-        return baseTransform && baseTransform !== 'none' ? baseTransform + ' ' + translate : translate;
-      }
-
-      function resetZoom() {
-        zoom.style.transition = 'transform 180ms ease-out';
-        zoom.style.transform = baseTransform && baseTransform !== 'none' ? baseTransform : '';
-        if (resetTimer) clearTimeout(resetTimer);
-        resetTimer = setTimeout(function() {
-          zoom.style.transition = baseTransition;
-        }, 220);
-      }
-
-      zoom.addEventListener('touchstart', function(e) {
-        if (e.touches.length !== 1 || isInteractiveTarget(e.target)) return;
-        var book = $(bookSelector);
-        if (!book.turn('is')) return;
-
-        startX = lastX = e.touches[0].clientX;
-        startY = lastY = e.touches[0].clientY;
-        startTime = Date.now();
-        currentPage = book.turn('page');
-        gesture = 'pending';
-        baseTransform = zoom.style.transform || '';
-        baseTransition = zoom.style.transition || '';
-        if (resetTimer) clearTimeout(resetTimer);
-        zoom.style.transition = 'none';
-      }, { passive: false });
-
-      zoom.addEventListener('touchmove', function(e) {
-        if (gesture === 'idle' || e.touches.length !== 1) return;
-
-        lastX = e.touches[0].clientX;
-        lastY = e.touches[0].clientY;
-        var dx = lastX - startX;
-        var dy = lastY - startY;
-        var absX = Math.abs(dx);
-        var absY = Math.abs(dy);
-
-        if (gesture === 'pending' && (absX > 10 || absY > 10)) {
-          gesture = absX > absY * DIRECTION_LOCK ? 'horizontal' : 'vertical';
-        }
-
-        if (gesture !== 'horizontal') return;
-
-        e.preventDefault();
-        zoom.style.transform = withBaseTransform(dx);
-      }, { passive: false });
-
-      function finishTouch() {
-        if (gesture === 'idle') return;
-
-        var wasHorizontal = gesture === 'horizontal';
-        gesture = 'idle';
-        resetZoom();
-
-        if (!wasHorizontal || isTurning) return;
-
-        var book = $(bookSelector);
-        if (!book.turn('is')) return;
-
-        var dx = lastX - startX;
-        var elapsed = Math.max(1, Date.now() - startTime);
-        var velocity = Math.abs(dx) / elapsed;
-        var shouldTurn = Math.abs(dx) >= SWIPE_THRESHOLD ||
-          (Math.abs(dx) >= FLICK_MIN_DISTANCE && velocity >= VELOCITY_THRESHOLD);
-        if (!shouldTurn) return;
-
-        if (dx < 0 && currentPage < book.turn('pages')) {
-          book.turn('next');
-        } else if (dx > 0 && currentPage > 1) {
+        if (ratio < 0.33) {
           book.turn('previous');
+        } else if (ratio >= 0.4) {
+          book.turn('next');
         }
-      }
-
-      zoom.addEventListener('touchend', finishTouch, { passive: false });
-      zoom.addEventListener('touchcancel', finishTouch, { passive: false });
+      }, { passive: true });
     }
 
     function mountTurn() {
@@ -366,7 +308,7 @@
       mountHash();
       mountKeyboard();
       mountTurn();
-      mountTouch();
+      mountTapToTurn();
       mountTocClicks();
       return true;
     }
