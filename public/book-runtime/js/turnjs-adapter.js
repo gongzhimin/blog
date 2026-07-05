@@ -26,6 +26,7 @@
     var startPage = options.startPage;
     var turnOptions = options.turnOptions || {};
     var paperTexture = options.paperTexture || {};
+    var pageToArticle = options.pageToArticle || {};
     var isMobile = !!options.isMobile;
     var ensurePaginated = options.ensurePaginated || function () {};
     var getPageContent = options.getPageContent || function () { return ''; };
@@ -171,11 +172,11 @@
       var startX = 0, startY = 0, lastX = 0, lastY = 0, startTime = 0;
       var currentPage = 1, gesture = 'idle', baseTransform = '', baseTransition = '';
       var resetTimer = null;
-      var SWIPE_THRESHOLD = 50;
-      var FLICK_MIN_DISTANCE = 28;
+      var SWIPE_THRESHOLD = 40;
+      var FLICK_MIN_DISTANCE = 24;
       var VELOCITY_THRESHOLD = 0.45;
-      var DIRECTION_LOCK = 1.4;
-      var MAX_DRAG = 40;
+      var DIRECTION_LOCK = 1.2;
+      var MAX_DRAG = 50;
 
       function isInteractiveTarget(target) {
         while (target && target !== zoom) {
@@ -186,7 +187,7 @@
       }
 
       function resistedOffset(dx) {
-        var offset = dx * 0.36;
+        var offset = dx * 0.5;
         return Math.max(-MAX_DRAG, Math.min(MAX_DRAG, offset));
       }
 
@@ -303,6 +304,16 @@
             updateDepth(book);
             $(sliderSelector).slider('value', getViewNumber(book, page));
             book.turn('center');
+
+            // Update URL to current article
+            var key = pageToArticle[page];
+            if (key) {
+              var url = window.location.pathname + '?post=' + key;
+              if (window.location.search !== '?post=' + key) {
+                window.history.replaceState(null, '', url);
+                Hash.update();
+              }
+            }
           },
           start: function() { isTurning = true; moveBar(true); },
           end: function() {
@@ -329,6 +340,21 @@
       $(canvasSelector).css({ visibility: 'visible' });
     }
 
+    function mountTocClicks() {
+      $(zoomSelector).on('click', 'a[data-page]', function(e) {
+        var rawHref = this.getAttribute('href');
+        if (!rawHref || rawHref.indexOf('?post=') !== 0) return;
+        e.preventDefault();
+        var page = parseInt(this.getAttribute('data-page'), 10);
+        if (!page) return;
+        var book = $(bookSelector);
+        if (!book.turn('is')) return;
+        book.turn('page', page);
+        window.history.pushState(null, '', rawHref);
+        Hash.update();
+      });
+    }
+
     function mount() {
       var flipbook = $(bookSelector);
       if (flipbook.width() == 0 || flipbook.height() == 0) {
@@ -341,6 +367,7 @@
       mountKeyboard();
       mountTurn();
       mountTouch();
+      mountTocClicks();
       return true;
     }
 

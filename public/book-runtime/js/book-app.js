@@ -86,8 +86,29 @@
       ensurePaginated: runPagination,
       getPageContent: function(page) {
         return pageCache.getPageContent(page);
-      }
+      },
+      pageToArticle: pageCache.getPageToArticle()
     });
+  }
+
+  function navigateToArticle() {
+    var params = new URLSearchParams(window.location.search);
+    var postKey = params.get('post');
+    if (!postKey) return;
+    var articleToPage = pageCache.getArticleToPage();
+    var targetPage = articleToPage[postKey];
+    if (!targetPage) return;
+
+    var attempts = 0;
+    function tryNavigate() {
+      var book = $('.sj-book');
+      if (book.turn('is')) {
+        book.turn('page', targetPage);
+      } else if (attempts++ < 30) {
+        setTimeout(tryNavigate, 100);
+      }
+    }
+    tryNavigate();
   }
 
   function loadApp() {
@@ -95,7 +116,9 @@
     var adapter = createAdapter();
     if (!adapter.mount()) {
       setTimeout(loadApp, 10);
+      return;
     }
+    navigateToArticle();
   }
 
   // Resize listener — reload page when crossing the mobile breakpoint.

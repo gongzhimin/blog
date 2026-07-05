@@ -1,5 +1,9 @@
 /* plain-manuscript content typography */
 
+.sj-book .page-number {
+  font-family: Georgia, "Times New Roman", serif;
+}
+
 .sj-book .book-content {
   width: 380px;
   margin: 54px auto 0;

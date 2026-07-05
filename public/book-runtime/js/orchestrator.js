@@ -41,6 +41,8 @@
     var paginated = false;
     var tocTitle = (options && options.tocTitle) || '目录';
     var coverSprite = getCoverSprite(options);
+    var articleToPage = {};
+    var pageToArticle = {};
 
     function getPageContent(page) {
       return pageCache[page];
@@ -63,7 +65,9 @@
       if (paginated) {
         return {
           totalPages: Object.keys(pageCache).length,
-          pageCache: pageCache
+          pageCache: pageCache,
+          articleToPage: articleToPage,
+          pageToArticle: pageToArticle
         };
       }
 
@@ -95,8 +99,9 @@
       for (var a = 0; a < articles.length; a++) {
         var phys = articleStarts[a] + shift;
         var disp = phys - bodyStart + 1;
-        tocItems += '<li><a href="#page/' + phys + '">' + articles[a].title +
-          ' <span>' + disp + '</span></a></li>';
+        var key = articles[a].key || '';
+        tocItems += '<li><a href="?post=' + key + '" data-page="' + phys + '">' +
+          articles[a].title + ' <span>' + disp + '</span></a></li>';
       }
       tocHTML = '<div class="table-contents"><h1>' + tocTitle + '</h1><ul>' + tocItems +
         '</ul></div><span class="page-number">i</span>';
@@ -141,6 +146,21 @@
         oldOuter.className = oldOuter.className.replace(/p\d+/, 'p' + totalPages);
       }
 
+      // ── Build article ↔ page maps for ?post= URL navigation ──
+      articleToPage = {};
+      pageToArticle = {};
+      for (var a = 0; a < articles.length; a++) {
+        var phys = articleStarts[a] + shift;
+        var key = articles[a].key;
+        var pageCount = articleCache[a].length;
+        if (key) {
+          articleToPage[key] = phys;
+          for (var p = 0; p < pageCount; p++) {
+            pageToArticle[phys + p] = key;
+          }
+        }
+      }
+
       injectBackCoverCSS(backPage, totalPages, coverSprite);
 
       paginated = true;
@@ -149,7 +169,9 @@
         backPage: backPage,
         articleStart: articleStart,
         bodyStart: bodyStart,
-        pageCache: pageCache
+        pageCache: pageCache,
+        articleToPage: articleToPage,
+        pageToArticle: pageToArticle
       };
     }
 
@@ -158,7 +180,9 @@
       isPaginated: isPaginated,
       paginateAll: paginateAll,
       reset: reset,
-      setPageContent: setPageContent
+      setPageContent: setPageContent,
+      getArticleToPage: function () { return articleToPage; },
+      getPageToArticle: function () { return pageToArticle; }
     };
   }
 

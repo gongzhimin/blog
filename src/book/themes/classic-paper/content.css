@@ -115,6 +115,7 @@
 }
 
 .sj-book .page-number {
+  font-family: var(--font-latin-serif), serif;
   color: var(--print-page-ink);
   letter-spacing: 0.06em;
   mix-blend-mode: multiply;
