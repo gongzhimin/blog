@@ -65,7 +65,7 @@ export function buildHomepageStyles({
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0 24px;
+    padding: 0;
     border-bottom: 1px solid ${light.nav.border};
     background: rgba(232, 228, 222, 0.88);
     backdrop-filter: blur(8px);
@@ -75,7 +75,9 @@ export function buildHomepageStyles({
   .site-nav .inner {
     display: flex;
     align-items: center;
-    gap: ${nav.innerGap}px;
+    justify-content: space-between;
+    width: ${book.canvasWidth}px;
+    margin: 0 auto;
   }
 
   .site-nav .brand {
@@ -174,10 +176,16 @@ ${paperTextureCSS}
 
   .site-footer {
     text-align: center;
-    padding: ${footer.padding.top}px 24px ${footer.padding.bottom}px;
+    padding: ${footer.padding.top}px 0 ${footer.padding.bottom}px;
     color: ${light.footer.text};
     font-size: ${footer.fontSize}px;
     border-top: 1px solid ${light.footer.border};
+  }
+
+  .site-footer .footer-inner {
+    width: ${book.canvasWidth}px;
+    margin: 0 auto;
+    text-align: left;
   }
 
   .site-footer .quote {
@@ -190,6 +198,7 @@ ${paperTextureCSS}
     color: ${light.footer.copyright};
     font-size: ${footer.copyrightFontSize}px;
     margin-top: 8px;
+    text-align: center;
   }
 
   /* ── Mobile 64K single-page ─────────────────────────────── */
@@ -201,12 +210,14 @@ ${paperTextureCSS}
     #slider-bar { display: none; }
     body { overflow-x: hidden !important; }
 
-    .site-nav { height: 44px; padding: 0 12px; }
+    .site-nav { height: 44px; padding: 0; }
+    .site-nav .inner { width: ${mobileCanvas.width}px; }
     .site-nav .brand { font-size: 13px; }
     .site-nav .links { gap: 12px; }
     .site-nav .links a { font-size: 11px; }
 
-    .site-footer { max-width: ${mobileCanvas.width}px; margin: 0 auto; padding: 4px 12px 24px; font-size: 11px; }
+    .site-footer { padding: 4px 0 24px; font-size: 11px; }
+    .site-footer .footer-inner { width: ${mobileCanvas.width}px; }
     .site-footer .quote { font-size: 11px; }
     .site-footer .copyright { font-size: 10px; }
   }

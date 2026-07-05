@@ -95,9 +95,9 @@
 		},
 		"paperTexture": {
 			"enabled": true,
-			"image": "/paper-bg-2.jpg",
+			"image": "/paper-bg-3.jpg",
 			"size": "736px 1097px",
-			"opacity": 0.15,
+			"opacity": 0.3,
 			"blendMode": "normal"
 		},
 		"gap": 30,

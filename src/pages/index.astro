@@ -112,9 +112,11 @@ const quoteAuthor = quote.author || footer.content.author;
     />
 
     <footer class="site-footer">
-      <div class="quote">"{quoteEnglish}"</div>
-      <div>{quoteChinese}</div>
-      <div style="margin-top:4px;color:#888">— {quoteAuthor}</div>
+      <div class="footer-inner">
+        <div class="quote">"{quoteEnglish}"</div>
+        <div>{quoteChinese}</div>
+        <div style="margin-top:4px;color:#888">— {quoteAuthor}</div>
+      </div>
       <div class="copyright">
         &copy; {new Date().getFullYear()} · {footer.content.copyright}
       </div>
