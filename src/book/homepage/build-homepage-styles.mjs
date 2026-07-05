@@ -8,6 +8,41 @@ export function buildHomepageStyles({
   nav,
   theme,
 }) {
+  const paperTexture = book.paperTexture || {};
+  const paperTextureCSS = paperTexture.enabled
+    ? `
+  .sj-book .own-size {
+    --paper-x: 50%;
+    --paper-y: 50%;
+    position: relative;
+  }
+
+  .sj-book .own-size::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image: url("${paperTexture.image}");
+    background-repeat: no-repeat;
+    background-size: ${paperTexture.size || "auto"};
+    background-position: var(--paper-x) var(--paper-y);
+    opacity: ${paperTexture.opacity ?? 0.08};
+    mix-blend-mode: ${paperTexture.blendMode || "multiply"};
+  }
+
+  .sj-book .own-size .book-content,
+  .sj-book .own-size .table-contents {
+    position: relative;
+    z-index: 1;
+  }
+
+  .sj-book .own-size .page-number {
+    z-index: 1;
+  }
+`
+    : "";
+
   return `
   html {
     min-height: 100%;
@@ -134,6 +169,7 @@ export function buildHomepageStyles({
   }
   .sj-book .own-size.odd  { background-image: linear-gradient(to left,  #e8e5dc 95%, #cdc8bc 100%), linear-gradient(to bottom, rgba(60,55,48,0.035) 0%, transparent 10%, transparent 88%, rgba(60,55,48,0.032) 100%), radial-gradient(ellipse at 48% 36%, rgba(255,255,255,0.48) 0%, rgba(255,255,255,0.16) 38%, transparent 72%), linear-gradient(135deg, #fbfaf5 0%, #f2f1ec 48%, #e8e5dc 100%); }
   .sj-book .own-size.even { background-image: linear-gradient(to right, #e8e5dc 95%, #cdc8bc 100%), linear-gradient(to bottom, rgba(60,55,48,0.035) 0%, transparent 10%, transparent 88%, rgba(60,55,48,0.032) 100%), radial-gradient(ellipse at 48% 36%, rgba(255,255,255,0.48) 0%, rgba(255,255,255,0.16) 38%, transparent 72%), linear-gradient(135deg, #fbfaf5 0%, #f2f1ec 48%, #e8e5dc 100%); }
+${paperTextureCSS}
 
   .site-footer {
     text-align: center;

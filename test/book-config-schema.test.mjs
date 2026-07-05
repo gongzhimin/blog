@@ -19,12 +19,17 @@ test("book config schema documents the runtime-critical groups", () => {
     "backgrounds",
   ]);
   assert.match(schema.properties.book.properties.coverSprite.description, /封面精灵图/);
+  assert.match(schema.properties.book.properties.paperTexture.description, /纸张背景/);
   assert.match(schema.properties.book.properties.mobileContentPage.description, /移动端/);
   assert.match(schema.properties.book.properties.pagination.description, /分页/);
 });
 
 test("valid book config passes runtime validation", () => {
   assert.doesNotThrow(() => validateBookConfig(config));
+  assert.equal(config.book.paperTexture.enabled, true);
+  assert.equal(config.book.paperTexture.image, "/paper-bg-2.jpg");
+  assert.equal(config.book.paperTexture.opacity, 1);
+  assert.equal(config.book.paperTexture.blendMode, "normal");
 });
 
 test("book config validation reports precise paths", () => {

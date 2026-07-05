@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { access, readFile } from "node:fs/promises";
 import { constants } from "node:fs";
+import vm from "node:vm";
 
 async function exists(path) {
   try {
@@ -96,4 +97,61 @@ test("Turn.js adapter owns mobile touch swipe handling outside vendor", async ()
   assert.match(source, /book\.turn\('next'\)/);
   assert.match(source, /book\.turn\('previous'\)/);
   assert.match(source, /mountTouch\(\)/);
+});
+
+test("Turn.js adapter assigns deterministic paper texture crops to dynamic pages", async () => {
+  const source = await readFile(
+    new URL("../public/book-runtime/js/turnjs-adapter.js", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(source, /function paperCropForPage\(page\)/);
+  assert.match(source, /paperTexture\.enabled/);
+  assert.match(source, /style\.setProperty\('--paper-x', crop\.x \+ '%'\)/);
+  assert.match(source, /style\.setProperty\('--paper-y', crop\.y \+ '%'\)/);
+});
+
+test("Turn.js adapter exposes unique paper texture crops for every configured page", async () => {
+  const source = await readFile(
+    new URL("../public/book-runtime/js/turnjs-adapter.js", import.meta.url),
+    "utf8",
+  );
+  const context = {
+    window: {},
+    navigator: { userAgent: "" },
+  };
+
+  vm.runInNewContext(source, context);
+
+  const cropForPage = context.window.BookRuntime.TurnAdapter.paperCropForPage;
+  assert.equal(typeof cropForPage, "function");
+
+  const dynamicPageSample = 260;
+  const crops = new Set(
+    Array.from({ length: dynamicPageSample }, (_, index) => {
+      const crop = cropForPage(index + 1);
+      return `${crop.x},${crop.y}`;
+    }),
+  );
+
+  assert.equal(crops.size, dynamicPageSample);
+});
+
+test("Turn.js adapter does not assume a fixed physical page count", async () => {
+  const source = await readFile(
+    new URL("../public/book-runtime/js/turnjs-adapter.js", import.meta.url),
+    "utf8",
+  );
+
+  assert.doesNotMatch(source, /pages\s*\/\s*112/);
+});
+
+test("Turn.js adapter applies paper texture crops to initial own-size placeholders", async () => {
+  const source = await readFile(
+    new URL("../public/book-runtime/js/turnjs-adapter.js", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(source, /function applyInitialPaperCrops\(book\)/);
+  assert.match(source, /applyInitialPaperCrops\(flipbook\)/);
 });

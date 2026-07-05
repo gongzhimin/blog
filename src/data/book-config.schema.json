@@ -29,7 +29,7 @@
     },
     "book": {
       "type": "object",
-      "description": "书本几何尺寸、Turn.js 参数、封面精灵图和分页配置。",
+      "description": "书本几何尺寸、Turn.js 参数、封面精灵图、纸张背景图集和分页配置。",
       "required": [
         "canvasWidth",
         "width",
@@ -80,8 +80,15 @@
         },
         "turn": {
           "type": "object",
-          "description": "Turn.js 初始化参数。",
-          "required": ["elevation", "duration", "totalPages", "startPage"]
+          "description": "Turn.js 初始化参数。totalPages 是启动估算值，浏览器端分页完成后会按实际内容页数动态覆盖。",
+          "required": ["elevation", "duration", "totalPages", "startPage"],
+          "properties": {
+            "totalPages": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "description": "启动时用于创建 Turn.js 的估算页数；运行时会由分页结果替换，不代表固定总页数。"
+            }
+          }
         },
         "coverSprite": {
           "type": "object",
@@ -106,6 +113,35 @@
                 "back",
                 "backOuter"
               ]
+            }
+          }
+        },
+        "paperTexture": {
+          "type": "object",
+          "description": "纸张背景图集配置。启用后，每个正文页会从同一张大背景图中确定性裁剪不同位置，避免所有页面纸纹完全重复。",
+          "required": ["enabled", "image"],
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "是否启用纸张背景图集。"
+            },
+            "image": {
+              "type": "string",
+              "description": "纸张背景图 URL，通常放在 public 目录并以 / 开头引用。"
+            },
+            "size": {
+              "type": "string",
+              "description": "CSS background-size 值，用于控制图集在书页上的裁剪尺度。"
+            },
+            "opacity": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "纸纹叠加透明度。"
+            },
+            "blendMode": {
+              "type": "string",
+              "description": "CSS mix-blend-mode 值，用于控制纸纹与原纸色的混合方式。"
             }
           }
         },

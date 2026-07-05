@@ -226,3 +226,39 @@ test("mobile touch swipe turns pages without hijacking vertical scroll", async (
   await page.waitForTimeout(250);
   expect(await readCurrentTurnPage(page)).toBe(afterHorizontalSwipe);
 });
+
+test("paper texture crops are assigned per rendered page", async ({ page }) => {
+  await page.setViewportSize({ width: 1200, height: 820 });
+  await page.goto("/", { waitUntil: "domcontentloaded" });
+  await expect(page.locator(".sj-book")).toBeVisible();
+
+  await page.evaluate(async () => {
+    const book = window.jQuery(document.querySelector(".sj-book"));
+    book.turn("options", { duration: 0 });
+    for (const pageNumber of [5, 7, 9, 11, 13]) {
+      book.turn("page", pageNumber);
+      await new Promise((resolve) => setTimeout(resolve, 80));
+    }
+  });
+
+  const crops = await page.evaluate(() =>
+    [...document.querySelectorAll(".sj-book .own-size")]
+      .map((node) => {
+        const style = getComputedStyle(node);
+        return {
+          className: node.className,
+          x: style.getPropertyValue("--paper-x").trim(),
+          y: style.getPropertyValue("--paper-y").trim(),
+        };
+      })
+      .filter((crop) => crop.x && crop.y),
+  );
+
+  expect(crops.length).toBeGreaterThanOrEqual(6);
+  expect(new Set(crops.map((crop) => `${crop.x},${crop.y}`)).size).toBe(
+    crops.length,
+  );
+  expect(crops.some((crop) => crop.x === "50%" && crop.y === "50%")).toBe(
+    false,
+  );
+});

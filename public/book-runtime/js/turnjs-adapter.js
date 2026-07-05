@@ -2,6 +2,19 @@
  * turnjs-adapter.js — isolates Turn.js and jQuery UI wiring from book-app.
  */
 (function () {
+  function paperHash(page, salt) {
+    var value = Math.sin(page * (12.9898 + salt) + salt * 78.233) * 43758.5453123;
+    return value - Math.floor(value);
+  }
+
+  function paperCropForPage(page) {
+    var safePage = Math.max(1, parseInt(page, 10) || 1);
+    return {
+      x: Math.round((5 + paperHash(safePage, 1) * 90) * 100) / 100,
+      y: Math.round((5 + paperHash(safePage, 2) * 90) * 100) / 100
+    };
+  }
+
   function createTurnJsAdapter(options) {
     var bookSelector = options.bookSelector || '.sj-book';
     var zoomSelector = options.zoomSelector || '#book-zoom';
@@ -12,15 +25,47 @@
     var backPage = options.backPage || totalPages - 1;
     var startPage = options.startPage;
     var turnOptions = options.turnOptions || {};
+    var paperTexture = options.paperTexture || {};
     var isMobile = !!options.isMobile;
     var ensurePaginated = options.ensurePaginated || function () {};
     var getPageContent = options.getPageContent || function () { return ''; };
     var isTurning = false;
 
+    function applyPaperCrop(element, page) {
+      if (!paperTexture.enabled || !element || !element.length) return;
+
+      var crop = paperCropForPage(page);
+      var node = element[0];
+      if (!node || !node.style) return;
+
+      node.style.setProperty('--paper-x', crop.x + '%');
+      node.style.setProperty('--paper-y', crop.y + '%');
+    }
+
+    function pageNumberFromClass(element) {
+      var classes = (element.attr('class') || '').split(/\s+/);
+      for (var i = 0; i < classes.length; i++) {
+        if (/^p[0-9]+$/.test(classes[i])) {
+          return parseInt(classes[i].slice(1), 10);
+        }
+      }
+      return null;
+    }
+
+    function applyInitialPaperCrops(book) {
+      if (!paperTexture.enabled) return;
+
+      book.find('.own-size').each(function(index) {
+        var element = $(this);
+        var page = pageNumberFromClass(element) || index + 3;
+        applyPaperCrop(element, page);
+      });
+    }
+
     function updateDepth(book, newPage) {
       var page = book.turn('page'),
         pages = book.turn('pages'),
-        maxDepth = 16 * Math.min(1, pages / 112),
+        maxDepth = 16,
         depthWidth = maxDepth * Math.min(1, page * 2 / pages);
       newPage = newPage || page;
       if (newPage > 3)
@@ -39,10 +84,12 @@
         ensurePaginated();
         var content = getPageContent(page) ||
           ('<div class="book-content"><p>&nbsp;</p></div><span class="page-number">' + page + '</span>');
+        var pageCss = { width: contentPage.width, height: contentPage.height };
         var element = $('<div />', {
           'class': 'own-size p' + page,
-          css: { width: contentPage.width, height: contentPage.height }
+          css: pageCss
         }).html(content);
+        applyPaperCrop(element, page);
         book.turn('addPage', element, page);
       }
     }
@@ -276,6 +323,7 @@
       }
 
       $(sliderSelector).slider('option', 'max', numberOfViews(flipbook));
+      applyInitialPaperCrops(flipbook);
       Hash.check().update();
       flipbook.addClass('animated');
       $(canvasSelector).css({ visibility: 'visible' });
@@ -304,7 +352,8 @@
 
   window.BookRuntime = window.BookRuntime || {};
   window.BookRuntime.TurnAdapter = {
-    create: createTurnJsAdapter
+    create: createTurnJsAdapter,
+    paperCropForPage: paperCropForPage
   };
   window.BookTurnAdapter = window.BookRuntime.TurnAdapter;
 })();

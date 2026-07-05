@@ -81,6 +81,7 @@
       backPage: BACK_PAGE,
       startPage: START_PAGE,
       turnOptions: TURN_OPTIONS,
+      paperTexture: BOOK_CONFIG.book.paperTexture,
       isMobile: isMobile,
       ensurePaginated: runPagination,
       getPageContent: function(page) {

@@ -93,6 +93,13 @@
 				"backOuter": "-1452px 0"
 			}
 		},
+		"paperTexture": {
+			"enabled": true,
+			"image": "/paper-bg-2.jpg",
+			"size": "736px 1097px",
+			"opacity": 0.2,
+			"blendMode": "normal"
+		},
 		"gap": 30,
 		"pagination": {
 			"contentWidth": 380,

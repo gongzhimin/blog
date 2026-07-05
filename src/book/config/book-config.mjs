@@ -82,5 +82,33 @@ export function validateBookConfig(config) {
     throw new Error("book.coverSprite.image must be a non-empty string");
   }
 
+  const paperTexture = config.book.paperTexture;
+  if (paperTexture?.enabled) {
+    if (typeof paperTexture.image !== "string" || !paperTexture.image) {
+      throw new Error("book.paperTexture.image must be a non-empty string");
+    }
+    if (
+      paperTexture.size !== undefined &&
+      (typeof paperTexture.size !== "string" || !paperTexture.size)
+    ) {
+      throw new Error("book.paperTexture.size must be a non-empty string");
+    }
+    if (
+      paperTexture.opacity !== undefined &&
+      (typeof paperTexture.opacity !== "number" ||
+        !Number.isFinite(paperTexture.opacity) ||
+        paperTexture.opacity < 0 ||
+        paperTexture.opacity > 1)
+    ) {
+      throw new Error("book.paperTexture.opacity must be a number between 0 and 1");
+    }
+    if (
+      paperTexture.blendMode !== undefined &&
+      (typeof paperTexture.blendMode !== "string" || !paperTexture.blendMode)
+    ) {
+      throw new Error("book.paperTexture.blendMode must be a non-empty string");
+    }
+  }
+
   return config;
 }

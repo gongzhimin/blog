@@ -126,6 +126,22 @@ test("homepage carries mobile toc styles in the themed visual css", async () => 
   assert.match(styles, /width: 280px/);
 });
 
+test("homepage applies the configured paper texture atlas to book pages", async () => {
+  const document = await loadHomepage();
+  const config = await loadBookConfig();
+  const styles = [...document.querySelectorAll("style")]
+    .map((node) => node.textContent)
+    .join("\n");
+
+  assert.equal(config.book.paperTexture.image, "/paper-bg-2.jpg");
+  assert.match(styles, /--paper-x: 50%/);
+  assert.match(styles, /--paper-y: 50%/);
+  assert.match(styles, /\.sj-book \.own-size::before/);
+  assert.match(styles, /url\("\/paper-bg-2\.jpg"\)/);
+  assert.match(styles, /opacity: 1/);
+  assert.match(styles, /mix-blend-mode: normal/);
+});
+
 test("homepage provides content for the opening spread via book-data", async () => {
   const document = await loadHomepage();
   const { config, articles } = readBookData(document);
