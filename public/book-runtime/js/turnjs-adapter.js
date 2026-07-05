@@ -245,6 +245,7 @@
             if (page == 2 || page == 3) { book.turn('peel', 'br'); }
             updateDepth(book);
             $(sliderSelector).slider('value', getViewNumber(book, page));
+            book.turn('center');
 
             // Update URL to current article
             var key = pageToArticle[page];

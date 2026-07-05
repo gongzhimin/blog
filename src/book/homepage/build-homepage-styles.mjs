@@ -121,6 +121,10 @@ export function buildHomepageStyles({
     padding: ${book.gap}px 0 !important;
   }
 
+  .sj-book.animated {
+    transition: margin-left 0.05s ease-out;
+  }
+
   .sj-book {
     width: ${book.width}px !important;
     height: ${book.height}px !important;
