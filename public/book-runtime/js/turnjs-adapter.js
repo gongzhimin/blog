@@ -219,7 +219,7 @@
         display: isMobile ? 'single' : 'double',
         elevation: turnOptions.elevation,
         acceleration: !isChrome(),
-        autoCenter: false,
+        autoCenter: true,
         gradients: true,
         duration: turnOptions.duration,
         pages: totalPages,
@@ -245,7 +245,6 @@
             if (page == 2 || page == 3) { book.turn('peel', 'br'); }
             updateDepth(book);
             $(sliderSelector).slider('value', getViewNumber(book, page));
-            book.turn('center');
 
             // Update URL to current article
             var key = pageToArticle[page];
