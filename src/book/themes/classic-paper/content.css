@@ -14,40 +14,40 @@
 
 :root {
   /* ── Colors ───────────────────────────────────────────────── */
-  --text-color: rgba(45, 42, 37, 0.88);
+  --text-color: var(--t-text-book);
   --text-muted: rgba(45, 42, 37, 0.58);
-  --text-heading: rgba(30, 28, 24, 0.92);
-  --text-h2: rgba(40, 36, 30, 0.88);
-  --text-h3: rgba(45, 42, 37, 0.82);
-  --link-color: #8b7355;
-  --link-border: #c9b99a;
+  --text-heading: var(--t-text-book-heading);
+  --text-h2: var(--t-text-book-h2);
+  --text-h3: var(--t-text-book-h3);
+  --link-color: var(--t-accent);
+  --link-border: var(--t-link-border);
 
   /* ── Code ─────────────────────────────────────────────────── */
-  --code-bg: rgba(72,70,62,0.045);
-  --code-line: rgba(70,68,60,0.22);
-  --code-text: rgba(48,46,42,0.92);
-  --inline-code-text: rgba(42,40,36,0.92);
-  --inline-code-bg: rgba(72,70,62,0.055);
+  --code-bg: var(--t-code-inline-bg);
+  --code-line: var(--t-code-line);
+  --code-text: var(--t-code-text);
+  --inline-code-text: var(--t-code-inline-text);
+  --inline-code-bg: var(--t-code-inline-bg);
 
   /* ── Blockquote ────────────────────────────────────────────── */
-  --blockquote-border: #c9b99a;
+  --blockquote-border: var(--t-link-border);
 
   /* ── Horizontal rule ───────────────────────────────────────── */
-  --hr-color: #ddd;
+  --hr-color: var(--t-hr);
 
   /* ── Fonts ─────────────────────────────────────────────────── */
-  --font-latin-serif: 'Stempel-Garamond-W01-Roman', Georgia, "Times New Roman";
-  --font-cjk-serif: "Chiron Sung HK", "Noto Serif SC", "Songti SC", "STSong", "SimSun";
-  --font-serif: var(--font-latin-serif), var(--font-cjk-serif), serif;
+  --font-latin-serif: var(--t-font-latin-serif);
+  --font-cjk-serif: var(--t-font-cjk-serif);
+  --font-serif: var(--t-font-serif);
 
-  --font-latin-sans: "Helvetica Neue", Helvetica, Arial;
-  --font-cjk-sans: "PingFang SC", "Microsoft YaHei", "Heiti SC";
-  --font-sans: var(--font-latin-sans), var(--font-cjk-sans), sans-serif;
+  --font-latin-sans: var(--t-font-latin-sans);
+  --font-cjk-sans: var(--t-font-cjk-sans);
+  --font-sans: var(--t-font-sans);
 
   --font-cjk-fangsong: "STFangsong", "FangSong", "FangSong_GB2312", var(--font-cjk-serif);
-  --font-cjk-kai: "Kaiti SC", "STKaiti", "KaiTi", var(--font-cjk-serif);
+  --font-cjk-kai: var(--t-font-kai);
 
-  --font-mono: "SFMono-Regular", Consolas, monospace;
+  --font-mono: var(--t-font-mono);
 
   /* ── Sizes ─────────────────────────────────────────────────── */
   --font-size-body: 13px;
@@ -69,7 +69,7 @@
   --spacing-text-indent: 2em;
 
   /* ── Table ─────────────────────────────────────────────────── */
-  --table-border: #999;
+  --table-border: var(--t-table-border);
 }
 
 

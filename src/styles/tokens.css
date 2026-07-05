@@ -1,0 +1,106 @@
+/* ═══════════════════════════════════════════════════════════════════
+   Design Tokens — single source of truth for colors, fonts.
+   Used by both flipbook themes and traditional blog CSS.
+
+   Hex values for direct use:   var(--t-xxx)
+   RGB tuples for rgb()/rgba(): var(--t-xxx-rgb)
+   ═══════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── Backgrounds ─────────────────────────────────────────────── */
+  --t-bg: #faf6f0;
+  --t-bg-rgb: 250, 246, 240;
+  --t-bg-alt: #f5efe8;
+  --t-bg-alt-rgb: 245, 239, 232;
+  --t-paper: #fcf9f4;
+  --t-paper-rgb: 252, 249, 244;
+
+  /* ── Text ────────────────────────────────────────────────────── */
+  --t-text: #2d2a25;
+  --t-text-rgb: 45, 42, 37;
+  --t-text-heading: #1e1c18;
+  --t-text-heading-rgb: 30, 28, 24;
+  --t-text-secondary: #504b46;
+  --t-text-secondary-rgb: 80, 75, 70;
+  --t-text-muted: #786753;
+  --t-text-muted-rgb: 120, 103, 83;
+  --t-text-book: rgba(45, 42, 37, 0.88);
+  --t-text-book-heading: rgba(30, 28, 24, 0.92);
+  --t-text-book-h2: rgba(40, 36, 30, 0.88);
+  --t-text-book-h3: rgba(45, 42, 37, 0.82);
+
+  /* ── Accent / Links ──────────────────────────────────────────── */
+  --t-accent: #8b7355;
+  --t-accent-rgb: 139, 115, 85;
+  --t-link-border: #c9b99a;
+
+  /* ── Borders / Dividers ──────────────────────────────────────── */
+  --t-border: #d6cdc2;
+  --t-border-rgb: 214, 205, 194;
+  --t-hr: #ddd;
+
+  /* ── Code ────────────────────────────────────────────────────── */
+  --t-code-bg: #f0eae1;
+  --t-code-bg-rgb: 240, 234, 225;
+  --t-code-line: rgba(70, 68, 60, 0.22);
+  --t-code-text: rgba(48, 46, 42, 0.92);
+  --t-code-inline-text: rgba(42, 40, 36, 0.92);
+  --t-code-inline-bg: rgba(72, 70, 62, 0.055);
+
+  /* ── Table ───────────────────────────────────────────────────── */
+  --t-table-border: #999;
+
+  /* ── Font stacks ─────────────────────────────────────────────── */
+  --t-font-latin-serif: Georgia, "Times New Roman";
+  --t-font-cjk-serif: "Chiron Sung HK", "Noto Serif SC", "Songti SC", "STSong", "SimSun";
+  --t-font-serif: var(--t-font-latin-serif), var(--t-font-cjk-serif), serif;
+
+  --t-font-latin-sans: "Helvetica Neue", Helvetica, Arial;
+  --t-font-cjk-sans: "PingFang SC", "Microsoft YaHei", "Heiti SC";
+  --t-font-sans: var(--t-font-latin-sans), var(--t-font-cjk-sans), sans-serif;
+
+  --t-font-kai: "Kaiti SC", "STKaiti", "KaiTi", var(--t-font-cjk-serif);
+  --t-font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+}
+
+/* ── Dark theme ──────────────────────────────────────────────────── */
+html[data-theme="dark"] {
+  --t-bg: #1f1f1d;
+  --t-bg-rgb: 31, 31, 29;
+  --t-bg-alt: #262522;
+  --t-bg-alt-rgb: 38, 37, 34;
+  --t-paper: #2c2a26;
+  --t-paper-rgb: 44, 42, 38;
+
+  --t-text: #ebe7df;
+  --t-text-rgb: 235, 231, 223;
+  --t-text-heading: #d5d0c7;
+  --t-text-heading-rgb: 213, 208, 199;
+  --t-text-secondary: #beb8ae;
+  --t-text-secondary-rgb: 190, 184, 174;
+  --t-text-muted: #978f84;
+  --t-text-muted-rgb: 151, 143, 132;
+  --t-text-book: rgba(235, 231, 223, 0.88);
+  --t-text-book-heading: rgba(213, 208, 199, 0.92);
+  --t-text-book-h2: rgba(190, 184, 174, 0.88);
+  --t-text-book-h3: rgba(235, 231, 223, 0.82);
+
+  --t-accent: #c29a70;
+  --t-accent-rgb: 194, 154, 112;
+  --t-link-border: #6b5d4f;
+
+  --t-border: #524e47;
+  --t-border-rgb: 82, 78, 71;
+  --t-hr: #444;
+
+  --t-code-bg: #312f2b;
+  --t-code-bg-rgb: 49, 47, 43;
+  --t-code-line: rgba(140, 136, 128, 0.22);
+  --t-code-text: rgba(220, 215, 208, 0.92);
+  --t-code-inline-text: rgba(225, 220, 213, 0.92);
+  --t-code-inline-bg: rgba(140, 136, 128, 0.12);
+
+  --t-table-border: #666;
+
+  color-scheme: dark;
+}

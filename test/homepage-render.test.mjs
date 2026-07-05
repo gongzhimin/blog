@@ -56,10 +56,16 @@ test("homepage renders the configured turnjs book shell", async () => {
       text: node.textContent.trim(),
       href: node.getAttribute("href"),
     })),
-    config.nav.links.items.map((item) => ({
-      text: item.label,
-      href: item.href,
-    })),
+    [
+      ...config.nav.links.items.map((item) => ({
+        text: item.label,
+        href: item.href,
+      })),
+      {
+        text: "传统视图",
+        href: "/classic",
+      },
+    ],
   );
   assert.ok(document.querySelector("#canvas"));
   assert.ok(document.querySelector("#book-zoom"));

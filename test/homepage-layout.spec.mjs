@@ -48,6 +48,81 @@ async function readBookState(page) {
   });
 }
 
+async function readCurrentTurnPage(page) {
+  return page.evaluate(() => {
+    const book = document.querySelector(".sj-book");
+    const flipbook = window.jQuery ? window.jQuery(book) : null;
+    return flipbook && flipbook.turn("is") ? flipbook.turn("page") : null;
+  });
+}
+
+async function dispatchTouchSwipe(page, selector, points) {
+  await page.evaluate(
+    ({ selector, points }) => {
+      const target = document.querySelector(selector);
+      if (!target) throw new Error(`Missing touch target: ${selector}`);
+
+      function createTouch(point) {
+        if (typeof Touch === "function") {
+          return new Touch({
+            identifier: 1,
+            target,
+            clientX: point.x,
+            clientY: point.y,
+            screenX: point.x,
+            screenY: point.y,
+            pageX: point.x,
+            pageY: point.y,
+          });
+        }
+
+        return {
+          identifier: 1,
+          target,
+          clientX: point.x,
+          clientY: point.y,
+          screenX: point.x,
+          screenY: point.y,
+          pageX: point.x,
+          pageY: point.y,
+        };
+      }
+
+      function dispatch(type, point, active) {
+        const touch = createTouch(point);
+        const touchList = active ? [touch] : [];
+        const changedTouches = [touch];
+        const event =
+          typeof TouchEvent === "function"
+            ? new TouchEvent(type, {
+                bubbles: true,
+                cancelable: true,
+                touches: touchList,
+                targetTouches: touchList,
+                changedTouches,
+              })
+            : new Event(type, { bubbles: true, cancelable: true });
+
+        if (typeof TouchEvent !== "function") {
+          Object.defineProperty(event, "touches", { value: touchList });
+          Object.defineProperty(event, "targetTouches", { value: touchList });
+          Object.defineProperty(event, "changedTouches", {
+            value: changedTouches,
+          });
+        }
+        target.dispatchEvent(event);
+      }
+
+      dispatch("touchstart", points[0], true);
+      for (const point of points.slice(1, -1)) {
+        dispatch("touchmove", point, true);
+      }
+      dispatch("touchend", points.at(-1), false);
+    },
+    { selector, points },
+  );
+}
+
 test("homepage initializes the configured turnjs book", async ({ page }) => {
   await page.setViewportSize({ width: 1200, height: 820 });
   await page.goto("/");
@@ -83,10 +158,14 @@ test("navigation and footer stay configured around the book", async ({
   await page.goto("/");
 
   await expect(page.locator(".site-nav .brand")).toHaveText("ZHIMIN");
-  await expect(page.locator(".site-nav .links a")).toHaveCount(4);
+  await expect(page.locator(".site-nav .links a")).toHaveCount(5);
   await expect(page.locator(".site-nav .links a").nth(0)).toHaveAttribute(
     "href",
     "/life",
+  );
+  await expect(page.locator(".site-nav .links a").nth(4)).toHaveAttribute(
+    "href",
+    "/classic",
   );
   await expect(page.locator(".site-footer .quote")).toBeVisible();
   await expect(page.locator(".site-footer .copyright")).toContainText(
@@ -111,10 +190,39 @@ test("narrow viewport keeps the book usable without horizontal overflow", async 
   expect(state.scrollWidth).toBe(state.innerWidth);
   expect(state.scrollHeight).toBeGreaterThanOrEqual(state.innerHeight);
   expect(state.book.width).toBe(370);
-  await expect(page.locator(".site-nav .links a")).toHaveCount(4);
+  await expect(page.locator(".site-nav .links a")).toHaveCount(5);
 
   await page.screenshot({
     path: "test-results/homepage-turnjs-mobile.png",
     fullPage: true,
   });
+});
+
+test("mobile touch swipe turns pages without hijacking vertical scroll", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+  await expect(page.locator(".sj-book")).toBeVisible();
+
+  const initialPage = await readCurrentTurnPage(page);
+  await dispatchTouchSwipe(page, "#book-zoom", [
+    { x: 320, y: 360 },
+    { x: 245, y: 362 },
+    { x: 170, y: 364 },
+  ]);
+
+  await expect
+    .poll(() => readCurrentTurnPage(page))
+    .toBe(initialPage + 1);
+
+  const afterHorizontalSwipe = await readCurrentTurnPage(page);
+  await dispatchTouchSwipe(page, "#book-zoom", [
+    { x: 200, y: 260 },
+    { x: 205, y: 360 },
+    { x: 207, y: 470 },
+  ]);
+
+  await page.waitForTimeout(250);
+  expect(await readCurrentTurnPage(page)).toBe(afterHorizontalSwipe);
 });

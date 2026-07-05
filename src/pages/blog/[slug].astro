@@ -1,6 +1,7 @@
 ---
-import { getCollection, render } from 'astro:content';
+import { getCollection } from 'astro:content';
 import PostLayout from '../../layouts/PostLayout.astro';
+import { renderMarkdown, stripLeadingTitle } from '../../book/renderers/markdown-renderer.mjs';
 
 export async function getStaticPaths() {
   const posts = (await getCollection('blog')).filter(p => !p.data.draft);
@@ -11,9 +12,10 @@ export async function getStaticPaths() {
 }
 
 const { post } = Astro.props;
-const { Content } = await render(post);
+const body = post.body || '';
+const html = renderMarkdown(stripLeadingTitle(body, post.data.title));
 ---
 
 <PostLayout {...post.data} collection="blog">
-  <Content />
+  <Fragment set:html={html} />
 </PostLayout>

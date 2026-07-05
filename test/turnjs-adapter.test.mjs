@@ -81,3 +81,19 @@ test("runtime page cache is instantiated instead of read as loose globals", asyn
   assert.doesNotMatch(app, /if \(_paginated\)/);
   assert.doesNotMatch(app, /_pageCache\[page\]/);
 });
+
+test("Turn.js adapter owns mobile touch swipe handling outside vendor", async () => {
+  const source = await readFile(
+    new URL("../public/book-runtime/js/turnjs-adapter.js", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(source, /function mountTouch/);
+  assert.match(source, /if \(!isMobile\) return/);
+  assert.match(source, /touchstart/);
+  assert.match(source, /touchmove/);
+  assert.match(source, /touchend/);
+  assert.match(source, /book\.turn\('next'\)/);
+  assert.match(source, /book\.turn\('previous'\)/);
+  assert.match(source, /mountTouch\(\)/);
+});

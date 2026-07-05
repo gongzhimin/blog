@@ -1,0 +1,116 @@
+---
+import '../styles/global.css';
+import { getCollection } from 'astro:content';
+import homepageConfig from '../data/homepage-config.json';
+import {
+  buildHomepageCssVariables,
+  validateHomepageConfig,
+} from '../lib/homepage-config.mjs';
+
+const lifePosts = (await getCollection('life')).filter(p => !p.data.draft);
+const blogPosts = (await getCollection('blog')).filter(p => !p.data.draft);
+validateHomepageConfig(homepageConfig);
+const homepageStyle = buildHomepageCssVariables(homepageConfig);
+
+function getDate(post) {
+  return post.data.pubDatetime ?? post.data.date;
+}
+
+function fmtDate(date) {
+  return date.toLocaleDateString('en-US', {
+    month: 'short', day: 'numeric', year: 'numeric',
+  });
+}
+
+const recentPosts = [...lifePosts, ...blogPosts]
+  .map(p => ({ post: p, date: getDate(p) }))
+  .sort((a, b) => b.date.valueOf() - a.date.valueOf())
+  .slice(0, 10);
+---
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Zhimin</title>
+    <meta name="description" content="文字留住瞬间。技术笔记与生活随笔。" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="alternate" type="application/rss+xml" title="RSS Feed" href="/rss.xml" />
+    <style is:inline set:html={`
+      .home-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        font-family: var(--font-sans);
+        font-size: 0.8rem;
+        color: rgb(var(--color-text-muted));
+        text-decoration: none;
+        background: none;
+        padding: 0.3rem 0.6rem;
+        border: 1px solid rgba(var(--color-border), 0.7);
+        border-radius: 0.4rem;
+        transition: border-color 0.2s, color 0.2s;
+      }
+      .home-toggle:hover {
+        color: rgb(var(--color-text-primary));
+        border-color: rgb(var(--color-text-muted));
+        background-size: 0% 1px;
+      }
+    `}></style>
+  </head>
+  <body style={homepageStyle}>
+    <main class="site-shell">
+      <header class="site-topbar">
+        <a href="/" class="site-brand">
+          <span class="site-brand__name">{homepageConfig.navigation.content.siteName}</span>
+        </a>
+        <nav style="display:flex;align-items:center;gap:1rem">
+          <a href="/life" class="archive-link" style="margin-top:0">Essays</a>
+          <a href="/blog" class="archive-link" style="margin-top:0">Technical</a>
+          <a href="/about" class="archive-link" style="margin-top:0">About</a>
+          <a href="/rss.xml" class="archive-link" style="margin-top:0">RSS</a>
+          <a href="/" class="home-toggle">翻页书</a>
+        </nav>
+      </header>
+
+      <section class="site-intro">
+        <h1>{homepageConfig.navigation.content.title}</h1>
+      </section>
+
+      <div class="home-grid">
+        <section class="home-column" data-section="life">
+          <h2 class="section-title">Recent essays</h2>
+          <div class="story-list">
+            {recentPosts.filter(e => e.post.collection === 'life').slice(0, 5).map(entry => (
+              <article class="story-list__item">
+                <a href={`/life/${entry.post.id}`} class="story-list__title">
+                  {entry.post.data.title}
+                </a>
+              </article>
+            ))}
+          </div>
+          <a href="/life" class="archive-link">All essays →</a>
+        </section>
+
+        <section class="home-column" data-section="technical">
+          <h2 class="section-title">Recent technical notes</h2>
+          <div class="story-list">
+            {recentPosts.filter(e => e.post.collection === 'blog').slice(0, 5).map(entry => (
+              <article class="story-list__item">
+                <a href={`/blog/${entry.post.id}`} class="story-list__title">
+                  {entry.post.data.title}
+                </a>
+              </article>
+            ))}
+          </div>
+          <a href="/blog" class="archive-link">All technical notes →</a>
+        </section>
+      </div>
+
+      <footer class="site-footer">
+        <span>&copy; {new Date().getFullYear()} &middot; {homepageConfig.footer.content.copyrightLabel}</span>
+      </footer>
+    </main>
+  </body>
+</html>

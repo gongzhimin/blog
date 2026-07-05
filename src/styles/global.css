@@ -1,34 +1,34 @@
 @import "tailwindcss";
+@import "./tokens.css";
 
 :root,
 html[data-theme="light"] {
-  --color-bg: 250, 246, 240;
-  --color-bg-alt: 245, 239, 232;
-  --color-paper: 252, 249, 244;
-  --color-text-primary: 42, 42, 42;
-  --color-text-secondary: 80, 75, 70;
-  --color-text-muted: 120, 103, 83;
-  --color-border: 214, 205, 194;
-  --color-accent: 167, 129, 92;
-  --color-code-bg: 240, 234, 225;
-  --font-serif: "Georgia", "Times New Roman", serif;
-  --font-sans: "Helvetica Neue", Arial, sans-serif;
+  --color-bg: var(--t-bg-rgb);
+  --color-bg-alt: var(--t-bg-alt-rgb);
+  --color-paper: var(--t-paper-rgb);
+  --color-text-primary: var(--t-text-rgb);
+  --color-text-secondary: var(--t-text-secondary-rgb);
+  --color-text-muted: var(--t-text-muted-rgb);
+  --color-border: var(--t-border-rgb);
+  --color-accent: var(--t-accent-rgb);
+  --color-code-bg: var(--t-code-bg-rgb);
+  --font-serif: var(--t-font-serif);
+  --font-sans: var(--t-font-sans);
   --page-width: 72rem;
   --content-width: 42rem;
   --compact-width: 38rem;
 }
 
 html[data-theme="dark"] {
-  --color-bg: 31, 31, 29;
-  --color-bg-alt: 38, 37, 34;
-  --color-paper: 44, 42, 38;
-  --color-text-primary: 235, 231, 223;
-  --color-text-secondary: 190, 184, 174;
-  --color-text-muted: 151, 143, 132;
-  --color-border: 82, 78, 71;
-  --color-accent: 194, 154, 112;
-  --color-code-bg: 49, 47, 43;
-  color-scheme: dark;
+  --color-bg: var(--t-bg-rgb);
+  --color-bg-alt: var(--t-bg-alt-rgb);
+  --color-paper: var(--t-paper-rgb);
+  --color-text-primary: var(--t-text-rgb);
+  --color-text-secondary: var(--t-text-secondary-rgb);
+  --color-text-muted: var(--t-text-muted-rgb);
+  --color-border: var(--t-border-rgb);
+  --color-accent: var(--t-accent-rgb);
+  --color-code-bg: var(--t-code-bg-rgb);
 }
 
 html {

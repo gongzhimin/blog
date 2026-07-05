@@ -10,6 +10,7 @@ import { createJsonBookDocument } from '../../book/sources/json-book-source.mjs'
 import { loadBundledBookTheme } from '../../book/themes/bundled-theme.mjs';
 import BookShell from '../../book/components/BookShell.astro';
 import BookRuntimeAssets from '../../book/components/BookRuntimeAssets.astro';
+import tokensCSS from '../../styles/tokens.css?raw';
 
 const katexCSS = readFileSync('node_modules/katex/dist/katex.min.css', 'utf8');
 const demoConfig = JSON.parse(JSON.stringify(bookConfig));
@@ -52,6 +53,7 @@ const homepageStyles = buildHomepageStyles({
     <title>Book Runtime Demo</title>
     <meta name="viewport" content="width=1050, user-scalable=no" />
     <BookRuntimeAssets />
+    <style is:inline set:html={tokensCSS}></style>
     <style is:inline set:html={homepageStyles}></style>
   </head>
   <body>

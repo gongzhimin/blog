@@ -15,6 +15,7 @@
     var isMobile = !!options.isMobile;
     var ensurePaginated = options.ensurePaginated || function () {};
     var getPageContent = options.getPageContent || function () { return ''; };
+    var isTurning = false;
 
     function updateDepth(book, newPage) {
       var page = book.turn('page'),
@@ -114,6 +115,114 @@
       });
     }
 
+    function mountTouch() {
+      if (!isMobile) return;
+
+      var zoom = document.querySelector(zoomSelector);
+      if (!zoom) return;
+
+      var startX = 0, startY = 0, lastX = 0, lastY = 0, startTime = 0;
+      var currentPage = 1, gesture = 'idle', baseTransform = '', baseTransition = '';
+      var resetTimer = null;
+      var SWIPE_THRESHOLD = 50;
+      var FLICK_MIN_DISTANCE = 28;
+      var VELOCITY_THRESHOLD = 0.45;
+      var DIRECTION_LOCK = 1.4;
+      var MAX_DRAG = 40;
+
+      function isInteractiveTarget(target) {
+        while (target && target !== zoom) {
+          if (target.id === 'slider-bar' || target.id === 'slider') return true;
+          target = target.parentNode;
+        }
+        return false;
+      }
+
+      function resistedOffset(dx) {
+        var offset = dx * 0.36;
+        return Math.max(-MAX_DRAG, Math.min(MAX_DRAG, offset));
+      }
+
+      function withBaseTransform(dx) {
+        var translate = 'translateX(' + resistedOffset(dx) + 'px)';
+        return baseTransform && baseTransform !== 'none' ? baseTransform + ' ' + translate : translate;
+      }
+
+      function resetZoom() {
+        zoom.style.transition = 'transform 180ms ease-out';
+        zoom.style.transform = baseTransform && baseTransform !== 'none' ? baseTransform : '';
+        if (resetTimer) clearTimeout(resetTimer);
+        resetTimer = setTimeout(function() {
+          zoom.style.transition = baseTransition;
+        }, 220);
+      }
+
+      zoom.addEventListener('touchstart', function(e) {
+        if (e.touches.length !== 1 || isInteractiveTarget(e.target)) return;
+        var book = $(bookSelector);
+        if (!book.turn('is')) return;
+
+        startX = lastX = e.touches[0].clientX;
+        startY = lastY = e.touches[0].clientY;
+        startTime = Date.now();
+        currentPage = book.turn('page');
+        gesture = 'pending';
+        baseTransform = zoom.style.transform || '';
+        baseTransition = zoom.style.transition || '';
+        if (resetTimer) clearTimeout(resetTimer);
+        zoom.style.transition = 'none';
+      }, { passive: false });
+
+      zoom.addEventListener('touchmove', function(e) {
+        if (gesture === 'idle' || e.touches.length !== 1) return;
+
+        lastX = e.touches[0].clientX;
+        lastY = e.touches[0].clientY;
+        var dx = lastX - startX;
+        var dy = lastY - startY;
+        var absX = Math.abs(dx);
+        var absY = Math.abs(dy);
+
+        if (gesture === 'pending' && (absX > 10 || absY > 10)) {
+          gesture = absX > absY * DIRECTION_LOCK ? 'horizontal' : 'vertical';
+        }
+
+        if (gesture !== 'horizontal') return;
+
+        e.preventDefault();
+        zoom.style.transform = withBaseTransform(dx);
+      }, { passive: false });
+
+      function finishTouch() {
+        if (gesture === 'idle') return;
+
+        var wasHorizontal = gesture === 'horizontal';
+        gesture = 'idle';
+        resetZoom();
+
+        if (!wasHorizontal || isTurning) return;
+
+        var book = $(bookSelector);
+        if (!book.turn('is')) return;
+
+        var dx = lastX - startX;
+        var elapsed = Math.max(1, Date.now() - startTime);
+        var velocity = Math.abs(dx) / elapsed;
+        var shouldTurn = Math.abs(dx) >= SWIPE_THRESHOLD ||
+          (Math.abs(dx) >= FLICK_MIN_DISTANCE && velocity >= VELOCITY_THRESHOLD);
+        if (!shouldTurn) return;
+
+        if (dx < 0 && currentPage < book.turn('pages')) {
+          book.turn('next');
+        } else if (dx > 0 && currentPage > 1) {
+          book.turn('previous');
+        }
+      }
+
+      zoom.addEventListener('touchend', finishTouch, { passive: false });
+      zoom.addEventListener('touchcancel', finishTouch, { passive: false });
+    }
+
     function mountTurn() {
       var flipbook = $(bookSelector);
       flipbook.turn({
@@ -141,14 +250,16 @@
             Hash.go('page/' + page).update();
           },
           turned: function(e, page) {
+            isTurning = false;
             var book = $(this);
             if (page == 2 || page == 3) { book.turn('peel', 'br'); }
             updateDepth(book);
             $(sliderSelector).slider('value', getViewNumber(book, page));
             book.turn('center');
           },
-          start: function() { moveBar(true); },
+          start: function() { isTurning = true; moveBar(true); },
           end: function() {
+            isTurning = false;
             var book = $(this);
             updateDepth(book);
             setTimeout(function() { $(sliderSelector).slider('value', getViewNumber(book)); }, 1);
@@ -181,6 +292,7 @@
       mountHash();
       mountKeyboard();
       mountTurn();
+      mountTouch();
       return true;
     }
 

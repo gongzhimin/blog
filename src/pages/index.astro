@@ -11,6 +11,7 @@ import { buildHomepageStyles } from '../book/homepage/build-homepage-styles.mjs'
 import { loadBundledBookTheme } from '../book/themes/bundled-theme.mjs';
 import BookShell from '../book/components/BookShell.astro';
 import BookRuntimeAssets from '../book/components/BookRuntimeAssets.astro';
+import tokensCSS from '../styles/tokens.css?raw';
 
 const SITE_TITLE = bookConfig.footer.content.copyright;
 const SITE_DESC = '文字留住瞬间。技术笔记与生活随笔。';
@@ -72,7 +73,24 @@ const quoteAuthor = quote.author || footer.content.author;
     <link rel="preconnect" href="https://gstatic.loli.net" crossorigin />
     <link href="https://fonts.loli.net/css2?family=Chiron+Sung+HK&display=swap" rel="stylesheet" />
     <BookRuntimeAssets />
+    <style is:inline set:html={tokensCSS}></style>
     <style is:inline set:html={homepageStyles}></style>
+    <style is:inline set:html={`
+      .home-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        font-size: 11px;
+        color: #999;
+        text-decoration: none;
+        padding: 2px 8px;
+        border: 1px solid rgba(0,0,0,0.12);
+        border-radius: 4px;
+        margin-left: 4px;
+        transition: border-color 0.2s, color 0.2s;
+      }
+      .home-toggle:hover { color: #555; border-color: rgba(0,0,0,0.28); }
+    `}></style>
   </head>
   <body>
     <header class="site-nav">
@@ -82,6 +100,7 @@ const quoteAuthor = quote.author || footer.content.author;
           {nav.links.items.map((item) => (
             <a href={item.href}>{item.label}</a>
           ))}
+          <a href="/classic" class="home-toggle">传统视图</a>
         </nav>
       </div>
     </header>
