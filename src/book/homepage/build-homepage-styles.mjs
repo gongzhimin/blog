@@ -54,7 +54,6 @@ export function buildHomepageStyles({
     overflow-x: auto !important;
     overflow-y: auto !important;
     color: #3a3a3a;
-    background: url("/website-bg.jpg") center / cover no-repeat;
   }
 
   .site-nav {
@@ -120,7 +119,7 @@ export function buildHomepageStyles({
     height: ${book.height}px !important;
     margin: 0 auto !important;
     padding: ${book.gap}px 0 !important;
-    background: ${light.background.fabric};
+    background: url("/website-bg.jpg") center / cover no-repeat;
   }
 
   .sj-book {
