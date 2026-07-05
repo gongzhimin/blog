@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import { createClassicPaperTheme } from "../src/book/themes/classic-paper/theme.mjs";
 import {
   listBookThemeIds,
@@ -66,4 +67,31 @@ test("book theme loader selects registered themes and defaults to classic-paper"
     () => loadBookTheme("missing-theme", cssSources),
     /Unknown book theme: missing-theme/,
   );
+});
+
+test("classic-paper content css keeps printed ink effects scoped to readable text", async () => {
+  const css = await readFile(
+    new URL("../src/book/themes/classic-paper/content.css", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(css, /--print-ink:/);
+  assert.match(css, /--print-shadow-body:/);
+  assert.match(css, /\.sj-book \.book-content :where\(p, li, blockquote\)/);
+  assert.match(css, /mix-blend-mode: multiply/);
+  assert.match(css, /text-shadow: var\(--print-shadow-body\)/);
+  assert.match(css, /\.sj-book \.book-content :where\(pre, code, img, \.table-wrap\)/);
+  assert.match(css, /mix-blend-mode: normal/);
+});
+
+test("classic-paper toc css gives directory text a lighter letterpress treatment", async () => {
+  const css = await readFile(
+    new URL("../src/book/themes/classic-paper/toc.css", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(css, /--toc-print-ink:/);
+  assert.match(css, /\.sj-book \.table-contents/);
+  assert.match(css, /mix-blend-mode: multiply/);
+  assert.match(css, /text-shadow: var\(--toc-print-shadow\)/);
 });

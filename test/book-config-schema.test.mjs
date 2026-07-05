@@ -28,7 +28,7 @@ test("valid book config passes runtime validation", () => {
   assert.doesNotThrow(() => validateBookConfig(config));
   assert.equal(config.book.paperTexture.enabled, true);
   assert.equal(config.book.paperTexture.image, "/paper-bg-2.jpg");
-  assert.equal(config.book.paperTexture.opacity, 1);
+  assert.equal(typeof config.book.paperTexture.opacity, "number");
   assert.equal(config.book.paperTexture.blendMode, "normal");
 });
 

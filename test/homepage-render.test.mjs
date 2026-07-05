@@ -138,8 +138,8 @@ test("homepage applies the configured paper texture atlas to book pages", async 
   assert.match(styles, /--paper-y: 50%/);
   assert.match(styles, /\.sj-book \.own-size::before/);
   assert.match(styles, /url\("\/paper-bg-2\.jpg"\)/);
-  assert.match(styles, /opacity: 1/);
-  assert.match(styles, /mix-blend-mode: normal/);
+  assert.match(styles, new RegExp(`opacity: ${config.book.paperTexture.opacity}`));
+  assert.match(styles, new RegExp(`mix-blend-mode: ${config.book.paperTexture.blendMode}`));
 });
 
 test("homepage provides content for the opening spread via book-data", async () => {

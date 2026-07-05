@@ -21,6 +21,17 @@
   --text-h3: var(--t-text-book-h3);
   --link-color: var(--t-accent);
   --link-border: var(--t-link-border);
+  --print-ink: rgba(48, 42, 35, 0.88);
+  --print-ink-strong: rgba(42, 36, 30, 0.92);
+  --print-page-ink: rgba(72, 57, 42, 0.58);
+  --print-shadow-body:
+    0.12px 0.12px 0 rgba(48, 42, 35, 0.12),
+    -0.08px 0 0 rgba(48, 42, 35, 0.06);
+  --print-shadow-heading:
+    0.18px 0.18px 0 rgba(42, 36, 30, 0.14),
+    -0.1px 0.04px 0 rgba(42, 36, 30, 0.08);
+  --print-shadow-page:
+    0.12px 0.12px 0 rgba(72, 57, 42, 0.12);
 
   /* ── Code ─────────────────────────────────────────────────── */
   --code-bg: var(--t-code-inline-bg);
@@ -83,6 +94,31 @@
   overflow-wrap: break-word;
   word-break: break-word;
   font-variant-numeric: proportional-nums;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.sj-book .book-content :where(p, li, blockquote) {
+  color: var(--print-ink);
+  mix-blend-mode: multiply;
+  text-shadow: var(--print-shadow-body);
+}
+
+.sj-book .book-content :where(h1, h2, h3, h4, h5, h6) {
+  mix-blend-mode: multiply;
+  text-shadow: var(--print-shadow-heading);
+}
+
+.sj-book .book-content :where(pre, code, img, .table-wrap) {
+  mix-blend-mode: normal;
+  text-shadow: none;
+}
+
+.sj-book .page-number {
+  color: var(--print-page-ink);
+  letter-spacing: 0.06em;
+  mix-blend-mode: multiply;
+  text-shadow: var(--print-shadow-page);
 }
 
 /* ── Headings ────────────────────────────────────────────────── */

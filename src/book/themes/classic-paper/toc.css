@@ -2,15 +2,25 @@
  * Mirrored into #__toc at build time for the TOC measurement container.
  */
 
+:root {
+  --toc-print-ink: rgba(74, 58, 43, 0.72);
+  --toc-print-accent: rgba(126, 96, 63, 0.82);
+  --toc-print-shadow:
+    0.12px 0.12px 0 rgba(74, 58, 43, 0.12),
+    -0.08px 0 0 rgba(74, 58, 43, 0.06);
+}
+
 .sj-book .table-contents {
   font-family: 'Stempel-Garamond-W01-Roman', Georgia, "Times New Roman",
                "Chiron Sung HK", "Noto Serif SC", "Songti SC", "STSong", "SimSun", serif;
-  color: #5a5a5a;
+  color: var(--toc-print-ink);
+  mix-blend-mode: multiply;
+  text-shadow: var(--toc-print-shadow);
 }
 
 .sj-book .table-contents a,
 .sj-book .table-contents a:hover {
-  color: #8b7355;
+  color: var(--toc-print-accent);
   display: flex;
   float: none;
   justify-content: space-between;

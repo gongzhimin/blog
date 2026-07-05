@@ -125,7 +125,7 @@ async function dispatchTouchSwipe(page, selector, points) {
 
 test("homepage initializes the configured turnjs book", async ({ page }) => {
   await page.setViewportSize({ width: 1200, height: 820 });
-  await page.goto("/");
+  await page.goto("/", { waitUntil: "domcontentloaded" });
   const state = await readBookState(page);
 
   expect(state.canvasVisibility).toBe("visible");
@@ -155,7 +155,7 @@ test("navigation and footer stay configured around the book", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1200, height: 820 });
-  await page.goto("/");
+  await page.goto("/", { waitUntil: "domcontentloaded" });
 
   await expect(page.locator(".site-nav .brand")).toHaveText("ZHIMIN");
   await expect(page.locator(".site-nav .links a")).toHaveCount(5);
@@ -182,7 +182,7 @@ test("narrow viewport keeps the book usable without horizontal overflow", async 
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/");
+  await page.goto("/", { waitUntil: "domcontentloaded" });
   const state = await readBookState(page);
 
   expect(state.display).toBe("single");
@@ -202,7 +202,7 @@ test("mobile touch swipe turns pages without hijacking vertical scroll", async (
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/");
+  await page.goto("/", { waitUntil: "domcontentloaded" });
   await expect(page.locator(".sj-book")).toBeVisible();
 
   const initialPage = await readCurrentTurnPage(page);
