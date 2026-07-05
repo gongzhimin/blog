@@ -122,6 +122,7 @@ export function buildHomepageStyles({
   .sj-book .own-size {
     width: ${book.contentPage.width}px;
     height: ${book.contentPage.height}px;
+    isolation: isolate;
   }
 
   .sj-book .p1 .side {

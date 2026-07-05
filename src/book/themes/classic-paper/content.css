@@ -21,8 +21,8 @@
   --text-h3: var(--t-text-book-h3);
   --link-color: var(--t-accent);
   --link-border: var(--t-link-border);
-  --print-ink: rgba(48, 42, 35, 0.88);
-  --print-ink-strong: rgba(42, 36, 30, 0.92);
+  --print-ink: rgba(42, 37, 31, 0.91);
+  --print-ink-strong: rgba(38, 33, 28, 0.93);
   --print-page-ink: rgba(72, 57, 42, 0.58);
   --print-shadow-body:
     0.12px 0.12px 0 rgba(48, 42, 35, 0.12),
