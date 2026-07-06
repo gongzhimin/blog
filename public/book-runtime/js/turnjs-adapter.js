@@ -66,16 +66,17 @@
     function updateDepth(book, newPage) {
       var page = book.turn('page'),
         pages = book.turn('pages'),
-        maxDepth = 16,
+        maxDepth = Math.min(40, Math.max(12, Math.round(pages * 0.28))),
+        anchor = maxDepth + 4,
         depthWidth = maxDepth * Math.min(1, page * 2 / pages);
       newPage = newPage || page;
       if (newPage > 3)
-        $('.sj-book .p2 .depth').css({ width: depthWidth, left: 20 - depthWidth });
+        $('.sj-book .p2 .depth').css({ width: depthWidth, left: anchor - depthWidth });
       else
         $('.sj-book .p2 .depth').css({ width: 0 });
       depthWidth = maxDepth * Math.min(1, (pages - page) * 2 / pages);
       if (newPage < pages - 3)
-        $('.sj-book .p' + backPage + ' .depth').css({ width: depthWidth, right: 20 - depthWidth });
+        $('.sj-book .p' + backPage + ' .depth').css({ width: depthWidth, right: anchor - depthWidth });
       else
         $('.sj-book .p' + backPage + ' .depth').css({ width: 0 });
     }
