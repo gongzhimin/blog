@@ -80,14 +80,6 @@
         $('.sj-book .p' + backPage + ' .depth').css({ width: 0 });
     }
 
-    function initDepthScale(totalPages) {
-      var scale = totalPages / 110;
-      if (scale < 0.5) scale = 0.5;
-      else if (scale > 1.5) scale = 1.5;
-      $('.sj-book .depth').css('background-size',
-        Math.round(scale * 100) + '% 100%');
-    }
-
     function addPage(page, book) {
       if (!book.turn('hasPage', page)) {
         ensurePaginated();
@@ -284,7 +276,6 @@
 
       $(sliderSelector).slider('option', 'max', numberOfViews(flipbook));
       applyInitialPaperCrops(flipbook);
-      initDepthScale(totalPages);
       Hash.check().update();
       flipbook.addClass('animated');
       $(canvasSelector).css({ visibility: 'visible' });
