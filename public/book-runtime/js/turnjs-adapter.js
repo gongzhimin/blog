@@ -66,7 +66,7 @@
     function updateDepth(book, newPage) {
       var page = book.turn('page'),
         pages = book.turn('pages'),
-        maxDepth = Math.min(40, Math.max(12, Math.round(pages * 0.28))),
+        maxDepth = Math.min(24, Math.max(8, Math.round(pages * 0.15))),
         anchor = maxDepth + 4,
         depthWidth = maxDepth * Math.min(1, page * 2 / pages);
       newPage = newPage || page;
