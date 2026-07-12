@@ -136,6 +136,7 @@ export function buildHomepageStyles({
   .sj-book {
     width: ${book.width}px !important;
     height: ${book.height}px !important;
+    background-color: #f2f1ec;
   }
 
   .sj-book .hard {
