@@ -121,9 +121,10 @@ const recentPosts = [...lifePosts, ...blogPosts]
         background: #E8773C;
         pointer-events: none; z-index: 99999;
         will-change: transform;
-        transition: width 0.2s, height 0.2s;
+        transition: width 0.2s, height 0.2s, opacity 0.2s;
       }
-      .cursor-dot.hover-link {
+      body:has(a:hover) .cursor-dot,
+      body:has(button:hover) .cursor-dot {
         width: 36px; height: 36px;
         opacity: 0.8;
       }

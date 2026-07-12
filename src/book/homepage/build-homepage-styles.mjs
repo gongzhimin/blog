@@ -222,12 +222,7 @@ ${paperTextureCSS}
     pointer-events: none;
     z-index: 99999;
     will-change: transform;
-    transition: width 0.2s, height 0.2s;
-  }
-
-  .cursor-dot.hover-link {
-    width: 36px; height: 36px;
-    opacity: 0.8;
+    transition: transform 0.05s ease-out;
   }
 
   @media (hover: none) {
