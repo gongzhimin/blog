@@ -227,6 +227,7 @@ ${paperTextureCSS}
 
   .cursor-dot.hover-link {
     width: 36px; height: 36px;
+    opacity: 0.55;
   }
 
   @media (hover: none) {
