@@ -123,8 +123,7 @@ const recentPosts = [...lifePosts, ...blogPosts]
         will-change: transform;
         transition: width 0.2s, height 0.2s, opacity 0.2s;
       }
-      body:has(a:hover) .cursor-dot,
-      body:has(button:hover) .cursor-dot {
+      .cursor-dot.hover-link {
         width: 36px; height: 36px;
         opacity: 0.8;
       }
