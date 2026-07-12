@@ -46,7 +46,7 @@ export function buildHomepageStyles({
   return `
   html {
     min-height: 100%;
-    background: ${light.background.fabric};
+    background: #EFEDD8;
   }
 
   body {
@@ -54,6 +54,14 @@ export function buildHomepageStyles({
     overflow-x: hidden !important;
     overflow-y: auto !important;
     color: #3a3a3a;
+    background:
+      radial-gradient(
+        ellipse at 72% 36%,
+        rgba(255, 255, 245, 0.32) 0%,
+        rgba(255, 255, 245, 0.12) 32%,
+        transparent 62%
+      ),
+      #EFEDD8;
   }
 
   .site-nav {
@@ -67,9 +75,9 @@ export function buildHomepageStyles({
     justify-content: center;
     padding: 0;
     border-bottom: 1px solid ${light.nav.border};
-    background: rgba(255, 249, 238, 0.36);
-    backdrop-filter: blur(22px) saturate(1.08);
-    -webkit-backdrop-filter: blur(22px) saturate(1.08);
+    background: rgba(255, 249, 238, 0.72);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
     box-sizing: border-box;
   }
 
