@@ -67,7 +67,7 @@ export function buildHomepageStyles({
     justify-content: center;
     padding: 0;
     border-bottom: 1px solid ${light.nav.border};
-    background: rgba(255, 249, 238, 0.64);
+    background: rgba(255, 249, 238, 0.36);
     backdrop-filter: blur(22px) saturate(1.08);
     -webkit-backdrop-filter: blur(22px) saturate(1.08);
     box-sizing: border-box;
