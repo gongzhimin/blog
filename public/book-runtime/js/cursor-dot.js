@@ -21,9 +21,10 @@
   var HOVER = hoverMode !== 'false';
   var half = 12;
   var hoverHalf = 24;
-  var desiredX = 0;
-  var desiredY = 0;
-  var rafPending = false;
+  var pendingX = 0;
+  var pendingY = 0;
+  var pendingTarget = null;
+  var rafId = 0;
   var hidden = true;
   var raf = window.requestAnimationFrame || function (callback) {
     return window.setTimeout(callback, 16);
@@ -137,27 +138,27 @@
 
   /* ── Positioning ────────────────────────────────────────────── */
 
-  function writePosition() {
-    rafPending = false;
-    dot.style.setProperty('--cx', desiredX + 'px');
-    dot.style.setProperty('--cy', desiredY + 'px');
-    tooltip.style.transform = 'translate3d(' + (desiredX + 18) + 'px, ' + (desiredY + 18) + 'px, 0)';
+  function tick() {
+    rafId = 0;
+    setHidden(false);
+    placeInHost(hostForPoint(pendingTarget, pendingX, pendingY));
+    dot.style.setProperty('--cx', pendingX + 'px');
+    dot.style.setProperty('--cy', pendingY + 'px');
+    tooltip.style.transform = 'translate3d(' + (pendingX + 18) + 'px, ' + (pendingY + 18) + 'px, 0)';
   }
 
-  function move(x, y) {
-    desiredX = x;
-    desiredY = y;
-    if (rafPending) return;
-    rafPending = true;
-    raf(writePosition);
+  function scheduleTick() {
+    if (rafId) return;
+    rafId = raf(tick);
   }
 
   /* ── Event binding ──────────────────────────────────────────── */
 
   document.addEventListener('mousemove', function (e) {
-    placeInHost(hostForPoint(e.target, e.clientX, e.clientY));
-    setHidden(false);
-    move(e.clientX, e.clientY);
+    pendingX = e.clientX;
+    pendingY = e.clientY;
+    pendingTarget = e.target;
+    scheduleTick();
   });
 
   document.addEventListener('mouseleave', hideCursor);
