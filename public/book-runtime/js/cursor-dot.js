@@ -79,10 +79,7 @@
     bookRect = book && book.getBoundingClientRect ? book.getBoundingClientRect() : null;
   }
 
-  function invalidateGeometryCache() {
-    invalidateHostCache();
-    bookRect = null;
-  }
+  function invalidateBookRect() { bookRect = null; }
 
   function hostForPoint(target, x, y) {
     var directHost = hostForTarget(target);
@@ -236,8 +233,8 @@
 
   document.addEventListener('mouseleave', hideCursor);
   window.addEventListener('blur', hideCursor);
-  window.addEventListener('resize', invalidateGeometryCache);
-  window.addEventListener('scroll', invalidateGeometryCache, true);
+  window.addEventListener('resize', function () { invalidateHostCache(); invalidateBookRect(); });
+  window.addEventListener('scroll', invalidateHostCache, true);
 
   if (HOVER) {
     document.addEventListener('mouseover', function (e) {
