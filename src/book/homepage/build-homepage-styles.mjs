@@ -216,7 +216,7 @@ ${paperTextureCSS}
   .cursor-dot {
     position: fixed;
     top: 0; left: 0;
-    width: 48px; height: 48px;
+    width: 16px; height: 16px;
     border-radius: 50%;
     background: #E8773C;
     pointer-events: none;
@@ -226,7 +226,7 @@ ${paperTextureCSS}
   }
 
   .cursor-dot.hover-link {
-    width: 64px; height: 64px;
+    width: 24px; height: 24px;
   }
 
   @media (hover: none) {
