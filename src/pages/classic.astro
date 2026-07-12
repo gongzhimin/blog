@@ -117,14 +117,14 @@ const recentPosts = [...lifePosts, ...blogPosts]
       html { cursor: none; }
       .cursor-dot {
         position: fixed; top: 0; left: 0;
-        width: 32px; height: 32px; border-radius: 50%;
+        width: 24px; height: 24px; border-radius: 50%;
         background: #E8773C;
         pointer-events: none; z-index: 99999;
         will-change: transform;
         transition: width 0.2s, height 0.2s;
       }
       .cursor-dot.hover-link {
-        width: 48px; height: 48px;
+        width: 36px; height: 36px;
       }
       @media (hover: none) {
         html { cursor: auto; }

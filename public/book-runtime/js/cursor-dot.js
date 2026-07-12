@@ -12,11 +12,11 @@
   dot.className = 'cursor-dot';
   document.body.appendChild(dot);
 
-  var half = 16;
+  var half = 12;
 
   function setHover(on) {
-    if (on) { dot.classList.add('hover-link'); half = 24; }
-    else    { dot.classList.remove('hover-link'); half = 16; }
+    if (on) { dot.classList.add('hover-link'); half = 18; }
+    else    { dot.classList.remove('hover-link'); half = 12; }
   }
 
   document.addEventListener('mousemove', function (e) {
