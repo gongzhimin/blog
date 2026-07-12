@@ -12,7 +12,7 @@
   dot.className = 'cursor-dot';
   document.body.appendChild(dot);
 
-  var x = 0, y = 0, rx = 0, ry = 0, half = 24;
+  var half = 24;
 
   function setHover(on) {
     if (on) { dot.classList.add('hover-link'); half = 32; }
@@ -20,8 +20,7 @@
   }
 
   document.addEventListener('mousemove', function (e) {
-    x = e.clientX;
-    y = e.clientY;
+    dot.style.transform = 'translate(' + (e.clientX - half) + 'px, ' + (e.clientY - half) + 'px)';
   });
 
   document.addEventListener('mouseover', function (e) {
@@ -37,10 +36,4 @@
     setHover(false);
   });
 
-  (function tick() {
-    rx += (x - rx) * 0.25;
-    ry += (y - ry) * 0.25;
-    dot.style.transform = 'translate(' + (rx - half) + 'px, ' + (ry - half) + 'px)';
-    requestAnimationFrame(tick);
-  })();
 })();
