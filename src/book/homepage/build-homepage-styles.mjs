@@ -210,6 +210,33 @@ ${paperTextureCSS}
     text-align: center;
   }
 
+  /* ── Custom cursor ──────────────────────────────────────── */
+  html { cursor: none; }
+
+  .cursor-dot {
+    position: fixed;
+    top: 0; left: 0;
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    background: rgba(139, 115, 85, 0.18);
+    border: 1.5px solid rgba(139, 115, 85, 0.35);
+    pointer-events: none;
+    z-index: 99999;
+    will-change: transform;
+    transition: width 0.2s, height 0.2s, background 0.2s, border-color 0.2s;
+  }
+
+  .cursor-dot.hover-link {
+    width: 64px; height: 64px;
+    background: rgba(139, 115, 85, 0.28);
+    border-color: rgba(139, 115, 85, 0.55);
+  }
+
+  @media (hover: none) {
+    html { cursor: auto; }
+    .cursor-dot { display: none; }
+  }
+
   /* ── Mobile 64K single-page ─────────────────────────────── */
   @media (max-width: ${book.mobileBreakpoint}px) {
     #canvas { width: ${mobileCanvas.width}px !important; height: auto !important; padding: ${mobileCanvas.paddingY}px 0 !important; }
