@@ -74,7 +74,7 @@ export function buildHomepageStyles({
     justify-content: center;
     padding: 0;
     border-bottom: 1px solid ${light.nav.border};
-    background: rgba(255, 249, 238, 0.55);
+    background: rgba(255, 249, 238, 0.24);
     backdrop-filter: blur(22px);
     -webkit-backdrop-filter: blur(22px);
     box-sizing: border-box;
@@ -230,9 +230,9 @@ ${paperTextureCSS}
     .site-nav { height: 44px; padding: 0; }
     .site-nav .inner { width: ${mobileCanvas.width}px; }
     .nav-slogan { display: none; }
-    .site-nav .brand { font-size: 13px; }
+    .site-nav .brand { font-size: 14px; }
     .site-nav .links { gap: 12px; }
-    .site-nav .links a { font-size: 11px; }
+    .site-nav .links a { font-size: 12px; }
 
     .site-footer { padding: 4px 0 24px; font-size: 11px; }
     .site-footer .footer-inner { width: ${mobileCanvas.width}px; }

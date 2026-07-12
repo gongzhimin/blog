@@ -7,14 +7,14 @@
 		"height": 56,
 		"innerGap": 28,
 		"slogan": "记录技术，也记录技术之外的生活",
-		"sloganFontSize": 12,
+		"sloganFontSize": 13,
 		"brand": {
 			"text": "ZHIMIN",
-			"fontSize": 15
+			"fontSize": 17
 		},
 		"links": {
 			"gap": 18,
-			"fontSize": 13,
+			"fontSize": 14,
 			"items": [
 				{
 					"label": "生活",
