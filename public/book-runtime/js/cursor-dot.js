@@ -32,7 +32,6 @@
   var foldSafe = false;
   var hidden = true;
   var book = null;
-  var bookRect = null;
   var raf = window.requestAnimationFrame || function (callback) {
     return window.setTimeout(callback, 16);
   };
@@ -75,18 +74,10 @@
     return null;
   }
 
-  function refreshBookRect() {
-    if (!book || !book.isConnected) book = document.querySelector('.sj-book');
-    bookRect = book && book.getBoundingClientRect ? book.getBoundingClientRect() : null;
-  }
-
-  function invalidateBookRect() {
-    bookRect = null;
-  }
-
   function inBookCorner(x, y) {
-    if (!bookRect) refreshBookRect();
-    var rect = bookRect;
+    if (!book || !book.isConnected) book = document.querySelector('.sj-book');
+    if (!book) return false;
+    var rect = book.getBoundingClientRect();
     if (!rect) return false;
 
     if (x < rect.left || x > rect.right || y < rect.top || y > rect.bottom) return false;
@@ -222,8 +213,8 @@
   window.addEventListener('blur', hideCursor);
   function invalidateHostCache() { _hostCache = null; _hostRects = null; }
 
-  window.addEventListener('resize', function () { invalidateBookRect(); invalidateHostCache(); });
-  window.addEventListener('scroll', function () { invalidateBookRect(); invalidateHostCache(); }, true);
+  window.addEventListener('resize', invalidateHostCache);
+  window.addEventListener('scroll', invalidateHostCache, true);
 
   if (HOVER) {
     document.addEventListener('mouseover', function (e) {
