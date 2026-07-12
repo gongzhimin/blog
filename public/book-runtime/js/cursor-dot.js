@@ -149,7 +149,8 @@
 
   function writePosition() {
     rafPending = false;
-    dot.style.transform = 'translate3d(' + (desiredX - half) + 'px, ' + (desiredY - half) + 'px, 0)';
+    dot.style.setProperty('--cx', desiredX + 'px');
+    dot.style.setProperty('--cy', desiredY + 'px');
     tooltip.style.transform = 'translate3d(' + (desiredX + 18) + 'px, ' + (desiredY + 18) + 'px, 0)';
   }
 
