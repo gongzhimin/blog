@@ -32,17 +32,14 @@ button,
   background: var(--cursor-dot-color);
   z-index: var(--cursor-dot-z);
   transform: translate3d(var(--cx, -9999px), var(--cy, -9999px), 0) translate(-50%, -50%);
-  will-change: transform, width, height, background-color, opacity;
+  will-change: transform, background-color, opacity;
   transition:
-    width 0.22s ease,
-    height 0.22s ease,
     background-color 0.22s ease,
     opacity 0.22s ease;
 }
 
 .cursor-dot.hover-link {
-  width: var(--cursor-dot-hover-size);
-  height: var(--cursor-dot-hover-size);
+  transform: translate3d(var(--cx, -9999px), var(--cy, -9999px), 0) translate(-50%, -50%) scale(1.5);
   background: var(--cursor-dot-hover-color);
 }
 

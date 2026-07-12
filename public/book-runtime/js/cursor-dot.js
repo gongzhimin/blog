@@ -50,23 +50,26 @@
     return target && target.closest ? target.closest('.site-nav, .site-topbar') : null;
   }
 
-  function circleIntersectsRect(x, y, rect) {
-    return rect &&
-      x + half >= rect.left &&
-      x - half <= rect.right &&
-      y + half >= rect.top &&
-      y - half <= rect.bottom;
+  var _hostCache = null;
+  var _hostRects = null;
+
+  function refreshHostCache() {
+    _hostCache = document.querySelectorAll('.site-nav, .site-topbar');
+    _hostRects = [];
+    for (var i = 0; i < _hostCache.length; i++) {
+      _hostRects.push(_hostCache[i].getBoundingClientRect());
+    }
   }
 
   function hostForPoint(target, x, y) {
     var directHost = hostForTarget(target);
     if (directHost) return directHost;
-
-    var hosts = document.querySelectorAll('.site-nav, .site-topbar');
-    for (var i = 0; i < hosts.length; i++) {
-      if (hosts[i].getBoundingClientRect &&
-          circleIntersectsRect(x, y, hosts[i].getBoundingClientRect())) {
-        return hosts[i];
+    if (!_hostCache) refreshHostCache();
+    for (var i = 0; i < _hostRects.length; i++) {
+      var r = _hostRects[i];
+      if (r && x + half >= r.left && x - half <= r.right &&
+          y + half >= r.top && y - half <= r.bottom) {
+        return _hostCache[i];
       }
     }
     return null;
@@ -217,8 +220,10 @@
 
   document.addEventListener('mouseleave', hideCursor);
   window.addEventListener('blur', hideCursor);
-  window.addEventListener('resize', invalidateBookRect);
-  window.addEventListener('scroll', invalidateBookRect, true);
+  function invalidateHostCache() { _hostCache = null; _hostRects = null; }
+
+  window.addEventListener('resize', function () { invalidateBookRect(); invalidateHostCache(); });
+  window.addEventListener('scroll', function () { invalidateBookRect(); invalidateHostCache(); }, true);
 
   if (HOVER) {
     document.addEventListener('mouseover', function (e) {
