@@ -32,10 +32,7 @@ button,
   background: var(--cursor-dot-color);
   z-index: var(--cursor-dot-z);
   transform: translate3d(var(--cx, -9999px), var(--cy, -9999px), 0) translate(-50%, -50%);
-  will-change: transform, background-color, opacity;
-  transition:
-    background-color 0.22s ease,
-    opacity 0.22s ease;
+  transition: opacity 0.22s ease;
 }
 
 .cursor-dot.hover-link {
