@@ -46,14 +46,6 @@ export function buildHomepageStyles({
   return `
   html {
     min-height: 100%;
-    background: #EFEDD8;
-  }
-
-  body {
-    min-height: 100vh;
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
-    color: #3a3a3a;
     background:
       radial-gradient(
         ellipse at 72% 36%,
@@ -62,6 +54,13 @@ export function buildHomepageStyles({
         transparent 62%
       ),
       #EFEDD8;
+  }
+
+  body {
+    min-height: 100vh;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    color: #3a3a3a;
   }
 
   .site-nav {
