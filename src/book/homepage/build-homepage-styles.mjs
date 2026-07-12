@@ -51,7 +51,7 @@ export function buildHomepageStyles({
 
   body {
     min-height: 100vh;
-    overflow-x: auto !important;
+    overflow-x: hidden !important;
     overflow-y: auto !important;
     color: #3a3a3a;
   }
