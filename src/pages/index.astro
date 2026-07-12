@@ -11,6 +11,7 @@ import { buildHomepageStyles } from '../book/homepage/build-homepage-styles.mjs'
 import { loadBundledBookTheme } from '../book/themes/bundled-theme.mjs';
 import BookShell from '../book/components/BookShell.astro';
 import BookRuntimeAssets from '../book/components/BookRuntimeAssets.astro';
+import CursorDot from '../components/CursorDot.astro';
 import tokensCSS from '../styles/tokens.css?raw';
 
 const SITE_TITLE = bookConfig.footer.content.copyright;
@@ -92,16 +93,18 @@ const quoteAuthor = quote.author || footer.content.author;
       .home-toggle:hover { color: #555; border-color: rgba(0,0,0,0.28); }
     `}></style>
   </head>
-  <body data-cursor-hover="false">
+  <body data-cursor-hover="nav">
     <header class="site-nav">
       <div class="inner">
-        <a class="brand" href="/">{nav.brand.text}</a>
-        <span class="nav-slogan">{nav.slogan}</span>
+        <a class="brand" href="/"><span class="cursor-text">{nav.brand.text}</span></a>
+        <span class="nav-slogan"><span class="cursor-text">{nav.slogan}</span></span>
         <nav class="links">
           {nav.links.items.map((item) => (
-            <a href={item.href}>{item.label}</a>
+            <a href={item.href}><span class="cursor-text">{item.label}</span></a>
           ))}
-          <a href="/classic" class="home-toggle">传统视图</a>
+          <a href="/classic" class="home-toggle" data-cursor-label="传统视图">
+            <span class="cursor-text">传统视图</span>
+          </a>
         </nav>
       </div>
     </header>
@@ -122,6 +125,6 @@ const quoteAuthor = quote.author || footer.content.author;
         &copy; {new Date().getFullYear()} · {footer.content.copyright}
       </div>
     </footer>
-    <script is:inline src="/book-runtime/js/cursor-dot.js"></script>
+    <CursorDot />
   </body>
 </html>

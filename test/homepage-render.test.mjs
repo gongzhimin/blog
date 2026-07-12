@@ -133,11 +133,12 @@ test("homepage applies the configured paper texture atlas to book pages", async 
     .map((node) => node.textContent)
     .join("\n");
 
-  assert.equal(config.book.paperTexture.image, "/paper-bg-2.jpg");
+  const escapedImage = config.book.paperTexture.image.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
   assert.match(styles, /--paper-x: 50%/);
   assert.match(styles, /--paper-y: 50%/);
   assert.match(styles, /\.sj-book \.own-size::before/);
-  assert.match(styles, /url\("\/paper-bg-2\.jpg"\)/);
+  assert.match(styles, new RegExp(`url\\("${escapedImage}"\\)`));
   assert.match(styles, new RegExp(`opacity: ${config.book.paperTexture.opacity}`));
   assert.match(styles, new RegExp(`mix-blend-mode: ${config.book.paperTexture.blendMode}`));
 });

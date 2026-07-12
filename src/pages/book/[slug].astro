@@ -10,6 +10,7 @@ import { createJsonBookDocument } from '../../book/sources/json-book-source.mjs'
 import { loadBundledBookTheme } from '../../book/themes/bundled-theme.mjs';
 import BookShell from '../../book/components/BookShell.astro';
 import BookRuntimeAssets from '../../book/components/BookRuntimeAssets.astro';
+import CursorDot from '../../components/CursorDot.astro';
 import tokensCSS from '../../styles/tokens.css?raw';
 
 export async function getStaticPaths() {
@@ -81,14 +82,14 @@ const pageTitle = bookDoc.title || data.title || slug;
     <style is:inline set:html={tokensCSS}></style>
     <style is:inline set:html={homepageStyles}></style>
   </head>
-  <body data-cursor-hover="false">
+  <body data-cursor-hover="nav">
     <header class="site-nav">
       <div class="inner">
-        <a class="brand" href="/">{nav.brand.text}</a>
-        <span class="nav-slogan">{nav.slogan}</span>
+        <a class="brand" href="/"><span class="cursor-text">{nav.brand.text}</span></a>
+        <span class="nav-slogan"><span class="cursor-text">{nav.slogan}</span></span>
         <nav class="links">
           {nav.links.items.map((item) => (
-            <a href={item.href}>{item.label}</a>
+            <a href={item.href}><span class="cursor-text">{item.label}</span></a>
           ))}
         </nav>
       </div>
@@ -105,6 +106,6 @@ const pageTitle = bookDoc.title || data.title || slug;
         &copy; {new Date().getFullYear()} &middot; {footer.content.copyright}
       </div>
     </footer>
-    <script is:inline src="/book-runtime/js/cursor-dot.js"></script>
+    <CursorDot />
   </body>
 </html>

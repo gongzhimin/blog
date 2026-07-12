@@ -163,44 +163,81 @@
       });
     }
 
-    function mountTapToTurn() {
+    function mountTouch() {
       if (!isMobile) return;
 
       var bookEl = document.querySelector(bookSelector);
-      if (!bookEl) return;
+      var touchEl = document.querySelector(zoomSelector) || bookEl;
+      if (!bookEl || !touchEl) return;
 
-      var startX = 0, startY = 0, startTime = 0;
+      var startX = 0, startY = 0, lastX = 0, lastY = 0, startTime = 0, intent = null;
       var TAP_MAX_MOVE = 10;
       var TAP_MAX_TIME = 300;
+      var SWIPE_MIN_DISTANCE = 56;
+      var SWIPE_INTENT_DISTANCE = 12;
 
-      bookEl.addEventListener('touchstart', function(e) {
+      function isInteractiveTouchTarget(target) {
+        while (target && target !== touchEl) {
+          if (target.tagName === 'A' || target.tagName === 'BUTTON' ||
+              target.id === 'slider-bar' || target.id === 'slider') {
+            return true;
+          }
+          target = target.parentNode;
+        }
+        return false;
+      }
+
+      touchEl.addEventListener('touchstart', function(e) {
         if (e.touches.length !== 1) return;
         startX = e.touches[0].clientX;
         startY = e.touches[0].clientY;
+        lastX = startX;
+        lastY = startY;
         startTime = Date.now();
+        intent = null;
       }, { passive: true });
 
-      bookEl.addEventListener('touchend', function(e) {
+      touchEl.addEventListener('touchmove', function(e) {
+        if (e.touches.length !== 1) return;
+        lastX = e.touches[0].clientX;
+        lastY = e.touches[0].clientY;
+
+        var dx = lastX - startX;
+        var dy = lastY - startY;
+        var absX = Math.abs(dx);
+        var absY = Math.abs(dy);
+
+        if (!intent && Math.max(absX, absY) >= SWIPE_INTENT_DISTANCE) {
+          intent = absX > absY * 1.25 ? 'horizontal' : 'vertical';
+        }
+
+        // Once the gesture is clearly horizontal, keep the page from scrolling.
+        if (intent === 'horizontal') e.preventDefault();
+      }, { passive: false });
+
+      touchEl.addEventListener('touchend', function(e) {
         var book = $(bookSelector);
         if (!book.turn('is') || isTurning) return;
 
         var dx = (e.changedTouches[0] ? e.changedTouches[0].clientX : startX) - startX;
         var dy = (e.changedTouches[0] ? e.changedTouches[0].clientY : startY) - startY;
+        var absX = Math.abs(dx);
+        var absY = Math.abs(dy);
         var moved = Math.sqrt(dx * dx + dy * dy);
         var elapsed = Date.now() - startTime;
 
-        // Only handle taps (minimal movement, short duration) — swipes are
-        // handled by Turn.js's native touch support in single mode.
-        if (moved > TAP_MAX_MOVE || elapsed > TAP_MAX_TIME) return;
+        if (isInteractiveTouchTarget(e.target)) return;
 
-        // Ignore taps on interactive elements
-        var target = e.target;
-        while (target && target !== bookEl) {
-          if (target.tagName === 'A' || target.id === 'slider-bar' || target.id === 'slider') return;
-          target = target.parentNode;
+        if (intent === 'horizontal' && absX >= SWIPE_MIN_DISTANCE && absX > absY * 1.25) {
+          if (dx < 0) book.turn('next');
+          else book.turn('previous');
+          return;
         }
 
-        // Left third → previous, right two-thirds → next
+        // Only handle taps after ruling out swipes.
+        if (moved > TAP_MAX_MOVE || elapsed > TAP_MAX_TIME) return;
+
+        // Left third → previous, right two-thirds → next.
         var relX = (e.changedTouches[0] || e.touches[0] || {}).clientX || startX;
         var rect = bookEl.getBoundingClientRect();
         var ratio = (relX - rect.left) / rect.width;
@@ -307,7 +344,7 @@
       mountHash();
       mountKeyboard();
       mountTurn();
-      mountTapToTurn();
+      mountTouch();
       mountTocClicks();
       return true;
     }

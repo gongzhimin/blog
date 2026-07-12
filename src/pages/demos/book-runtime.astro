@@ -10,6 +10,7 @@ import { createJsonBookDocument } from '../../book/sources/json-book-source.mjs'
 import { loadBundledBookTheme } from '../../book/themes/bundled-theme.mjs';
 import BookShell from '../../book/components/BookShell.astro';
 import BookRuntimeAssets from '../../book/components/BookRuntimeAssets.astro';
+import CursorDot from '../../components/CursorDot.astro';
 import tokensCSS from '../../styles/tokens.css?raw';
 
 const katexCSS = readFileSync('node_modules/katex/dist/katex.min.css', 'utf8');
@@ -56,11 +57,13 @@ const homepageStyles = buildHomepageStyles({
     <style is:inline set:html={tokensCSS}></style>
     <style is:inline set:html={homepageStyles}></style>
   </head>
-  <body data-cursor-hover="false">
+  <body data-cursor-hover="nav">
     <header class="site-nav">
       <div class="inner">
-        <a class="brand" href="/demos/book-runtime/">Book Runtime Demo</a>
-        <span class="nav-slogan">{demoConfig.nav.slogan}</span>
+        <a class="brand" href="/demos/book-runtime/">
+          <span class="cursor-text">Book Runtime Demo</span>
+        </a>
+        <span class="nav-slogan"><span class="cursor-text">{demoConfig.nav.slogan}</span></span>
       </div>
     </header>
 
@@ -69,6 +72,6 @@ const homepageStyles = buildHomepageStyles({
       measureArticleCSS={theme.measurement.articleCSS}
       measureTocCSS={theme.measurement.tocCSS}
     />
-    <script is:inline src="/book-runtime/js/cursor-dot.js"></script>
+    <CursorDot />
   </body>
 </html>

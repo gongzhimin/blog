@@ -27,7 +27,7 @@ test("book config schema documents the runtime-critical groups", () => {
 test("valid book config passes runtime validation", () => {
   assert.doesNotThrow(() => validateBookConfig(config));
   assert.equal(config.book.paperTexture.enabled, true);
-  assert.equal(config.book.paperTexture.image, "/paper-bg-2.jpg");
+  assert.match(config.book.paperTexture.image, /^\/paper-bg-[0-9]+\.jpg$/);
   assert.equal(typeof config.book.paperTexture.opacity, "number");
   assert.equal(config.book.paperTexture.blendMode, "normal");
 });

@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import { getCollection } from 'astro:content';
 import homepageConfig from '../data/homepage-config.json';
+import CursorDot from '../components/CursorDot.astro';
 import {
   buildHomepageCssVariables,
   validateHomepageConfig,
@@ -63,14 +64,16 @@ const recentPosts = [...lifePosts, ...blogPosts]
     <main class="site-shell">
       <header class="site-topbar">
         <a href="/" class="site-brand">
-          <span class="site-brand__name">{homepageConfig.navigation.content.siteName}</span>
+          <span class="site-brand__name cursor-text">{homepageConfig.navigation.content.siteName}</span>
         </a>
         <nav style="display:flex;align-items:center;gap:1rem">
-          <a href="/life" class="archive-link" style="margin-top:0">Essays</a>
-          <a href="/blog" class="archive-link" style="margin-top:0">Technical</a>
-          <a href="/about" class="archive-link" style="margin-top:0">About</a>
-          <a href="/rss.xml" class="archive-link" style="margin-top:0">RSS</a>
-          <a href="/" class="home-toggle">翻页书</a>
+          <a href="/life" class="archive-link" style="margin-top:0"><span class="cursor-text">Essays</span></a>
+          <a href="/blog" class="archive-link" style="margin-top:0"><span class="cursor-text">Technical</span></a>
+          <a href="/about" class="archive-link" style="margin-top:0"><span class="cursor-text">About</span></a>
+          <a href="/rss.xml" class="archive-link" style="margin-top:0"><span class="cursor-text">RSS</span></a>
+          <a href="/" class="home-toggle" data-cursor-label="翻页书">
+            <span class="cursor-text">翻页书</span>
+          </a>
         </nav>
       </header>
 
@@ -112,25 +115,6 @@ const recentPosts = [...lifePosts, ...blogPosts]
         <span>&copy; {new Date().getFullYear()} &middot; {homepageConfig.footer.content.copyrightLabel}</span>
       </footer>
     </main>
-    <script is:inline src="/book-runtime/js/cursor-dot.js"></script>
-    <style is:inline set:html={`
-      html, a, button, [role="button"] { cursor: none; }
-      .cursor-dot {
-        position: fixed; top: 0; left: 0;
-        width: 24px; height: 24px; border-radius: 50%;
-        background: #E8773C;
-        pointer-events: none; z-index: 99999;
-        will-change: transform;
-        transition: width 0.2s, height 0.2s, opacity 0.2s;
-      }
-      .cursor-dot.hover-link {
-        width: 36px; height: 36px;
-        opacity: 0.8;
-      }
-      @media (hover: none) {
-        html { cursor: auto; }
-        .cursor-dot { display: none; }
-      }
-    `}></style>
+    <CursorDot />
   </body>
 </html>

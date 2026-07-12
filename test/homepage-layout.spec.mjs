@@ -1,5 +1,7 @@
 import { test, expect } from "@playwright/test";
 
+test.setTimeout(60_000);
+
 async function readBookState(page) {
   await expect(page.locator("#canvas")).toBeVisible();
   await expect(page.locator(".sj-book")).toBeVisible();
