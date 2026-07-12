@@ -211,7 +211,7 @@ ${paperTextureCSS}
   }
 
   /* ── Custom cursor ──────────────────────────────────────── */
-  html { cursor: none; }
+  html, a, button, [role="button"] { cursor: none; }
 
   .cursor-dot {
     position: fixed;
