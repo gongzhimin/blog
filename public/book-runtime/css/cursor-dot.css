@@ -1,6 +1,6 @@
 :root {
   --cursor-dot-size: 24px;
-  --cursor-dot-hover-size: 36px;
+  --cursor-dot-hover-scale: 1.5;
   --cursor-dot-color: #E8773C;
   --cursor-dot-hover-color: #E87438;
   --cursor-dot-z: 950;
@@ -36,7 +36,7 @@ button,
 }
 
 .cursor-dot.hover-link {
-  transform: translate3d(var(--cx, -9999px), var(--cy, -9999px), 0) translate(-50%, -50%) scale(1.5);
+  transform: translate3d(var(--cx, -9999px), var(--cy, -9999px), 0) translate(-50%, -50%) scale(var(--cursor-dot-hover-scale));
   background: var(--cursor-dot-hover-color);
 }
 

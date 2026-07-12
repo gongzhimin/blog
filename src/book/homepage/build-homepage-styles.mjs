@@ -46,6 +46,11 @@ export function buildHomepageStyles({
   return `
   html {
     min-height: 100%;
+    background: rgb(255, 249, 238);
+  }
+
+  body {
+    min-height: 100vh;
     background:
       radial-gradient(
         ellipse at 72% 36%,
@@ -54,10 +59,6 @@ export function buildHomepageStyles({
         transparent 62%
       ),
       #EFEDD8;
-  }
-
-  body {
-    min-height: 100vh;
     overflow-x: hidden !important;
     overflow-y: auto !important;
     color: #3a3a3a;
@@ -73,10 +74,13 @@ export function buildHomepageStyles({
     align-items: center;
     justify-content: center;
     padding: 0;
-    border-bottom: 1px solid ${light.nav.border};
-    background: rgba(255, 249, 238, 0.55);
-    backdrop-filter: blur(22px);
-    -webkit-backdrop-filter: blur(22px);
+    border-bottom: 1px solid rgba(45, 38, 28, 0.10);
+    background: rgba(255, 249, 238, 0.64);
+    backdrop-filter: blur(18px) saturate(1.08);
+    -webkit-backdrop-filter: blur(18px) saturate(1.08);
+    box-shadow:
+      inset 0 -1px 0 rgba(255,255,255,0.28),
+      0 1px 0 rgba(45,38,28,0.05);
     box-sizing: border-box;
   }
 
@@ -153,6 +157,7 @@ export function buildHomepageStyles({
   .sj-book .depth {
     top: ${book.depth.top}px;
     height: ${book.depth.height}px;
+    background-color: #f2f1ec;
   }
 
   /* ── Cover sprites & content surface ───────────────── */
@@ -227,12 +232,12 @@ ${paperTextureCSS}
     #slider-bar { display: none; }
     body { overflow-x: hidden !important; }
 
-    .site-nav { height: 44px; padding: 0; }
+    .site-nav { height: 50px; padding: 0; }
     .site-nav .inner { width: ${mobileCanvas.width}px; }
     .nav-slogan { display: none; }
-    .site-nav .brand { font-size: 14px; }
+    .site-nav .brand { font-size: 15px; }
     .site-nav .links { gap: 12px; }
-    .site-nav .links a { font-size: 12px; }
+    .site-nav .links a { font-size: 13px; }
 
     .site-footer { padding: 4px 0 24px; font-size: 11px; }
     .site-footer .footer-inner { width: ${mobileCanvas.width}px; }

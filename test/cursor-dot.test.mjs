@@ -21,7 +21,8 @@ test("cursor dot css defines the branded dot, hover scale, tooltip, and mobile f
   const css = readFileSync(cssPath, "utf8");
 
   assert.match(css, /--cursor-dot-size:\s*24px/);
-  assert.match(css, /--cursor-dot-hover-size:\s*36px/);
+  assert.match(css, /--cursor-dot-hover-scale:\s*1\.5/);
+  assert.doesNotMatch(css, /--cursor-dot-hover-size/);
   assert.match(css, /--cursor-dot-color:\s*#E8773C/i);
   assert.match(css, /--cursor-dot-hover-color:\s*#E87438/i);
   assert.match(css, /\.cursor-dot\.hover-link/);
@@ -143,7 +144,8 @@ test("cursor dot stays visible in book corners while fold-safe mode pauses toolt
   assert.equal(dot.classList.contains("is-suppressed"), false);
   assert.equal(dot.classList.contains("hover-link"), false);
   assert.equal(document.querySelector(".cursor-tooltip").getAttribute("aria-hidden"), "true");
-  assert.match(dot.getAttribute("style"), /translate3d\(98px, 98px, 0\)/);
+  assert.match(dot.getAttribute("style"), /--cx:\s*110px/);
+  assert.match(dot.getAttribute("style"), /--cy:\s*110px/);
 });
 
 test("cursor dot keeps moving but ignores hover during the Turn.js corner cooldown", () => {
@@ -175,7 +177,8 @@ test("cursor dot keeps moving but ignores hover during the Turn.js corner cooldo
   assert.equal(dot.classList.contains("is-hidden"), false);
   assert.equal(dot.classList.contains("hover-link"), false);
   assert.equal(document.querySelector(".cursor-tooltip").getAttribute("aria-hidden"), "true");
-  assert.match(dot.getAttribute("style"), /translate3d\(288px, 288px, 0\)/);
+  assert.match(dot.getAttribute("style"), /--cx:\s*300px/);
+  assert.match(dot.getAttribute("style"), /--cy:\s*300px/);
 
   now = 2_000;
   document.dispatchEvent(new MouseEvent("mousemove", { bubbles: true, clientX: 300, clientY: 300 }));
@@ -184,7 +187,7 @@ test("cursor dot keeps moving but ignores hover during the Turn.js corner cooldo
   assert.equal(document.querySelector(".cursor-tooltip").getAttribute("aria-hidden"), "false");
 });
 
-test("cursor dot highlights table of contents links without showing a tooltip", () => {
+test("cursor dot does not change over table of contents links", () => {
   const dom = runCursorDom(`
     <body data-cursor-hover="nav">
       <div class="table-contents">
@@ -199,7 +202,7 @@ test("cursor dot highlights table of contents links without showing a tooltip", 
 
   const dot = document.querySelector(".cursor-dot");
   const tooltip = document.querySelector(".cursor-tooltip");
-  assert.equal(dot.classList.contains("hover-link"), true);
+  assert.equal(dot.classList.contains("hover-link"), false);
   assert.equal(tooltip.classList.contains("is-visible"), false);
   assert.equal(tooltip.getAttribute("aria-hidden"), "true");
 });

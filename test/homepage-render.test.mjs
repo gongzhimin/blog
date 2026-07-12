@@ -126,6 +126,26 @@ test("homepage carries mobile toc styles in the themed visual css", async () => 
   assert.match(styles, /width: 280px/);
 });
 
+test("homepage navigation uses a dense translucent glass layer", async () => {
+  const document = await loadHomepage();
+  const config = await loadBookConfig();
+  const styles = [...document.querySelectorAll("style")]
+    .map((node) => node.textContent)
+    .join("\n");
+
+  assert.match(styles, /html\s*\{[\s\S]*background:\s*rgb\(255,\s*249,\s*238\)/);
+  assert.match(styles, /body\s*\{[\s\S]*#EFEDD8/);
+  assert.match(styles, new RegExp(`height: ${config.nav.height}px`));
+  assert.match(styles, new RegExp(`font-size: ${config.nav.brand.fontSize}px`));
+  assert.match(styles, new RegExp(`font-size: ${config.nav.links.fontSize}px`));
+  assert.match(styles, /rgba\(255,\s*249,\s*238,\s*0\.64\)/);
+  assert.match(styles, /backdrop-filter:\s*blur\(18px\)\s*saturate\(1\.08\)/);
+  assert.match(styles, /box-shadow:\s*inset 0 -1px 0 rgba\(255,255,255,0\.28\)/);
+  assert.match(styles, /\.site-nav \{ height: 50px; padding: 0; \}/);
+  assert.match(styles, /\.site-nav \.brand \{ font-size: 15px; \}/);
+  assert.match(styles, /\.site-nav \.links a \{ font-size: 13px; \}/);
+});
+
 test("homepage applies the configured paper texture atlas to book pages", async () => {
   const document = await loadHomepage();
   const config = await loadBookConfig();

@@ -17,15 +17,31 @@
   tooltip.setAttribute('aria-hidden', 'true');
   document.body.appendChild(tooltip);
 
+  function cssNumber(name, fallback) {
+    var raw = window.getComputedStyle
+      ? window.getComputedStyle(document.documentElement).getPropertyValue(name).trim()
+      : '';
+    var value = parseFloat(raw);
+    return Number.isFinite ? (Number.isFinite(value) ? value : fallback) : (isNaN(value) ? fallback : value);
+  }
+
   var hoverMode = document.body.getAttribute('data-cursor-hover') || 'all';
   var HOVER = hoverMode !== 'false';
-  var half = 12;
-  var hoverHalf = 24;
+  var baseHalf = cssNumber('--cursor-dot-size', 24) / 2;
+  var hoverScale = cssNumber('--cursor-dot-hover-scale', 1.5);
+  var half = baseHalf;
+  var hoverHalf = baseHalf * hoverScale;
   var pendingX = 0;
   var pendingY = 0;
   var pendingTarget = null;
-  var rafId = 0;
+  var rafQueued = false;
   var hidden = true;
+  var foldSafe = false;
+  var foldSafeUntil = 0;
+  var CORNER_SUPPRESS_SIZE = 110;
+  var CORNER_SUPPRESS_COOLDOWN_MS = 900;
+  var book = null;
+  var bookRect = null;
   var raf = window.requestAnimationFrame || function (callback) {
     return window.setTimeout(callback, 16);
   };
@@ -58,6 +74,16 @@
 
   function invalidateHostCache() { _hostCache = null; _hostRects = null; }
 
+  function refreshBookRect() {
+    if (!book || !book.isConnected) book = document.querySelector('.sj-book');
+    bookRect = book && book.getBoundingClientRect ? book.getBoundingClientRect() : null;
+  }
+
+  function invalidateGeometryCache() {
+    invalidateHostCache();
+    bookRect = null;
+  }
+
   function hostForPoint(target, x, y) {
     var directHost = hostForTarget(target);
     if (directHost) return directHost;
@@ -72,7 +98,34 @@
     return null;
   }
 
+  function inBookCorner(x, y) {
+    if (!bookRect) refreshBookRect();
+    var rect = bookRect;
+    if (!rect) return false;
+    if (x < rect.left || x > rect.right || y < rect.top || y > rect.bottom) return false;
+
+    var nearX = (x - rect.left) <= CORNER_SUPPRESS_SIZE ||
+      (rect.right - x) <= CORNER_SUPPRESS_SIZE;
+    var nearY = (y - rect.top) <= CORNER_SUPPRESS_SIZE ||
+      (rect.bottom - y) <= CORNER_SUPPRESS_SIZE;
+
+    return nearX && nearY;
+  }
+
   /* ── Visibility ─────────────────────────────────────────────── */
+
+  function clearHover() {
+    dot.classList.remove('hover-link');
+    half = baseHalf;
+    tooltip.classList.remove('is-visible');
+    tooltip.setAttribute('aria-hidden', 'true');
+  }
+
+  function setFoldSafe(on) {
+    if (foldSafe === on) return;
+    foldSafe = on;
+    if (on) clearHover();
+  }
 
   function setHidden(on) {
     if (hidden === on) return;
@@ -84,6 +137,7 @@
 
   function hideCursor() {
     setHidden(true);
+    setFoldSafe(false);
     setHover(null);
   }
 
@@ -103,6 +157,7 @@
     if (!target || !target.closest) return null;
     var el = target.closest('[data-cursor-label], a, button, [role="button"]');
     if (!el) return null;
+    if (el.closest('.table-contents')) return null;
     if (hoverMode === 'nav' &&
         !el.closest('.site-nav, .site-topbar') &&
         !el.hasAttribute('data-cursor-label')) {
@@ -116,6 +171,11 @@
   }
 
   function setHover(el) {
+    if (foldSafe) {
+      clearHover();
+      return;
+    }
+
     if (el) {
       var label = labelFor(el);
       dot.classList.add('hover-link');
@@ -129,17 +189,14 @@
         tooltip.setAttribute('aria-hidden', 'true');
       }
     } else {
-      dot.classList.remove('hover-link');
-      half = 12;
-      tooltip.classList.remove('is-visible');
-      tooltip.setAttribute('aria-hidden', 'true');
+      clearHover();
     }
   }
 
   /* ── Positioning ────────────────────────────────────────────── */
 
   function tick() {
-    rafId = 0;
+    rafQueued = false;
     setHidden(false);
     placeInHost(hostForPoint(pendingTarget, pendingX, pendingY));
     dot.style.setProperty('--cx', pendingX + 'px');
@@ -148,8 +205,9 @@
   }
 
   function scheduleTick() {
-    if (rafId) return;
-    rafId = raf(tick);
+    if (rafQueued) return;
+    rafQueued = true;
+    raf(tick);
   }
 
   /* ── Event binding ──────────────────────────────────────────── */
@@ -158,13 +216,28 @@
     pendingX = e.clientX;
     pendingY = e.clientY;
     pendingTarget = e.target;
+
+    if (inBookCorner(e.clientX, e.clientY)) {
+      foldSafeUntil = Date.now() + CORNER_SUPPRESS_COOLDOWN_MS;
+      setFoldSafe(true);
+      scheduleTick();
+      return;
+    }
+
+    if (Date.now() < foldSafeUntil) {
+      setFoldSafe(true);
+      scheduleTick();
+      return;
+    }
+
+    setFoldSafe(false);
     scheduleTick();
   });
 
   document.addEventListener('mouseleave', hideCursor);
   window.addEventListener('blur', hideCursor);
-  window.addEventListener('resize', invalidateHostCache);
-  window.addEventListener('scroll', invalidateHostCache, true);
+  window.addEventListener('resize', invalidateGeometryCache);
+  window.addEventListener('scroll', invalidateGeometryCache, true);
 
   if (HOVER) {
     document.addEventListener('mouseover', function (e) {

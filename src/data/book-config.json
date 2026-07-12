@@ -4,17 +4,17 @@
 		"id": "classic-paper"
 	},
 	"nav": {
-		"height": 56,
+		"height": 68,
 		"innerGap": 28,
 		"slogan": "记录技术，也记录技术之外的生活",
-		"sloganFontSize": 13,
+		"sloganFontSize": 14,
 		"brand": {
 			"text": "ZHIMIN",
-			"fontSize": 17
+			"fontSize": 20
 		},
 		"links": {
 			"gap": 18,
-			"fontSize": 14,
+			"fontSize": 16,
 			"items": [
 				{
 					"label": "生活",
