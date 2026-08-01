@@ -136,7 +136,6 @@ export function buildHomepageStyles({
   .sj-book {
     width: ${book.width}px !important;
     height: ${book.height}px !important;
-    background-color: #f2f1ec;
   }
 
   .sj-book .hard {
@@ -158,7 +157,6 @@ export function buildHomepageStyles({
   .sj-book .depth {
     top: ${book.depth.top}px;
     height: ${book.depth.height}px;
-    background-color: #f2f1ec;
   }
 
   /* ── Cover sprites & content surface ───────────────── */

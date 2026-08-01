@@ -41,6 +41,12 @@ function readBookData(document) {
   };
 }
 
+function readCssBlock(styles, selector) {
+  const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const match = styles.match(new RegExp(`${escaped}\\s*\\{([^}]*)\\}`));
+  return match ? match[1] : "";
+}
+
 test("homepage renders the configured turnjs book shell", async () => {
   const document = await loadHomepage();
   const config = await loadBookConfig();
@@ -161,6 +167,20 @@ test("homepage applies the configured paper texture atlas to book pages", async 
   assert.match(styles, new RegExp(`url\\("${escapedImage}"\\)`));
   assert.match(styles, new RegExp(`opacity: ${config.book.paperTexture.opacity}`));
   assert.match(styles, new RegExp(`mix-blend-mode: ${config.book.paperTexture.blendMode}`));
+});
+
+test("homepage does not paint opaque backgrounds on book shell or page-depth overlays", async () => {
+  const document = await loadHomepage();
+  const styles = [...document.querySelectorAll("style")]
+    .map((node) => node.textContent)
+    .join("\n");
+  const bookShellBlock = readCssBlock(styles, ".sj-book");
+  const depthBlock = readCssBlock(styles, ".sj-book .depth");
+
+  assert.notEqual(bookShellBlock, "", "missing .sj-book style block");
+  assert.notEqual(depthBlock, "", "missing .sj-book .depth style block");
+  assert.doesNotMatch(bookShellBlock, /background(?:-color)?:/);
+  assert.doesNotMatch(depthBlock, /background(?:-color)?:/);
 });
 
 test("homepage provides content for the opening spread via book-data", async () => {
