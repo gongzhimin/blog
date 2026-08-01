@@ -183,6 +183,85 @@ test("homepage does not paint opaque backgrounds on book shell or page-depth ove
   assert.doesNotMatch(depthBlock, /background(?:-color)?:/);
 });
 
+test("homepage renders stable cover underlays outside turnjs page wrappers", async () => {
+  const document = await loadHomepage();
+  const config = await loadBookConfig();
+  const cover = config.book.coverSprite;
+  const layers = [
+    ...document.querySelectorAll(".sj-book > .book-cover-underlay"),
+  ];
+  const styles = [...document.querySelectorAll("style")]
+    .map((node) => node.textContent)
+    .join("\n");
+  const underlayBlock = readCssBlock(
+    styles,
+    ".sj-book .book-cover-underlay",
+  );
+  const frontBlock = readCssBlock(
+    styles,
+    ".sj-book .book-cover-underlay--front",
+  );
+  const backBlock = readCssBlock(
+    styles,
+    ".sj-book .book-cover-underlay--back",
+  );
+
+  assert.equal(layers.length, 2);
+  assert.deepEqual(
+    layers.map((layer) => layer.getAttribute("ignore")),
+    ["1", "1"],
+  );
+  assert.deepEqual(
+    layers.map((layer) => layer.getAttribute("aria-hidden")),
+    ["true", "true"],
+  );
+  assert.deepEqual(
+    layers.map((layer) => layer.classList[1]),
+    ["book-cover-underlay--front", "book-cover-underlay--back"],
+  );
+  assert.match(underlayBlock, /position:\s*absolute/);
+  assert.match(underlayBlock, /pointer-events:\s*none/);
+  assert.match(
+    underlayBlock,
+    new RegExp(`width: ${config.book.hardPage.width}px`),
+  );
+  assert.match(
+    underlayBlock,
+    new RegExp(`height: ${config.book.hardPage.height}px`),
+  );
+  assert.match(
+    underlayBlock,
+    new RegExp(
+      cover.image.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+    ),
+  );
+  assert.match(
+    frontBlock,
+    new RegExp(
+      cover.positions.frontInside.replace(
+        /[.*+?^${}()|[\]\\]/g,
+        "\\$&",
+      ),
+    ),
+  );
+  assert.match(
+    backBlock,
+    new RegExp(
+      cover.positions.back.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+    ),
+  );
+  assert.match(
+    styles,
+    new RegExp(
+      `\\.book-cover-underlay \\{ width: ${config.book.mobileContentPage.width}px !important; height: ${config.book.mobileContentPage.height}px !important; \\}`,
+    ),
+  );
+  assert.match(
+    styles,
+    /\.sj-book \.book-cover-underlay--back \{ display: none; \}/,
+  );
+});
+
 test("homepage provides content for the opening spread via book-data", async () => {
   const document = await loadHomepage();
   const { config, articles } = readBookData(document);

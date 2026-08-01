@@ -138,6 +138,34 @@ export function buildHomepageStyles({
     height: ${book.height}px !important;
   }
 
+  .sj-book .book-cover-underlay {
+    position: absolute;
+    top: 0;
+    width: ${book.hardPage.width}px;
+    height: ${book.hardPage.height}px;
+    z-index: 0;
+    pointer-events: none;
+    background-color: white;
+    background-image: url(${cover.image});
+    background-repeat: no-repeat;
+    background-size: ${cover.backgroundSize};
+  }
+
+  .sj-book .book-cover-underlay--front {
+    left: 0;
+    background-position: ${cover.positions.frontInside};
+  }
+
+  .sj-book .book-cover-underlay--back {
+    right: 0;
+    background-position: ${cover.positions.back};
+  }
+
+  .sj-book.book-at-first .book-cover-underlay--front,
+  .sj-book.book-at-last .book-cover-underlay--back {
+    display: none;
+  }
+
   .sj-book .hard {
     width: ${book.hardPage.width}px;
     height: ${book.hardPage.height}px;
@@ -228,6 +256,8 @@ ${paperTextureCSS}
     .sj-book { width: ${mobileContentPage.width}px !important; height: ${mobileContentPage.height}px !important; }
     .sj-book .hard,
     .sj-book .own-size { width: ${mobileContentPage.width}px !important; height: ${mobileContentPage.height}px !important; }
+    .sj-book .book-cover-underlay { width: ${mobileContentPage.width}px !important; height: ${mobileContentPage.height}px !important; }
+    .sj-book .book-cover-underlay--back { display: none; }
     #slider-bar { display: none; }
     body { overflow-x: hidden !important; }
 

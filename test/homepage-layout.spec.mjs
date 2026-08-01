@@ -2,6 +2,11 @@ import { test, expect } from "@playwright/test";
 
 test.setTimeout(60_000);
 
+test.beforeEach(async ({ page }) => {
+  await page.route("https://fonts.loli.net/**", (route) => route.abort());
+  await page.route("https://gstatic.loli.net/**", (route) => route.abort());
+});
+
 async function readBookState(page) {
   await expect(page.locator("#canvas")).toBeVisible();
   await expect(page.locator(".sj-book")).toBeVisible();
@@ -152,10 +157,34 @@ test("book depth stays mounted during corner previews", async ({ page }) => {
       const root = document.querySelector(".sj-book");
       const backPage = root.querySelector(".back-side");
       const backWrapper = backPage?.closest(".page-wrapper");
+      const book = window.jQuery(root);
+      const bookRect = root.getBoundingClientRect();
       return {
+        animating: book.turn("animating"),
+        movingPages: [...book.data().pageMv],
+        book: bookRect.toJSON(),
         backWrapperZ: backWrapper
           ? getComputedStyle(backWrapper).zIndex
           : null,
+        underlays: Array.from(
+          root.querySelectorAll(":scope > .book-cover-underlay"),
+        ).map((layer) => {
+          const rect = layer.getBoundingClientRect();
+          return {
+            connected: layer.isConnected,
+            display: getComputedStyle(layer).display,
+            visibility: getComputedStyle(layer).visibility,
+            opacity: getComputedStyle(layer).opacity,
+            zIndex: getComputedStyle(layer).zIndex,
+            backgroundImage: getComputedStyle(layer).backgroundImage,
+            backgroundPosition: getComputedStyle(layer).backgroundPosition,
+            left: rect.left,
+            right: rect.right,
+            width: rect.width,
+            height: rect.height,
+            inPageWrapper: Boolean(layer.closest(".page-wrapper")),
+          };
+        }),
         layers: Array.from(root.querySelectorAll(":scope > .book-depth")).map(
           (layer) => {
             const rect = layer.getBoundingClientRect();
@@ -171,7 +200,28 @@ test("book depth stays mounted during corner previews", async ({ page }) => {
       };
     });
 
+    expect(state.animating).toBe(true);
+    expect(state.movingPages.length).toBeGreaterThan(0);
     expect(state.backWrapperZ).toBe("-1");
+    expect(state.underlays).toHaveLength(2);
+    for (const layer of state.underlays) {
+      expect(layer.connected).toBe(true);
+      expect(layer.display).toBe("block");
+      expect(layer.visibility).toBe("visible");
+      expect(layer.opacity).toBe("1");
+      expect(layer.zIndex).toBe("0");
+      expect(layer.backgroundImage).toContain(
+        "/vendor/turnjs/pics/book-covers.jpg",
+      );
+      expect(layer.width).toBeGreaterThan(0);
+      expect(layer.height).toBeGreaterThan(0);
+      expect(layer.inPageWrapper).toBe(false);
+    }
+    expect(state.underlays[0].backgroundPosition).not.toBe(
+      state.underlays[1].backgroundPosition,
+    );
+    expect(state.underlays[0].left).toBeCloseTo(state.book.left, 0);
+    expect(state.underlays[1].right).toBeCloseTo(state.book.right, 0);
     expect(state.layers).toHaveLength(2);
     for (const layer of state.layers) {
       expect(layer.connected).toBe(true);
@@ -186,6 +236,130 @@ test("book depth stays mounted during corner previews", async ({ page }) => {
       bounds.y + bounds.height / 2,
     );
     await page.waitForTimeout(900);
+  }
+});
+
+test("cover underlays stay mounted across consecutive page turns", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1200, height: 820 });
+  await page.goto("/", { waitUntil: "domcontentloaded" });
+  await expect(page.locator(".sj-book")).toBeVisible();
+
+  for (let turn = 0; turn < 3; turn += 1) {
+    await page.evaluate(() => window.jQuery(".sj-book").turn("next"));
+    await page.waitForTimeout(100);
+
+    const state = await page.evaluate(() => {
+      const root = document.querySelector(".sj-book");
+      const backPage = root.querySelector(".back-side");
+      const backWrapper = backPage?.closest(".page-wrapper");
+      return {
+        animating: window.jQuery(root).turn("animating"),
+        backWrapperZ: backWrapper
+          ? getComputedStyle(backWrapper).zIndex
+          : null,
+        layers: Array.from(
+          root.querySelectorAll(":scope > .book-cover-underlay"),
+        ).map((layer) => {
+          const rect = layer.getBoundingClientRect();
+          return {
+            connected: layer.isConnected,
+            display: getComputedStyle(layer).display,
+            width: rect.width,
+            height: rect.height,
+            inPageWrapper: Boolean(layer.closest(".page-wrapper")),
+          };
+        }),
+      };
+    });
+
+    expect(state.animating).toBe(true);
+    expect(state.backWrapperZ).toBe("-1");
+    expect(state.layers).toHaveLength(2);
+    for (const layer of state.layers) {
+      expect(layer.connected).toBe(true);
+      expect(layer.display).toBe("block");
+      expect(layer.width).toBeGreaterThan(0);
+      expect(layer.height).toBeGreaterThan(0);
+      expect(layer.inPageWrapper).toBe(false);
+    }
+
+    await page.waitForTimeout(900);
+  }
+});
+
+test("closed covers hide the unused underlay half", async ({ page }) => {
+  await page.setViewportSize({ width: 1200, height: 820 });
+  await page.goto("/", { waitUntil: "domcontentloaded" });
+  await expect(page.locator(".sj-book")).toBeVisible();
+
+  const totalPages = await page.evaluate(() =>
+    window.jQuery(".sj-book").turn("pages"),
+  );
+  const endpoints = [
+    { pageNumber: 1, hidden: "front", visible: "back" },
+    { pageNumber: totalPages, hidden: "back", visible: "front" },
+  ];
+
+  for (const endpoint of endpoints) {
+    await page.evaluate(() => window.jQuery(".sj-book").turn("page", 5));
+    await expect
+      .poll(() => readCurrentTurnPage(page), { timeout: 5_000 })
+      .toBe(5);
+    await page.waitForTimeout(900);
+
+    await page.evaluate(
+      (pageNumber) => window.jQuery(".sj-book").turn("page", pageNumber),
+      endpoint.pageNumber,
+    );
+    await page.waitForTimeout(100);
+
+    const turningState = await page.evaluate(() => {
+      const root = document.querySelector(".sj-book");
+      const readDisplay = (side) =>
+        getComputedStyle(
+          root.querySelector(`.book-cover-underlay--${side}`),
+        ).display;
+      return {
+        animating: window.jQuery(root).turn("animating"),
+        frontDisplay: readDisplay("front"),
+        backDisplay: readDisplay("back"),
+      };
+    });
+
+    expect(turningState.animating).toBe(true);
+    expect(turningState.frontDisplay).toBe("block");
+    expect(turningState.backDisplay).toBe("block");
+
+    await expect
+      .poll(() => readCurrentTurnPage(page), { timeout: 5_000 })
+      .toBe(endpoint.pageNumber);
+    await page.waitForTimeout(900);
+
+    const state = await page.evaluate(() => {
+      const root = document.querySelector(".sj-book");
+      const read = (side) => {
+        const node = root.querySelector(`.book-cover-underlay--${side}`);
+        return {
+          display: getComputedStyle(node).display,
+          width: node.getBoundingClientRect().width,
+        };
+      };
+      return {
+        className: root.className,
+        front: read("front"),
+        back: read("back"),
+      };
+    });
+
+    expect(state.className).toContain(
+      `book-at-${endpoint.pageNumber === 1 ? "first" : "last"}`,
+    );
+    expect(state[endpoint.hidden].display).toBe("none");
+    expect(state[endpoint.hidden].width).toBe(0);
+    expect(state[endpoint.visible].display).toBe("block");
+    expect(state[endpoint.visible].width).toBeGreaterThan(0);
   }
 });
 
@@ -257,6 +431,30 @@ test("narrow viewport keeps the book usable without horizontal overflow", async 
   expect(state.scrollHeight).toBeGreaterThanOrEqual(state.innerHeight);
   expect(state.book.width).toBe(370);
   await expect(page.locator(".site-nav .links a")).toHaveCount(5);
+
+  const underlays = await page.evaluate(() => {
+    const root = document.querySelector(".sj-book");
+    return ["front", "back"].map((side) => {
+      const node = root.querySelector(`.book-cover-underlay--${side}`);
+      const rect = node.getBoundingClientRect();
+      return {
+        side,
+        display: getComputedStyle(node).display,
+        width: rect.width,
+        height: rect.height,
+        left: rect.left,
+        bookLeft: root.getBoundingClientRect().left,
+      };
+    });
+  });
+  expect(underlays[0]).toMatchObject({
+    side: "front",
+    display: "block",
+    width: 370,
+    height: 507,
+  });
+  expect(underlays[0].left).toBeCloseTo(underlays[0].bookLeft, 0);
+  expect(underlays[1]).toMatchObject({ side: "back", display: "none" });
 
   await page.screenshot({
     path: "test-results/homepage-turnjs-mobile.png",

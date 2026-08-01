@@ -16,6 +16,7 @@
 - 修改 `test/homepage-layout.spec.mjs`：验证四角预览及连续翻页期间底衬保持挂载。
 - 修改 `src/book/components/BookShell.astro`：添加 Turn.js 忽略的左右底衬节点。
 - 修改 `src/book/homepage/build-homepage-styles.mjs`：生成桌面端和移动端底衬样式。
+- 修改 `public/book-runtime/js/turnjs-adapter.js`：维护首封和末封的书壳状态类。
 
 ### 任务 1：建立失败的结构与样式测试
 
@@ -86,7 +87,11 @@ test("cover underlays stay mounted across consecutive page turns", async ({ page
 });
 ```
 
-- [ ] **步骤 3：运行交互测试并确认失败**
+- [ ] **步骤 3：新增首尾闭合状态和移动端测试**
+
+跳转到第 1 页与最后一页，分别断言左、右多余底衬隐藏；在 390px 视口下断言左底衬为 `370 × 507`、右底衬隐藏。角落预览时同时断言 Turn.js 处于动画状态、存在移动页，且两块底衬的背景图、背景位置、层级和左右边界正确。
+
+- [ ] **步骤 4：运行交互测试并确认失败**
 
 运行：`npm run test:e2e -- --grep "cover underlays|book depth stays"`
 
@@ -97,6 +102,7 @@ test("cover underlays stay mounted across consecutive page turns", async ({ page
 **文件：**
 - 修改：`src/book/components/BookShell.astro`
 - 修改：`src/book/homepage/build-homepage-styles.mjs`
+- 修改：`public/book-runtime/js/turnjs-adapter.js`
 
 - [ ] **步骤 1：添加稳定 DOM 节点**
 
@@ -136,7 +142,11 @@ test("cover underlays stay mounted across consecutive page turns", async ({ page
 
 在移动端媒体查询中让底衬使用 `${mobileContentPage.width}px × ${mobileContentPage.height}px`。移动端为单页画布，隐藏右底衬，保留左底衬覆盖完整画布，避免两幅不同精灵图重叠。
 
-- [ ] **步骤 3：运行目标测试并确认通过**
+- [ ] **步骤 3：维护闭合端点状态**
+
+在适配器初始化和动画完成后维护 `book-at-first` / `book-at-last` 类；`turning` 时清除两个类，使动画期间两块底衬都保持可见。CSS 在第一页 settled 状态隐藏左底衬、最后一页 settled 状态隐藏右底衬；中间页保持两块底衬可见。
+
+- [ ] **步骤 4：运行目标测试并确认通过**
 
 运行：`npm run build && node --test --test-name-pattern="stable cover underlays" test/homepage-render.test.mjs`
 
@@ -181,6 +191,7 @@ test("cover underlays stay mounted across consecutive page turns", async ({ page
 git add docs/superpowers/plans/2026-08-01-stable-cover-underlay.md \
   src/book/components/BookShell.astro \
   src/book/homepage/build-homepage-styles.mjs \
+  public/book-runtime/js/turnjs-adapter.js \
   test/homepage-render.test.mjs \
   test/homepage-layout.spec.mjs
 git commit -m "fix: keep cover backing stable during page turns"

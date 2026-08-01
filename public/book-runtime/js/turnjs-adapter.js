@@ -82,6 +82,13 @@
         backDepth.css({ width: 0, zIndex: pages + 1 });
     }
 
+    function updateCoverUnderlays(book, newPage) {
+      var page = newPage || book.turn('page'),
+        pages = book.turn('pages');
+      book.toggleClass('book-at-first', page <= 1);
+      book.toggleClass('book-at-last', page >= pages);
+    }
+
     function addPage(page, book) {
       if (!book.turn('hasPage', page)) {
         ensurePaginated();
@@ -266,6 +273,7 @@
         when: {
           turning: function(e, page) {
             var book = $(this), currentPage = book.turn('page'), pages = book.turn('pages');
+            book.removeClass('book-at-first book-at-last');
             if (currentPage > 3 && currentPage < pages - 3) {
               if (page == 1) { book.turn('page', 2).turn('stop').turn('page', page); e.preventDefault(); return; }
               else if (page == pages) { book.turn('page', pages - 1).turn('stop').turn('page', page); e.preventDefault(); return; }
@@ -282,6 +290,7 @@
             isTurning = false;
             var book = $(this);
             if (page == 2 || page == 3) { book.turn('peel', 'br'); }
+            if (!book.turn('animating')) updateCoverUnderlays(book, page);
             updateDepth(book);
             $(sliderSelector).slider('value', getViewNumber(book, page));
 
@@ -300,7 +309,10 @@
             isTurning = false;
             var book = $(this);
             updateDepth(book);
-            setTimeout(function() { $(sliderSelector).slider('value', getViewNumber(book)); }, 1);
+            setTimeout(function() {
+              if (!book.turn('animating')) updateCoverUnderlays(book);
+              $(sliderSelector).slider('value', getViewNumber(book));
+            }, 1);
             moveBar(false);
           },
           missing: function(e, pages) {
@@ -315,6 +327,7 @@
 
       $(sliderSelector).slider('option', 'max', numberOfViews(flipbook));
       applyInitialPaperCrops(flipbook);
+      updateCoverUnderlays(flipbook);
       Hash.check().update();
       flipbook.addClass('animated');
       $(canvasSelector).css({ visibility: 'visible' });

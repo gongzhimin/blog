@@ -9,6 +9,7 @@ const {
 const backPage = runConfig.book.turn.backPage;
 const totalPages = runConfig.book.turn.totalPages;
 const pageDepthAttrs = { depth };
+const ignoredDecorationAttrs = { ignore: '1', 'aria-hidden': 'true' } as const;
 const measureCSS =
   `var MEASURE_CSS={article:${JSON.stringify(measureArticleCSS)},toc:${JSON.stringify(measureTocCSS)}};`;
 ---
@@ -19,6 +20,8 @@ const measureCSS =
       <div class="sj-book">
         <div ignore="1" aria-hidden="true" class="depth book-depth book-depth--front"></div>
         <div ignore="1" aria-hidden="true" class="depth book-depth book-depth--back"></div>
+        <div {...ignoredDecorationAttrs} class="book-cover-underlay book-cover-underlay--front"></div>
+        <div {...ignoredDecorationAttrs} class="book-cover-underlay book-cover-underlay--back"></div>
         <div {...pageDepthAttrs} class="hard">
           <div class="side"></div>
         </div>
