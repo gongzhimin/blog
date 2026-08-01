@@ -48,6 +48,50 @@ test("book shell loads the adapter before the app bootstrap", async () => {
   assert.ok(adapterIndex < appIndex, "adapter must load before book-app");
 });
 
+test("book shell keeps depth decorations outside Turn.js managed pages", async () => {
+  const source = await readFile(
+    new URL("../src/book/components/BookShell.astro", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(
+    source,
+    /<div class="sj-book">\s*<div ignore="1" aria-hidden="true" class="depth book-depth book-depth--front"><\/div>\s*<div ignore="1" aria-hidden="true" class="depth book-depth book-depth--back"><\/div>/,
+  );
+  assert.doesNotMatch(
+    source,
+    /class="hard front-side">\s*<div class="depth"><\/div>/,
+  );
+  assert.doesNotMatch(
+    source,
+    /class=\{`hard fixed back-side[^}]+\}>\s*<div class="depth"><\/div>/,
+  );
+});
+
+test("Turn.js adapter updates stable depth layers instead of page children", async () => {
+  const [adapter, styles] = await Promise.all([
+    readFile(
+      new URL("../public/book-runtime/js/turnjs-adapter.js", import.meta.url),
+      "utf8",
+    ),
+    readFile(
+      new URL("../public/vendor/turnjs/css/steve-jobs.css", import.meta.url),
+      "utf8",
+    ),
+  ]);
+
+  assert.match(adapter, /book\.children\('\.book-depth--front'\)/);
+  assert.match(adapter, /book\.children\('\.book-depth--back'\)/);
+  assert.match(adapter, /zIndex:\s*pages \+ 1/);
+  assert.doesNotMatch(adapter, /\.p2 \.depth/);
+  assert.doesNotMatch(adapter, /' \.depth'/);
+
+  assert.match(styles, /\.sj-book > \.book-depth\s*\{/);
+  assert.match(styles, /pointer-events:\s*none/);
+  assert.match(styles, /\.sj-book > \.book-depth--front\s*\{/);
+  assert.match(styles, /\.sj-book > \.book-depth--back\s*\{/);
+});
+
 test("book app delegates Turn.js details to the adapter", async () => {
   const source = await readFile(
     new URL("../public/book-runtime/js/book-app.js", import.meta.url),

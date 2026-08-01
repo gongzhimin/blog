@@ -125,6 +125,70 @@ async function dispatchTouchSwipe(page, selector, points) {
   );
 }
 
+test("book depth stays mounted during corner previews", async ({ page }) => {
+  await page.setViewportSize({ width: 1200, height: 820 });
+  await page.goto("/", { waitUntil: "domcontentloaded" });
+
+  const book = page.locator(".sj-book");
+  await expect(book).toBeVisible();
+  const bounds = await book.boundingBox();
+  expect(bounds).not.toBeNull();
+
+  const corners = [
+    { x: bounds.x + 30, y: bounds.y + 20 },
+    { x: bounds.x + bounds.width - 30, y: bounds.y + 20 },
+    { x: bounds.x + 30, y: bounds.y + bounds.height - 18 },
+    {
+      x: bounds.x + bounds.width - 30,
+      y: bounds.y + bounds.height - 18,
+    },
+  ];
+
+  for (const corner of corners) {
+    await page.mouse.move(corner.x, corner.y);
+    await page.waitForTimeout(180);
+
+    const state = await page.evaluate(() => {
+      const root = document.querySelector(".sj-book");
+      const backPage = root.querySelector(".back-side");
+      const backWrapper = backPage?.closest(".page-wrapper");
+      return {
+        backWrapperZ: backWrapper
+          ? getComputedStyle(backWrapper).zIndex
+          : null,
+        layers: Array.from(root.querySelectorAll(":scope > .book-depth")).map(
+          (layer) => {
+            const rect = layer.getBoundingClientRect();
+            return {
+              connected: layer.isConnected,
+              display: getComputedStyle(layer).display,
+              width: rect.width,
+              height: rect.height,
+              inPageWrapper: Boolean(layer.closest(".page-wrapper")),
+            };
+          },
+        ),
+      };
+    });
+
+    expect(state.backWrapperZ).toBe("-1");
+    expect(state.layers).toHaveLength(2);
+    for (const layer of state.layers) {
+      expect(layer.connected).toBe(true);
+      expect(layer.display).toBe("block");
+      expect(layer.width).toBeGreaterThan(0);
+      expect(layer.height).toBeGreaterThan(0);
+      expect(layer.inPageWrapper).toBe(false);
+    }
+
+    await page.mouse.move(
+      bounds.x + bounds.width / 2,
+      bounds.y + bounds.height / 2,
+    );
+    await page.waitForTimeout(900);
+  }
+});
+
 test("homepage initializes the configured turnjs book", async ({ page }) => {
   await page.setViewportSize({ width: 1200, height: 820 });
   await page.goto("/", { waitUntil: "domcontentloaded" });

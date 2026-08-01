@@ -233,12 +233,16 @@ body, ul, table, form{
 	height:590px;
 }
 
-.sj-book .front-side .depth{
+.sj-book > .book-depth{
+	pointer-events:none;
+}
+
+.sj-book > .book-depth--front{
 	left:4px;
 	background-position:0 0;
 }
 
-.sj-book .back-side .depth{
+.sj-book > .book-depth--back{
 	right:4px;
 	background-position:right 0;
 }
@@ -389,4 +393,3 @@ body, ul, table, form{
 	background-position:left top;
 	background-repeat:repeat-y;
 }
-
