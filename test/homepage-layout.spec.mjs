@@ -170,14 +170,18 @@ test("book depth stays mounted during corner previews", async ({ page }) => {
           root.querySelectorAll(":scope > .book-cover-underlay"),
         ).map((layer) => {
           const rect = layer.getBoundingClientRect();
+          const style = getComputedStyle(layer);
+          const frameStyle = getComputedStyle(layer, "::before");
           return {
             connected: layer.isConnected,
-            display: getComputedStyle(layer).display,
-            visibility: getComputedStyle(layer).visibility,
-            opacity: getComputedStyle(layer).opacity,
-            zIndex: getComputedStyle(layer).zIndex,
-            backgroundImage: getComputedStyle(layer).backgroundImage,
-            backgroundPosition: getComputedStyle(layer).backgroundPosition,
+            display: style.display,
+            visibility: style.visibility,
+            opacity: style.opacity,
+            zIndex: style.zIndex,
+            backgroundImage: style.backgroundImage,
+            frameBackgroundImage: frameStyle.backgroundImage,
+            frameBackgroundPosition: frameStyle.backgroundPosition,
+            frameClipPath: frameStyle.clipPath,
             left: rect.left,
             right: rect.right,
             width: rect.width,
@@ -210,15 +214,19 @@ test("book depth stays mounted during corner previews", async ({ page }) => {
       expect(layer.visibility).toBe("visible");
       expect(layer.opacity).toBe("1");
       expect(layer.zIndex).toBe("0");
-      expect(layer.backgroundImage).toContain(
+      expect(layer.backgroundImage).not.toContain(
         "/vendor/turnjs/pics/book-covers.jpg",
       );
+      expect(layer.frameBackgroundImage).toContain(
+        "/vendor/turnjs/pics/book-covers.jpg",
+      );
+      expect(layer.frameClipPath).not.toBe("none");
       expect(layer.width).toBeGreaterThan(0);
       expect(layer.height).toBeGreaterThan(0);
       expect(layer.inPageWrapper).toBe(false);
     }
-    expect(state.underlays[0].backgroundPosition).not.toBe(
-      state.underlays[1].backgroundPosition,
+    expect(state.underlays[0].frameBackgroundPosition).not.toBe(
+      state.underlays[1].frameBackgroundPosition,
     );
     expect(state.underlays[0].left).toBeCloseTo(state.book.left, 0);
     expect(state.underlays[1].right).toBeCloseTo(state.book.right, 0);
@@ -327,9 +335,14 @@ test("closed covers hide overlapping underlays and page depth", async ({
       const root = document.querySelector(".sj-book");
       const read = (selector) => {
         const node = root.querySelector(selector);
+        const style = getComputedStyle(node);
+        const frameStyle = getComputedStyle(node, "::before");
         return {
-          display: getComputedStyle(node).display,
+          display: style.display,
           width: node.getBoundingClientRect().width,
+          backgroundImage: style.backgroundImage,
+          frameBackgroundImage: frameStyle.backgroundImage,
+          frameClipPath: frameStyle.clipPath,
         };
       };
       return {
@@ -344,6 +357,11 @@ test("closed covers hide overlapping underlays and page depth", async ({
     expect(turningState.animating).toBe(true);
     expect(turningState.front.display).toBe("block");
     expect(turningState.back.display).toBe("block");
+    for (const side of [turningState.front, turningState.back]) {
+      expect(side.backgroundImage).not.toContain("book-covers");
+      expect(side.frameBackgroundImage).toContain("book-covers");
+      expect(side.frameClipPath).not.toBe("none");
+    }
     expect(turningState[`${endpoint.hiddenDepth}Depth`].display).toBe("block");
     expect(turningState[`${endpoint.hiddenDepth}Depth`].width).toBeGreaterThan(0);
 
@@ -359,9 +377,14 @@ test("closed covers hide overlapping underlays and page depth", async ({
       const root = document.querySelector(".sj-book");
       const read = (selector) => {
         const node = root.querySelector(selector);
+        const style = getComputedStyle(node);
+        const frameStyle = getComputedStyle(node, "::before");
         return {
-          display: getComputedStyle(node).display,
+          display: style.display,
           width: node.getBoundingClientRect().width,
+          backgroundImage: style.backgroundImage,
+          frameBackgroundImage: frameStyle.backgroundImage,
+          frameClipPath: frameStyle.clipPath,
         };
       };
       return {
@@ -399,9 +422,14 @@ test("closed covers hide overlapping underlays and page depth", async ({
       const root = document.querySelector(".sj-book");
       const read = (selector) => {
         const node = root.querySelector(selector);
+        const style = getComputedStyle(node);
+        const frameStyle = getComputedStyle(node, "::before");
         return {
-          display: getComputedStyle(node).display,
+          display: style.display,
           width: node.getBoundingClientRect().width,
+          backgroundImage: style.backgroundImage,
+          frameBackgroundImage: frameStyle.backgroundImage,
+          frameClipPath: frameStyle.clipPath,
         };
       };
       return {
@@ -414,6 +442,11 @@ test("closed covers hide overlapping underlays and page depth", async ({
 
     expect(previewState.front.display).toBe("block");
     expect(previewState.back.display).toBe("block");
+    for (const side of [previewState.front, previewState.back]) {
+      expect(side.backgroundImage).not.toContain("book-covers");
+      expect(side.frameBackgroundImage).toContain("book-covers");
+      expect(side.frameClipPath).not.toBe("none");
+    }
     expect(previewState[`${endpoint.hiddenDepth}Depth`].display).toBe("block");
     expect(previewState[`${endpoint.hiddenDepth}Depth`].width).toBeGreaterThan(0);
 
@@ -502,6 +535,8 @@ test("narrow viewport keeps the book usable without horizontal overflow", async 
       return {
         side,
         display: getComputedStyle(node).display,
+        backgroundImage: getComputedStyle(node).backgroundImage,
+        frameDisplay: getComputedStyle(node, "::before").display,
         width: rect.width,
         height: rect.height,
         left: rect.left,
@@ -512,9 +547,11 @@ test("narrow viewport keeps the book usable without horizontal overflow", async 
   expect(underlays[0]).toMatchObject({
     side: "front",
     display: "block",
+    frameDisplay: "none",
     width: 370,
     height: 507,
   });
+  expect(underlays[0].backgroundImage).not.toContain("book-covers");
   expect(underlays[0].left).toBeCloseTo(underlays[0].bookLeft, 0);
   expect(underlays[1]).toMatchObject({ side: "back", display: "none" });
 

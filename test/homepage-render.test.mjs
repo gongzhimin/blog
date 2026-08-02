@@ -197,14 +197,29 @@ test("homepage renders stable cover underlays outside turnjs page wrappers", asy
     styles,
     ".sj-book .book-cover-underlay",
   );
+  const frameBlock = readCssBlock(
+    styles,
+    ".sj-book .book-cover-underlay::before",
+  );
   const frontBlock = readCssBlock(
     styles,
     ".sj-book .book-cover-underlay--front",
+  );
+  const frontFrameBlock = readCssBlock(
+    styles,
+    ".sj-book .book-cover-underlay--front::before",
   );
   const backBlock = readCssBlock(
     styles,
     ".sj-book .book-cover-underlay--back",
   );
+  const backFrameBlock = readCssBlock(
+    styles,
+    ".sj-book .book-cover-underlay--back::before",
+  );
+  const horizontalInset = config.book.hardPage.width - config.book.contentPage.width;
+  const verticalInset =
+    (config.book.hardPage.height - config.book.contentPage.height) / 2;
 
   assert.equal(layers.length, 2);
   assert.deepEqual(
@@ -229,14 +244,16 @@ test("homepage renders stable cover underlays outside turnjs page wrappers", asy
     underlayBlock,
     new RegExp(`height: ${config.book.hardPage.height}px`),
   );
+  assert.doesNotMatch(underlayBlock, /background-image:\s*url/);
+  assert.match(frameBlock, /content:\s*""/);
+  assert.match(frameBlock, /position:\s*absolute/);
+  assert.match(frameBlock, /inset:\s*0/);
   assert.match(
-    underlayBlock,
-    new RegExp(
-      cover.image.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
-    ),
+    frameBlock,
+    new RegExp(cover.image.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")),
   );
   assert.match(
-    frontBlock,
+    frontFrameBlock,
     new RegExp(
       cover.positions.frontInside.replace(
         /[.*+?^${}()|[\]\\]/g,
@@ -245,11 +262,19 @@ test("homepage renders stable cover underlays outside turnjs page wrappers", asy
     ),
   );
   assert.match(
-    backBlock,
+    backFrameBlock,
     new RegExp(
       cover.positions.back.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
     ),
   );
+  assert.match(frontBlock, /left:\s*0/);
+  assert.match(backBlock, /right:\s*0/);
+  assert.match(frontFrameBlock, /clip-path:\s*polygon\(/);
+  assert.match(backFrameBlock, /clip-path:\s*polygon\(/);
+  assert.match(frontFrameBlock, new RegExp(`${horizontalInset}px`));
+  assert.match(frontFrameBlock, new RegExp(`${verticalInset}px`));
+  assert.match(backFrameBlock, new RegExp(`${horizontalInset}px`));
+  assert.match(backFrameBlock, new RegExp(`${verticalInset}px`));
   assert.match(
     styles,
     new RegExp(
@@ -259,6 +284,10 @@ test("homepage renders stable cover underlays outside turnjs page wrappers", asy
   assert.match(
     styles,
     /\.sj-book \.book-cover-underlay--back \{ display: none; \}/,
+  );
+  assert.match(
+    styles,
+    /\.sj-book \.book-cover-underlay::before \{ display: none; \}/,
   );
 });
 

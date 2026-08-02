@@ -9,6 +9,9 @@ export function buildHomepageStyles({
   theme,
 }) {
   const paperTexture = book.paperTexture || {};
+  const horizontalCoverInset = book.hardPage.width - book.contentPage.width;
+  const verticalCoverInset =
+    (book.hardPage.height - book.contentPage.height) / 2;
   const paperTextureCSS = paperTexture.enabled
     ? `
   .sj-book .own-size {
@@ -145,7 +148,14 @@ export function buildHomepageStyles({
     height: ${book.hardPage.height}px;
     z-index: 0;
     pointer-events: none;
-    background-color: white;
+    background-color: #f2f1ec;
+  }
+
+  .sj-book .book-cover-underlay::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
     background-image: url(${cover.image});
     background-repeat: no-repeat;
     background-size: ${cover.backgroundSize};
@@ -153,12 +163,58 @@ export function buildHomepageStyles({
 
   .sj-book .book-cover-underlay--front {
     left: 0;
+  }
+
+  .sj-book .book-cover-underlay--front::before {
     background-position: ${cover.positions.frontInside};
+    -webkit-clip-path: polygon(
+      0 0,
+      100% 0,
+      100% ${verticalCoverInset}px,
+      ${horizontalCoverInset}px ${verticalCoverInset}px,
+      ${horizontalCoverInset}px calc(100% - ${verticalCoverInset}px),
+      100% calc(100% - ${verticalCoverInset}px),
+      100% 100%,
+      0 100%
+    );
+    clip-path: polygon(
+      0 0,
+      100% 0,
+      100% ${verticalCoverInset}px,
+      ${horizontalCoverInset}px ${verticalCoverInset}px,
+      ${horizontalCoverInset}px calc(100% - ${verticalCoverInset}px),
+      100% calc(100% - ${verticalCoverInset}px),
+      100% 100%,
+      0 100%
+    );
   }
 
   .sj-book .book-cover-underlay--back {
     right: 0;
+  }
+
+  .sj-book .book-cover-underlay--back::before {
     background-position: ${cover.positions.back};
+    -webkit-clip-path: polygon(
+      0 0,
+      100% 0,
+      100% 100%,
+      0 100%,
+      0 calc(100% - ${verticalCoverInset}px),
+      calc(100% - ${horizontalCoverInset}px) calc(100% - ${verticalCoverInset}px),
+      calc(100% - ${horizontalCoverInset}px) ${verticalCoverInset}px,
+      0 ${verticalCoverInset}px
+    );
+    clip-path: polygon(
+      0 0,
+      100% 0,
+      100% 100%,
+      0 100%,
+      0 calc(100% - ${verticalCoverInset}px),
+      calc(100% - ${horizontalCoverInset}px) calc(100% - ${verticalCoverInset}px),
+      calc(100% - ${horizontalCoverInset}px) ${verticalCoverInset}px,
+      0 ${verticalCoverInset}px
+    );
   }
 
   .sj-book.book-at-first .book-cover-underlay,
@@ -259,6 +315,7 @@ ${paperTextureCSS}
     .sj-book .hard,
     .sj-book .own-size { width: ${mobileContentPage.width}px !important; height: ${mobileContentPage.height}px !important; }
     .sj-book .book-cover-underlay { width: ${mobileContentPage.width}px !important; height: ${mobileContentPage.height}px !important; }
+    .sj-book .book-cover-underlay::before { display: none; }
     .sj-book .book-cover-underlay--back { display: none; }
     #slider-bar { display: none; }
     body { overflow-x: hidden !important; }
