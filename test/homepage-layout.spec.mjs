@@ -335,7 +335,10 @@ test("closed covers hide the unused underlay half", async ({ page }) => {
     await expect
       .poll(() => readCurrentTurnPage(page), { timeout: 5_000 })
       .toBe(endpoint.pageNumber);
-    await page.waitForTimeout(900);
+    await expect(page.locator(".sj-book")).toHaveClass(
+      new RegExp(`book-at-${endpoint.pageNumber === 1 ? "first" : "last"}`),
+      { timeout: 5_000 },
+    );
 
     const state = await page.evaluate(() => {
       const root = document.querySelector(".sj-book");
