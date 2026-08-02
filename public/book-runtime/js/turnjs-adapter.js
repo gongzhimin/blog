@@ -304,7 +304,11 @@
               }
             }
           },
-          start: function() { isTurning = true; moveBar(true); },
+          start: function() {
+            isTurning = true;
+            $(this).removeClass('book-at-first book-at-last');
+            moveBar(true);
+          },
           end: function() {
             isTurning = false;
             var book = $(this);

@@ -161,8 +161,10 @@ export function buildHomepageStyles({
     background-position: ${cover.positions.back};
   }
 
-  .sj-book.book-at-first .book-cover-underlay--front,
-  .sj-book.book-at-last .book-cover-underlay--back {
+  .sj-book.book-at-first .book-cover-underlay,
+  .sj-book.book-at-last .book-cover-underlay,
+  .sj-book.book-at-first .book-depth--back,
+  .sj-book.book-at-last .book-depth--front {
     display: none;
   }
 

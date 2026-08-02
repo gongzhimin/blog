@@ -89,7 +89,7 @@ test("cover underlays stay mounted across consecutive page turns", async ({ page
 
 - [ ] **步骤 3：新增首尾闭合状态和移动端测试**
 
-跳转到第 1 页与最后一页，分别断言左、右多余底衬隐藏；在 390px 视口下断言左底衬为 `370 × 507`、右底衬隐藏。角落预览时同时断言 Turn.js 处于动画状态、存在移动页，且两块底衬的背景图、背景位置、层级和左右边界正确。
+跳转到第 1 页与最后一页，断言两块底衬均隐藏，并分别断言右、左书口厚度隐藏；在 390px 视口下断言中间页左底衬为 `370 × 507`、右底衬隐藏。角落预览时同时断言 Turn.js 处于动画状态、存在移动页，且两块底衬和对应书口恢复显示。
 
 - [ ] **步骤 4：运行交互测试并确认失败**
 
@@ -144,7 +144,7 @@ test("cover underlays stay mounted across consecutive page turns", async ({ page
 
 - [ ] **步骤 3：维护闭合端点状态**
 
-在适配器初始化和动画完成后维护 `book-at-first` / `book-at-last` 类；`turning` 时清除两个类，使动画期间两块底衬都保持可见。CSS 在第一页 settled 状态隐藏左底衬、最后一页 settled 状态隐藏右底衬；中间页保持两块底衬可见。
+在适配器初始化和动画完成后维护 `book-at-first` / `book-at-last` 类；`start` 和 `turning` 时清除两个类，使动画期间两块底衬都保持可见。CSS 在第一页和最后一页 settled 状态隐藏两块底衬，并分别隐藏右、左书口厚度；中间页保持两块底衬和书口可见。
 
 - [ ] **步骤 4：运行目标测试并确认通过**
 

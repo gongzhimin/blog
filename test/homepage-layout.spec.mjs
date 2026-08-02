@@ -289,7 +289,9 @@ test("cover underlays stay mounted across consecutive page turns", async ({
   }
 });
 
-test("closed covers hide the unused underlay half", async ({ page }) => {
+test("closed covers hide overlapping underlays and page depth", async ({
+  page,
+}) => {
   await page.setViewportSize({ width: 1200, height: 820 });
   await page.goto("/", { waitUntil: "domcontentloaded" });
   await expect(page.locator(".sj-book")).toBeVisible();
@@ -298,8 +300,14 @@ test("closed covers hide the unused underlay half", async ({ page }) => {
     window.jQuery(".sj-book").turn("pages"),
   );
   const endpoints = [
-    { pageNumber: 1, hidden: "front", visible: "back" },
-    { pageNumber: totalPages, hidden: "back", visible: "front" },
+    {
+      pageNumber: 1,
+      hiddenDepth: "back",
+    },
+    {
+      pageNumber: totalPages,
+      hiddenDepth: "front",
+    },
   ];
 
   for (const endpoint of endpoints) {
@@ -317,20 +325,27 @@ test("closed covers hide the unused underlay half", async ({ page }) => {
 
     const turningState = await page.evaluate(() => {
       const root = document.querySelector(".sj-book");
-      const readDisplay = (side) =>
-        getComputedStyle(
-          root.querySelector(`.book-cover-underlay--${side}`),
-        ).display;
+      const read = (selector) => {
+        const node = root.querySelector(selector);
+        return {
+          display: getComputedStyle(node).display,
+          width: node.getBoundingClientRect().width,
+        };
+      };
       return {
         animating: window.jQuery(root).turn("animating"),
-        frontDisplay: readDisplay("front"),
-        backDisplay: readDisplay("back"),
+        front: read(".book-cover-underlay--front"),
+        back: read(".book-cover-underlay--back"),
+        frontDepth: read(".book-depth--front"),
+        backDepth: read(".book-depth--back"),
       };
     });
 
     expect(turningState.animating).toBe(true);
-    expect(turningState.frontDisplay).toBe("block");
-    expect(turningState.backDisplay).toBe("block");
+    expect(turningState.front.display).toBe("block");
+    expect(turningState.back.display).toBe("block");
+    expect(turningState[`${endpoint.hiddenDepth}Depth`].display).toBe("block");
+    expect(turningState[`${endpoint.hiddenDepth}Depth`].width).toBeGreaterThan(0);
 
     await expect
       .poll(() => readCurrentTurnPage(page), { timeout: 5_000 })
@@ -342,8 +357,8 @@ test("closed covers hide the unused underlay half", async ({ page }) => {
 
     const state = await page.evaluate(() => {
       const root = document.querySelector(".sj-book");
-      const read = (side) => {
-        const node = root.querySelector(`.book-cover-underlay--${side}`);
+      const read = (selector) => {
+        const node = root.querySelector(selector);
         return {
           display: getComputedStyle(node).display,
           width: node.getBoundingClientRect().width,
@@ -351,18 +366,62 @@ test("closed covers hide the unused underlay half", async ({ page }) => {
       };
       return {
         className: root.className,
-        front: read("front"),
-        back: read("back"),
+        front: read(".book-cover-underlay--front"),
+        back: read(".book-cover-underlay--back"),
+        frontDepth: read(".book-depth--front"),
+        backDepth: read(".book-depth--back"),
       };
     });
 
     expect(state.className).toContain(
       `book-at-${endpoint.pageNumber === 1 ? "first" : "last"}`,
     );
-    expect(state[endpoint.hidden].display).toBe("none");
-    expect(state[endpoint.hidden].width).toBe(0);
-    expect(state[endpoint.visible].display).toBe("block");
-    expect(state[endpoint.visible].width).toBeGreaterThan(0);
+    expect(state.front.display).toBe("none");
+    expect(state.front.width).toBe(0);
+    expect(state.back.display).toBe("none");
+    expect(state.back.width).toBe(0);
+    expect(state[`${endpoint.hiddenDepth}Depth`].display).toBe("none");
+    expect(state[`${endpoint.hiddenDepth}Depth`].width).toBe(0);
+
+    const coverRect = await page.evaluate((pageNumber) => {
+      const cover = document.querySelector(`.sj-book .p${pageNumber}`);
+      return cover.getBoundingClientRect().toJSON();
+    }, endpoint.pageNumber);
+    await page.mouse.move(
+      endpoint.pageNumber === 1
+        ? coverRect.right - 20
+        : coverRect.left + 20,
+      coverRect.bottom - 20,
+    );
+    await page.waitForTimeout(180);
+
+    const previewState = await page.evaluate(() => {
+      const root = document.querySelector(".sj-book");
+      const read = (selector) => {
+        const node = root.querySelector(selector);
+        return {
+          display: getComputedStyle(node).display,
+          width: node.getBoundingClientRect().width,
+        };
+      };
+      return {
+        front: read(".book-cover-underlay--front"),
+        back: read(".book-cover-underlay--back"),
+        frontDepth: read(".book-depth--front"),
+        backDepth: read(".book-depth--back"),
+      };
+    });
+
+    expect(previewState.front.display).toBe("block");
+    expect(previewState.back.display).toBe("block");
+    expect(previewState[`${endpoint.hiddenDepth}Depth`].display).toBe("block");
+    expect(previewState[`${endpoint.hiddenDepth}Depth`].width).toBeGreaterThan(0);
+
+    await page.mouse.move(
+      coverRect.left + coverRect.width / 2,
+      coverRect.top + coverRect.height / 2,
+    );
+    await page.waitForTimeout(900);
   }
 });
 
