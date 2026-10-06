@@ -39,30 +39,27 @@ Tooling 把模块清单、当前文档及配置参考的一致性要求转为本
 ## 内部结构
 
 ```text
-packages/tooling/src/
-+-- modules.json               模块归属与依赖权威清单
-+-- api/index.mjs              唯一公开纯函数入口
-+-- internal/checks.mjs        私有依赖、链接、参考表函数
-+-- internal/documents.mjs     私有元数据、章节与目录校验
-+-- cli/
-|   +-- verify.mjs             清单、文件扫描与门禁
-|   +-- generate-reference.mjs 配置参考和编辑器 Schema 生成
-+-- config/
-|   +-- eslint.config.mjs      全仓 JavaScript 正确性规则
-|   +-- playwright.config.mjs 浏览器测试和预览服务配置
-|   +-- tsconfig.contracts.json  限定的跨模块类型检查
-+-- tests/                    边界与文档规则正反例
-+-- README.md
-+-- docs/
-    +-- explanation/design.md
-    +-- algorithms/module-dependencies.md
-    +-- reference/api.md
-    +-- testing/strategy.md
-    +-- tutorials/getting-started.md
-    +-- guides/change.md
+packages/tooling/
++-- src/
+|   +-- modules.json          模块归属权威清单
+|   +-- api/index.mjs         只读检查任务（启动子进程）
+|   +-- api/index.d.ts        检查输入与报告
+|   +-- internal/
+|   |   +-- checks.mjs        导入、全局边界与链接
+|   |   +-- documents.mjs     文档契约
+|   |   +-- testing.mjs       测试盘点与摘要判据
+|   |   +-- strict-browser-reporter.mjs  浏览器退出门禁
+|   +-- cli/
+|   |   +-- verify.mjs        文件扫描与诊断
+|   |   +-- generate-reference.mjs  参考生成
+|   |   +-- test.mjs          Node 执行与零跳过门禁
+|   |   +-- packages.mjs      tarball 消费与类型验收
+|   +-- config/               ESLint、Playwright、契约 TS
++-- tests/                    规则、版本联动及消费夹具
++-- docs/                     设计、算法、API 与测试
 ```
 
-`packages/site/src/cli/update-daily-quote.mjs` 归 Site 管理，它调用 Site 的引语入口并更新快照，不属于边界检查 CLI。跨模块工程场景和真实生成来源的回归位于根 `tests/integration/`。
+`packages/site/src/cli/update-daily-quote.mjs` 归 Site 管理，调用包内引语服务并更新快照，不属于边界检查 CLI，也不是 Site 包根导出。跨模块工程场景和真实生成来源的回归位于根 `tests/integration/`。
 
 ## 依赖与数据流
 

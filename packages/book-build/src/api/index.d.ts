@@ -5,6 +5,8 @@ export type {
   BookDocument,
   BookEntry,
   BookRuntime,
+  BookRuntimeConfig,
+  RuntimePagination,
   JsonBookEntryInput,
   JsonBookInput,
   RuntimeArticle,

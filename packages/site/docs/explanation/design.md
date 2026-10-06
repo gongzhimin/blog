@@ -54,7 +54,7 @@ Astro Content Collections (生活与技术文稿资产)
                      |
                      v
 +-----------------------------------------------------------+
-| Site API 核心边界 (api/index.mjs)                         |
+| Site 内部构建与维护职责（不是公开导出清单）               |
 |   |-- 内容源适配器 (sources/) -----> 过滤草稿并构建 BookDocument |
 |   |-- 目录与归档服务 (catalog/) ----> 投影经典双栏与归档列表     |
 |   |-- 视觉配置验证 (config/) -----> 校验 Schema 并注入 CSS 变量 |
@@ -75,6 +75,7 @@ Astro Content Collections (生活与技术文稿资产)
 - **目录服务（`catalog/`）**：负责为经典首页和归档页生成轻量级文章索引列表，包含紧凑日期格式化与窄屏自适应隐藏计算；
 - **配置与样式引擎（`config/` 与 `styles/`）**：负责校验 `homepage-config.json`，并将断点间距、字体族与亮/暗色阶映射为 CSS 自定义属性；
 - **格言同步服务（`quotes/`）**：由句子更新 CLI 请求外部每日一句接口，页面构建只读取仓库快照，管理超时中断并在网络故障时安全回退至上一次快照。
+- **浏览器交互（internal/turnjs-adapter.js、book-app.js）**：消费 Runtime 的页数组与映射，装配 Turn.js 并处理触摸、目录、深链接和动画。适配器不属于 Runtime API；它使用 SiteReader 私有命名空间。
 
 ## 数据与接口
 

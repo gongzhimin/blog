@@ -1,6 +1,6 @@
 {
   "name": "@myblog/publishing",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "engines": {
     "node": "^22.13.0 || >=24"
@@ -11,7 +11,10 @@
     "README.md"
   ],
   "exports": {
-    ".": "./src/api/index.cjs"
+    ".": {
+      "types": "./src/api/index.d.cts",
+      "default": "./src/api/index.cjs"
+    }
   },
   "scripts": {
     "test": "node --test tests/*.test.*"

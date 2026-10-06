@@ -19,6 +19,8 @@
         "packages/site/tests/homepage-data.test.mjs",
         "packages/site/tests/homepage-config.test.mjs",
         "packages/site/tests/cursor-dot.test.mjs",
+        "packages/site/tests/turnjs-adapter.test.mjs",
+        "packages/site/tests/book-app-mobile.test.mjs",
         "packages/site/tests/book-theme-styles.test.mjs",
         "tests/integration/homepage-render.test.mjs",
         "tests/integration/archive-render.test.mjs",
@@ -57,12 +59,13 @@
       "testRoot": "packages/book-runtime/tests",
       "owns": ["packages/book-runtime/"],
       "dependencies": [],
-      "entries": ["packages/book-runtime/src/api/index.mjs"],
+      "entries": [
+        "packages/book-runtime/src/api/index.mjs",
+        "packages/book-runtime/src/api/index.d.ts"
+      ],
       "tests": [
         "packages/book-runtime/tests/paginator-config.test.mjs",
         "packages/book-runtime/tests/runtime-lifecycle.test.mjs",
-        "packages/book-runtime/tests/turnjs-adapter.test.mjs",
-        "packages/book-runtime/tests/book-app-mobile.test.mjs",
         "tests/integration/book-runtime-boundary.test.mjs",
         "tests/integration/book-runtime-demo.test.mjs",
         "tests/integration/turnjs-integration.test.mjs",
@@ -79,7 +82,10 @@
       "testRoot": "packages/publishing/tests",
       "owns": ["packages/publishing/"],
       "dependencies": [],
-      "entries": ["packages/publishing/src/api/index.cjs"],
+      "entries": [
+        "packages/publishing/src/api/index.cjs",
+        "packages/publishing/src/api/index.d.cts"
+      ],
       "tests": [
         "packages/publishing/tests/webhook-receiver.test.cjs",
         "packages/publishing/tests/cli.test.cjs",
@@ -95,7 +101,10 @@
       "testRoot": "packages/operations/tests",
       "owns": ["packages/operations/"],
       "dependencies": [],
-      "entries": ["packages/operations/src/api/index.cjs"],
+      "entries": [
+        "packages/operations/src/api/index.cjs",
+        "packages/operations/src/api/index.d.cts"
+      ],
       "tests": [
         "packages/operations/tests/server-health-check.test.mjs",
         "packages/operations/tests/cli.test.mjs",
@@ -110,13 +119,17 @@
       "testRoot": "packages/tooling/tests",
       "owns": ["packages/tooling/"],
       "dependencies": ["site", "book-build"],
-      "entries": ["packages/tooling/src/api/index.mjs"],
+      "entries": [
+        "packages/tooling/src/api/index.mjs",
+        "packages/tooling/src/api/index.d.ts"
+      ],
       "tests": [
         "packages/tooling/tests/engineering-boundaries.test.mjs",
         "packages/tooling/tests/public-api.test.mjs",
         "packages/tooling/tests/document-contract.test.mjs",
         "packages/tooling/tests/workspace-scan.test.mjs",
         "packages/tooling/tests/test-policy.test.mjs",
+        "packages/tooling/tests/versioning.test.mjs",
         "tests/integration/engineering-system.test.mjs",
         "tests/integration/module-layout.test.mjs",
         "tests/integration/generated-reference.test.mjs"
@@ -124,7 +137,8 @@
       "applicationEntries": [
         "packages/tooling/src/cli/verify.mjs",
         "packages/tooling/src/cli/generate-reference.mjs",
-        "packages/tooling/src/cli/test.mjs"
+        "packages/tooling/src/cli/test.mjs",
+        "packages/tooling/src/cli/packages.mjs"
       ]
     }
   ]

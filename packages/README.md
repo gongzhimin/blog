@@ -61,7 +61,7 @@ related:
 | ------------ | ------------------------------------------------ | ---------------------------------- |
 | Site         | 读取 Astro 集合、筛选内容、组织路由和页面        | 页面、`BookDocument`、书籍展示资源 |
 | Book Build   | 校验书籍配置，把 `BookDocument` 渲染成浏览器载荷 | `BookRuntime` 数据或诊断           |
-| Book Runtime | 在浏览器测量 DOM、分页、映射文章并控制 Turn.js   | 物理页、文章页映射或诊断           |
+| Book Runtime | 在浏览器测量 DOM、分页与映射文章                 | 物理页、文章页映射或诊断           |
 | Publishing   | 校验 webhook 请求、规划文件变更并写入 GitHub     | HTTP 结果及远端提交状态            |
 | Operations   | 执行服务器和站点只读探针                         | 分项检查结果及进程退出码           |
 | Tooling      | 检查模块边界、文档和配置参考                     | 诊断或生成的参考文件               |
@@ -134,6 +134,7 @@ Site 的 Astro 页面直接组合 Site 自有组件；它们不再从其他包�
 ```text
 本地开发：npm run dev
 本地验收：npm run verify
+包交付验收：npm run check:packages
 浏览器验收：npm run test:e2e
 
 移动发布：客户端 -> Publishing -> GitHub ref 更新 -> CI -> Site 构建/部署
@@ -147,6 +148,8 @@ Webhook 的 HTTP 成功表示远端内容分支已更新，不代表 CI 或部�
 统一包根导入让调用者只需记一个路径；包内部仍可提供不同任务函数，避免用一个带 `kind` 分支的万能函数隐藏职责。Site 持有 Astro 组件，因为路由、HTML 和资源加载都由 Site 决定。Book Build 和 Runtime 只保留可跨包复用的数据任务，不暴露宿主组件子路径。
 
 六包不是一条串行链：Site/Book Build/Runtime 构成阅读流程；Publishing 构成独立写入流程；Operations 观察运行结果；Tooling 在开发和 CI 验证工程资料。
+
+私有版本由 Changesets 管理，未配置 registry 发布或 tag。版本与精确 workspace 依赖一起更新；包根类型声明随 tarball 交付。具体版本读各包 package.json，不在本页维护重复数字。
 
 ## 风险与验证
 

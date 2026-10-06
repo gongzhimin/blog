@@ -42,6 +42,8 @@ Operations 的包根只提供一个任务入口：执行项目配置的默认健
 
 **签名**：`runHealthChecks(): Promise<HealthReport>`
 
+公开声明见 [index.d.cts](../../src/api/index.d.cts)。没有用户输入；返回报告不含恢复或重启能力。
+
 无参数、无调用方默认值。函数读取包内受控探针定义并使用系统 shell runner。当前配置检查 Nginx、Webhook 服务、环境文件、监听端口和公网首页；目标主机和探针策略见[运维设计](../explanation/design.md)及[服务器指南](../guides/server-runtime/README.md)。
 
 返回字段：

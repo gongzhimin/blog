@@ -262,7 +262,10 @@ test('acceptance configuration prevents warning, retry, stale build and CI compa
   assert.match(scripts.check, /--minimumFailingSeverity hint/);
   assert.match(scripts.lint, /--max-warnings=0/);
   assert.match(scripts.verify, /npm run check:tests/);
-  assert.equal(scripts['verify:release'], 'npm run verify && npm run test:e2e');
+  assert.equal(
+    scripts['verify:release'],
+    'npm run verify && npm run check:packages && npm run test:e2e',
+  );
   assert.equal(scripts['pretest:e2e'], 'npm run check:tests && npm run build');
   const contracts = JSON.parse(
     readFileSync('packages/tooling/src/config/tsconfig.contracts.json', 'utf8'),

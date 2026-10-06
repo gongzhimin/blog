@@ -112,6 +112,73 @@ export function dependencyErrors(file, source, modules) {
     }
   }
   function visit(node) {
+    if (
+      ts.isPropertyAccessExpression(node) ||
+      ts.isElementAccessExpression(node)
+    ) {
+      const name = ts.isPropertyAccessExpression(node)
+        ? node.name.text
+        : ts.isStringLiteralLike(node.argumentExpression)
+          ? node.argumentExpression.text
+          : null;
+      const receiver = node.expression;
+      if (
+        name === 'BookRuntime' &&
+        from.id !== 'book-runtime' &&
+        ts.isIdentifier(receiver) &&
+        ['window', 'globalThis'].includes(receiver.text)
+      ) {
+        const parent = node.parent;
+        const member = ts.isPropertyAccessExpression(parent)
+          ? parent.name.text
+          : ts.isElementAccessExpression(parent) &&
+              ts.isStringLiteralLike(parent.argumentExpression)
+            ? parent.argumentExpression.text
+            : null;
+        if (parent.expression !== node || member !== 'API')
+          errors.push(`${file}: do not capture the private Runtime namespace`);
+      }
+      if (
+        ts.isPropertyAccessExpression(receiver) ||
+        ts.isElementAccessExpression(receiver)
+      ) {
+        const namespace = ts.isPropertyAccessExpression(receiver)
+          ? receiver.name.text
+          : ts.isStringLiteralLike(receiver.argumentExpression)
+            ? receiver.argumentExpression.text
+            : null;
+        const host = receiver.expression;
+        if (
+          ts.isIdentifier(host) &&
+          ['window', 'globalThis'].includes(host.text) &&
+          namespace === 'BookRuntime' &&
+          from.id !== 'book-runtime' &&
+          name !== 'API'
+        )
+          errors.push(
+            `${file}: Runtime browser globals must use the public API namespace`,
+          );
+      }
+    }
+    if (
+      from.id !== 'book-runtime' &&
+      ts.isVariableDeclaration(node) &&
+      node.initializer &&
+      ts.isIdentifier(node.initializer) &&
+      ['window', 'globalThis'].includes(node.initializer.text) &&
+      ts.isObjectBindingPattern(node.name)
+    ) {
+      for (const element of node.name.elements) {
+        const key = element.propertyName || element.name;
+        if (
+          (ts.isIdentifier(key) || ts.isStringLiteralLike(key)) &&
+          key.text === 'BookRuntime'
+        )
+          errors.push(
+            `${file}: do not destructure the private Runtime namespace`,
+          );
+      }
+    }
     if (ts.isImportDeclaration(node) || ts.isExportDeclaration(node)) {
       if (node.moduleSpecifier) check(node.moduleSpecifier);
     } else if (

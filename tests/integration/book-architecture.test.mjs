@@ -76,7 +76,6 @@ test('runtime entry owns initialization order; BookShell contains only markup an
     'paginator-splitters.js',
     'paginator.js',
     'orchestrator.js',
-    'turnjs-adapter.js',
   ];
   const positions = files.map((name) => api.indexOf(name));
   assert.ok(

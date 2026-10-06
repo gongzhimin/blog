@@ -7,7 +7,7 @@ const TURNJS_ADAPTER_URL = new URL(
   import.meta.url,
 );
 
-test('Turn.js adapter clamps mobile page targets before calling turn.js', async () => {
+test('Site Turn.js adapter clamps mobile page targets before calling turn.js', async () => {
   const source = await readFile(TURNJS_ADAPTER_URL, 'utf8');
 
   assert.match(source, /function clampPageTarget\(book, page\)/);

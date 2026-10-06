@@ -15,7 +15,7 @@ async function exists(path) {
 
 test('book runtime has a dedicated Turn.js adapter outside vendor', async () => {
   assert.equal(
-    await exists('../../packages/book-runtime/src/internal/turnjs-adapter.js'),
+    await exists('../../packages/site/src/internal/turnjs-adapter.js'),
     true,
   );
   assert.equal(
@@ -25,12 +25,13 @@ test('book runtime has a dedicated Turn.js adapter outside vendor', async () => 
 
   const source = await readFile(
     new URL(
-      '../../packages/book-runtime/src/internal/turnjs-adapter.js',
+      '../../packages/site/src/internal/turnjs-adapter.js',
       import.meta.url,
     ),
     'utf8',
   );
-  assert.match(source, /window\.BookRuntime\.TurnAdapter/);
+  assert.match(source, /window\.SiteReader\s*=\s*\{/);
+  assert.match(source, /TurnAdapter:\s*\{/);
   assert.match(source, /function createTurnJsAdapter/);
   assert.doesNotMatch(source, /destroy:/);
   assert.doesNotMatch(source, /currentPage:/);
@@ -57,7 +58,7 @@ test('Turn.js adapter updates stable depth layers instead of page children', asy
   const [adapter, styles] = await Promise.all([
     readFile(
       new URL(
-        '../../packages/book-runtime/src/internal/turnjs-adapter.js',
+        '../../packages/site/src/internal/turnjs-adapter.js',
         import.meta.url,
       ),
       'utf8',

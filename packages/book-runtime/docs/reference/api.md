@@ -33,7 +33,7 @@ related:
 | ---------------------- | ----------------------- | ---------- | ---------------------- |
 | `@myblog/book-runtime` | `paginateBook(payload)` | 浏览器 DOM | 整本测量分页与导航映射 |
 
-`Paginator`、`Orchestrator` 和 `TurnAdapter` 是内部实现命名空间，不属于 package exports，不承诺跨版本稳定。
+`Paginator` 和 `Orchestrator` 是内部实现命名空间，不属于 package exports，不承诺跨版本稳定。TurnAdapter 属于 Site；消费者不得通过全局变量访问 Runtime 私有成员。
 
 ## 输入与配置
 
@@ -53,7 +53,7 @@ related:
 | `source.documentTitle`     | `string`                   | 否   | 页面标题元数据，缺省空字符串                                            |
 | `footer.content.author`    | `string`                   | 否   | 封底/版权页作者，缺省“志民”                                             |
 
-`PaginationConfig` 的 `articleWidth`、`articleHeight`、`tocWidth`、`tocHeight` 为 CSS px 数值；可选 `articleCSS`、`tocCSS` 覆盖 BookShell 的 `window.MEASURE_CSS`。配置必须与实际显示主题尺寸相符。函数要求当前浏览器窗口、`document.body` 和内部 Runtime 模块已初始化；Astro Assets 会按正确顺序初始化它们。
+`PaginationConfig` 的四个尺寸字段单位为 CSS px；必须与实际显示尺寸相符。显式 CSS 优先；空字符串会清空旧样式，即使宿主有 MEASURE_CSS。只有未提供（undefined/null）时才使用宿主样式，宿主也未提供时用空字符串。函数要求导入前存在 window 和 document.body。声明见 [index.d.ts](../../src/api/index.d.ts)。
 
 ## 输出与副作用
 

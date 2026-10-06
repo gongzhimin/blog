@@ -42,6 +42,8 @@ import { inspectRepository } from '@myblog/tooling';
 
 **签名**：`inspectRepository(input?: InspectRepositoryInput): InspectRepositoryReport`
 
+公开声明见 [index.d.ts](../../src/api/index.d.ts)。类型契约约束 mode 取值，JavaScript 非法输入仍由运行时拒绝。
+
 调用是同步的，因为它只启动一个本地检查子进程；它不会访问网络，也不会修改仓库文件。
 
 | 字段   | 类型                              | 必填 | 默认值          | 约束与作用                             |

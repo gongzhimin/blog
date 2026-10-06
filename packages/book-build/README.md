@@ -49,8 +49,8 @@ packages/book-build/
   src/api/content.mjs        文章正文转换
   src/api/book-theme.mjs     CSS 字符串到主题样式的转换
   src/api/book-config.schema.json 配置校验 Schema
-  src/internal/              私有来源、装配、渲染、配置和主题转换算法
-  tests/                     JSON 来源与主题单元测试
+  src/internal/              装配、渲染、配置和主题转换算法
+  tests/                     主题与公开任务单元测试；来源转换归 Site
   docs/                      设计、算法、API、教程、指南与测试方案
 ```
 

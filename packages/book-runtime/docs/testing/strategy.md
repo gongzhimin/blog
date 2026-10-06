@@ -32,7 +32,7 @@ related:
 
 ## 测试分层
 
-paginator-config、runtime-lifecycle 和 turnjs-adapter 使用 JSDOM/受控替身验证规则、状态和清理；book-app-mobile 验证局部事件。产物边界在 tests/integration。真实几何、富文本属性、多页目录、可见导航和特殊页在 tests/e2e/pagination-behavior.spec.mjs 与 test-pages-debug.spec.mjs。
+paginator-config、runtime-lifecycle 使用 JSDOM/受控替身验证分页规则、状态和清理。turnjs-adapter 和 book-app-mobile 的单测属于 Site。产物边界在 tests/integration。真实几何、富文本属性、多页目录、可见导航和特殊页在 tests/e2e/pagination-behavior.spec.mjs 与 test-pages-debug.spec.mjs。
 
 模块测试使用本包夹具；读取其他包的实例配置、私有实现或构建产物时归集成层。测试清单在 `packages/tooling/src/modules.json`，新增文件必须登记并通过递归盘点。
 

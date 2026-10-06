@@ -42,6 +42,8 @@ Publishing 是仓库内移动文章发布服务，不是通用 GitHub SDK。包�
 
 **签名**：`startServer(): http.Server`
 
+公开声明见 [index.d.cts](../../src/api/index.d.cts)。监听尚未就绪时句柄仍会返回；宿主须处理 listening/error 事件，尤其端口占用不是同步成功。
+
 无参数。调用前必须通过环境变量提供非空 `BLOG_WEBHOOK_TOKEN`；GitHub 仓库、分支和访问 Token 由服务环境配置。服务固定监听 `127.0.0.1:9000`，外部请求应通过受控反向代理进入。
 
 HTTP 协议为 `POST /webhook`。请求体为 JSON；顶层字段名会先 trim，`token` 以原值与 `BLOG_WEBHOOK_TOKEN` 比较，Authorization 请求头不用于客户端鉴权。

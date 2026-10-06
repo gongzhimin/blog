@@ -39,15 +39,17 @@ related:
 ## 内部结构
 
 ```text
-packages/publishing/src/
-  api/index.cjs          明确公开入口
-  internal/input.cjs     标题、换行、图片输入转换
-  internal/planning.cjs  文章身份、目标文件与删除计划
-  internal/github.cjs    仓库快照与 Git 对象 transport
-  internal/http.cjs      请求与服务生命周期
-  cli/publish.cjs        服务启动；调用公开 API
-  tests/                转换/提交计划及回环 HTTP 测试
-  docs/                  模块资料
+packages/publishing/
++-- src/
+|   +-- api/index.cjs         唯一启动任务
+|   +-- api/index.d.cts       服务句柄声明
+|   +-- internal/input.cjs    正文、标题与图片转换
+|   +-- internal/planning.cjs 身份、文件与删除计划
+|   +-- internal/github.cjs   Git 对象 transport
+|   +-- internal/http.cjs     HTTP 与实例队列
+|   +-- cli/publish.cjs       显式启动
++-- tests/                    转换、提交与回环 HTTP
++-- docs/                     设计、协议与操作资料
 ```
 
 调用者只通过 api/index.cjs 进入模块；internal 不承担跨模块契约。CLI 显式启动服务，导入 API 不创建 HTTP 对象。

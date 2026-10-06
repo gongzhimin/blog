@@ -540,9 +540,10 @@
     };
   }
 
-  window.BookRuntime = window.BookRuntime || {};
-  window.BookRuntime.TurnAdapter = {
-    create: createTurnJsAdapter,
-    paperCropForPage: paperCropForPage,
+  window.SiteReader = {
+    TurnAdapter: {
+      create: createTurnJsAdapter,
+      paperCropForPage: paperCropForPage,
+    },
   };
 })();

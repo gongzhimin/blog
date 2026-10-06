@@ -1,6 +1,28 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { dependencyErrors, moduleErrors } from '../src/internal/checks.mjs';
+test('cross-package browser globals cannot bypass public API boundaries', () => {
+  for (const source of [
+    'window.BookRuntime.TurnAdapter.create({})',
+    'window["BookRuntime"]["Paginator"].configure({})',
+    'const alias = globalThis.BookRuntime.Orchestrator',
+    'const runtime = window.BookRuntime; runtime.Orchestrator.createPageCache({})',
+    'const { Paginator } = window.BookRuntime; Paginator.configure({})',
+    'const { BookRuntime: runtime } = window; runtime.Paginator.configure({})',
+  ])
+    assert.ok(
+      dependencyErrors('packages/site/src/use.js', source, modules).length,
+      source,
+    );
+  assert.deepEqual(
+    dependencyErrors(
+      'packages/site/src/use.js',
+      'window.BookRuntime.API.paginateBook(payload)',
+      modules,
+    ),
+    [],
+  );
+});
 const modules = [
   {
     id: 'site',

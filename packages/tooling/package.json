@@ -1,6 +1,6 @@
 {
   "name": "@myblog/tooling",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "type": "module",
   "engines": {
@@ -12,14 +12,17 @@
     "README.md"
   ],
   "exports": {
-    ".": "./src/api/index.mjs"
+    ".": {
+      "types": "./src/api/index.d.ts",
+      "default": "./src/api/index.mjs"
+    }
   },
   "scripts": {
     "test": "node --test tests/*.test.*"
   },
   "dependencies": {
-    "@myblog/book-build": "0.1.0",
-    "@myblog/site": "0.1.0",
+    "@myblog/book-build": "0.1.1",
+    "@myblog/site": "0.1.1",
     "js-yaml": "^4.3.2",
     "typescript": "^5.9.3"
   },

@@ -10,6 +10,10 @@
     "node": "^22.13.0 || >=24"
   },
   "scripts": {
+    "changeset": "changeset",
+    "version:status": "changeset status",
+    "version:packages": "changeset version",
+    "check:packages": "node packages/tooling/src/cli/packages.mjs",
     "dev": "astro dev",
     "build": "astro build",
     "check": "astro check --minimumFailingSeverity hint",
@@ -23,7 +27,7 @@
     "check:tests": "node packages/tooling/src/cli/test.mjs --check",
     "test:node": "node packages/tooling/src/cli/test.mjs",
     "verify": "npm run format:check && npm run lint && npm run check:contracts && npm run check:docs && npm run check:boundaries && npm run check:tests && npm run check && npm run build && npm run test:node",
-    "verify:release": "npm run verify && npm run test:e2e",
+    "verify:release": "npm run verify && npm run check:packages && npm run test:e2e",
     "preview": "astro preview",
     "test": "npm run build && npm run test:node",
     "test:homepage": "npm run build && node --test packages/site/tests/homepage-*.test.mjs tests/integration/homepage-*.test.mjs",
@@ -73,6 +77,7 @@
     "typescript": "^5.9.3"
   },
   "devDependencies": {
+    "@changesets/cli": "^3.0.3",
     "@iconify-json/lucide": "^1.2.114",
     "@playwright/test": "^1.61.0",
     "eslint": "^10.12.0",

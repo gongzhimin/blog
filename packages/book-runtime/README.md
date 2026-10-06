@@ -36,22 +36,24 @@ related:
 
 提供正文与目录分页、文本/列表/表格/代码块分割、目录点击、URL 定位、键盘及触摸。包根只提供 `paginateBook(payload)`，一次配置测量并完成整本分页，返回物理页和文章映射。物理页用于 Turn.js，显示页是正文数字或目录罗马数字，不能互换。分页同步执行，没有字体/图片统一就绪屏障或自动缓存失效。超高不可拆分元素仍可能溢出。
 
-Runtime 包只处理浏览器分页与 Turn.js 适配，不负责 Astro 页面、应用启动和光标样式。Site 浏览器入口先导入 Runtime 包根，再启动本地 `book-app.js`；Runtime 不导出 Astro 组件，也不提供独立 destroy 生命周期。
+Runtime 包只处理浏览器分页；Turn.js 适配、Astro 页面、启动和光标属于 Site。Site 从包根调用分页，不读取 Runtime 内部缓存或适配器。Runtime 不创建持久交互资源，也不提供 destroy 生命周期。
 
 ## 内部结构
 
-core 维护共享测量配置，splitters 提供元素分割策略，paginator 组合策略；orchestrator 管理全书页轴，adapter 隔离第三方交互，app 负责启动。
+core 管理测量配置，splitters 分割元素，paginator 执行测量，orchestrator 校准目录并组装页轴。交互和页面启动在 Site。
 
 ```text
-packages/book-runtime/src/
-  api/index.mjs              唯一包根入口与分页函数 paginateBook
-  internal/paginator-core.js 配置和临时测量 DOM
-  internal/paginator-splitters.js 富文本分割
-  internal/paginator.js      正文与目录分页
-  internal/orchestrator.js   缓存、映射与封底
-  internal/turnjs-adapter.js  第三方交互适配
-  tests/                    分页、编排和适配器测试
-  docs/                     设计、算法、API、操作与测试
+packages/book-runtime/
++-- src/
+|   +-- api/index.mjs          唯一任务 paginateBook
+|   +-- api/index.d.ts         输入、分页结果与诊断类型
+|   +-- internal/
+|       +-- paginator-core.js 测量配置与临时 DOM
+|       +-- paginator-splitters.js  富文本切分
+|       +-- paginator.js      正文与目录测量
+|       +-- orchestrator.js   页轴、目录校准与映射
++-- tests/                    分页、编排与清理测试
++-- docs/                     设计、算法、API 与测试
 ```
 
 ## 依赖与数据流
@@ -63,7 +65,7 @@ Book Build payload -> API/browser bootstrap
                            | HTML pages
                     Orchestrator cache
                            | physical pages
-                  TurnAdapter -> Turn.js
+                 返回页数组与映射 -> Site 适配器 -> Turn.js
 ```
 
 Site 的 `BookShell.astro` 输出 DOM 和 `window.MEASURE_CSS`；Site 的 `BookRuntimeAssets.astro` 加载 `public/vendor` 并导入 Runtime 根 API。页面启动和 CursorDot 也由 Site 持有。
@@ -119,7 +121,7 @@ Book Build payload 提供桌面与移动分页几何；`paginateBook` 根据窗�
 在 blog 根运行：
 
 ```sh
-node --test packages/book-runtime/tests/paginator-config.test.mjs packages/book-runtime/tests/book-app-mobile.test.mjs packages/book-runtime/tests/runtime-lifecycle.test.mjs
+node --test packages/book-runtime/tests/paginator-config.test.mjs packages/site/tests/book-app-mobile.test.mjs packages/book-runtime/tests/runtime-lifecycle.test.mjs
 npm run build
 npm run test:e2e
 ```

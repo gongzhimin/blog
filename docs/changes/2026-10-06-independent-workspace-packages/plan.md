@@ -1,7 +1,7 @@
 ---
 id: 'independent-workspace-packages-plan'
 type: 'record'
-status: 'active'
+status: 'historical'
 created: '2026-10-06'
 modified: '2026-10-06'
 scope: '六个独立版本 workspace 包与模块 API 重构'
@@ -16,6 +16,8 @@ related:
 ---
 
 # 六个独立版本 workspace 包重构计划
+
+此文件保存早期目标和分阶段证据，不再用未勾选项推断当前状态。部分协议版本、句柄和子路径设计未采用；当前实施边界见 [收敛验收记录](completion.md)，当前 API 以各包接口参考为准。
 
 目录：
 
@@ -158,7 +160,7 @@ Root workspace -- install/version-check/build/test --> all six packages
 
 ### 阶段 3：按依赖顺序迁移 Book Build 与 Book Runtime
 
-- [x] **步骤 3.1：迁移并收敛 Book Build。** Book Build 已位于 `packages/book-build/`；包根只导出 `buildBook({ document, config })`，Site 以包名调用。当前 `BookDocument` 含 `Date`，不是早期草案里的 JSON-safe `BookDocumentV1`；key 碰撞拒绝和深层 JSON 输出校验仍未实现，作为独立契约缺口跟踪。配置 Schema 仍是唯一权威来源。
+- [x] **步骤 3.1（当时状态）：迁移 Book Build。** 后续又加入 renderArticle 和 createBookTheme；现有三项任务均从同一个包根导出。BookDocument 保有 Date，不是早期 JSON-safe V1 提案。碰撞和深层载荷校验属于独立演进要求。
 - [ ] **步骤 3.2：补齐 Book Build API 参考。** 为 `buildBook`、文档构造、渲染、主题列表/加载、Schema 和 Astro/Vite 主题资源入口逐项定义输入字段、返回结构、格式默认值、错误、是否纯函数、示例和测试链接。删除不是独立调用任务的低层导出。
 - [x] **步骤 3.3：迁移 Runtime 并设计任务入口。** Runtime 已位于 `packages/book-runtime/`；包根 `paginateBook(payload)` 负责选择测量配置并协调分页、目录校准和映射。Astro Assets 管理页面装载和翻页插件；调用者不再调用 configure→paginate→cache→adapter 内部步骤，也不获得 `RuntimeHandle`。
 - [ ] **步骤 3.4：固定 Runtime 失败和资源语义。** 挂载检查 `protocolVersion`、视口与主题输入；TOC 重测需重新校准导航；校准不收敛必须返回明确错误，不交付错误映射。状态快照、导航返回态、订阅退订和 `destroy()` 全部测试正常、失败、重入和重复清理。

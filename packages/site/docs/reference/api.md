@@ -72,16 +72,16 @@ type Result<T> =
 
 成功值 `SiteHomepageModel` 包含：
 
-| 字段             | 类型                                                   | 含义                                                                       |
-| ---------------- | ------------------------------------------------------ | -------------------------------------------------------------------------- |
-| `document`       | `BookDocument`                                         | 从非草稿集合生成、按日期降序排列的 `zhimin-blog` 文档                      |
-| `runConfig`      | `BookRuntime`                                          | Book Build 返回的配置和文章/目录载荷；Site 附加已加载主题的 `runtime` 部分 |
-| `homepageStyles` | `string`                                               | 由 BookConfig 和主题生成的翻页首页 CSS                                     |
-| `quote`          | `{ english: string, chinese: string, author: string }` | 快照中存在的值；否则回退至 footer 配置                                     |
+| 字段             | 类型                                                   | 含义                                                                                           |
+| ---------------- | ------------------------------------------------------ | ---------------------------------------------------------------------------------------------- |
+| `document`       | `BookDocument`                                         | 从非草稿集合生成、按日期降序排列的 `zhimin-blog` 文档                                          |
+| `runConfig`      | `BookRuntimeConfig`                                    | Book Build 返回的浏览器配置，含文章/目录和测量参数；Site 将 theme.runtime 写入 runConfig.theme |
+| `homepageStyles` | `string`                                               | 由 BookConfig 和主题生成的翻页首页 CSS                                                         |
+| `quote`          | `{ english: string, chinese: string, author: string }` | 快照中存在的值；否则回退至 footer 配置                                                         |
 
 `inspectHomepageConfig` 成功返回 `{ ok: true, schema }`；失败返回 `{ ok: false, schema, diagnostic }`，Schema 仍可用于定位编辑器字段约束。
 
-函数不执行 I/O。`document.entries` 中的 `Date` 与 `metadata` 保留来源集合引用；`runConfig` 是 Book Build 返回的新配置对象，但 `theme.runtime` 与传入主题共享引用。调用方不得在模型生成后再原地修改这些共享输入。
+函数不请求引语上游、不写文件、不操作浏览器 DOM。Book Build 渲染本地图片时可能读取 cwd/public 下的尺寸。document.entries 中的 Date 与 metadata 保留来源引用；runConfig 是新配置对象，但 runConfig.theme 与输入 theme.runtime 共享引用。生成模型后不得原地修改这些共享输入。声明见 [index.d.ts](../../src/api/index.d.ts)；编译夹具验证 runConfig 可直接交给 paginateBook。
 
 ## 错误与边界
 

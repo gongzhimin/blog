@@ -68,7 +68,7 @@ BookShell -----------------------> 注入测量 CSS 与 book-data
             browser-entry --------> 初始化 book-app 顶层控制器
                  |
                  v
-          api/index.mjs ----------> 对外暴露受控接口与生命周期方法
+          api/index.mjs ----------> 唯一任务 paginateBook(payload)
                  |
     +------------+------------+
     |                         |
@@ -79,7 +79,7 @@ PaginatorCore (配置快照)    Paginator (测量与切分编排)
 Orchestrator (页轴编排/缓存) <--+
     |
     v
-TurnAdapter (事件代理与页节点创建) --> 驱动第三方 Turn.js 翻页引擎
+返回 BookPagination --> Site TurnAdapter (事件代理与页节点创建) --> Turn.js
 
 Site 页面 -> Cursor.astro --------> 挂载独立光标跟随 DOM (生命周期与书籍解耦)
 ```
@@ -90,8 +90,8 @@ Site 页面 -> Cursor.astro --------> 挂载独立光标跟随 DOM (生命周期
 2. **Paginator**：核心分页调度器，负责遍历文章并驱动各专用拆分器计算文本截断点，产出单篇文章的物理页切片数组；
 3. **Splitters**：包含文本分段、有序/无序列表切分、HTML 表格按行切分以及代码块切分的原子算法集合，尝试保持元素结构；跨页语义需专门测试；
 4. **Orchestrator**：全书编排中枢，负责管理全书物理页缓存、动态生成书籍目录、计算罗马数字页码与阿拉伯正文页码映射，以及控制封底插入位置；
-5. **TurnAdapter**：封装与第三方翻页库的底层交互，负责在翻页时按需提取缓存中的 HTML 挂载至对应 DOM 节点，并代理触摸、点击与按键事件；
-6. **book-app**：前端总控引导程序，负责读取 DOM 中注入的构建期配置、判断移动端断点、在脚本就绪后启动同步分页并在失败时执行降级逻辑。
+5. **Site TurnAdapter（包外）**：读取公开分页结果，装配 Turn.js 页面并处理触摸、点击、按键。实现和单元测试归 Site；
+6. **Site book-app（包外）**：加载载荷、调用分页任务、处理失败与移动断点。不会调用 Runtime 私有命名空间。
 
 ## 数据与接口
 
@@ -107,9 +107,9 @@ Site 页面 -> Cursor.astro --------> 挂载独立光标跟随 DOM (生命周期
   1. `physical → HTML`：物理页号到实际承载内容的映射。物理页 1、2、N-1、N 为书壳节点，物理页 3、4、目录页、正文页和可选尾衬页由 `pageCache` 动态注入；
   2. `article key → physicalStartPage`：文章导航键到物理起始页的索引，支撑 `?post=<key>` 深度链接跳转；键碰撞可能使定位不明确；
   3. `physical → displayPage`：物理页号到用户可见页脚的映射。**页码统计隔离不变量**：前四页、目录页、对齐尾衬页和最后两页均**不计入**正文页码统计与计数；正文页面是全书唯一参与页码统计的范围，显示页码严格从 1 递增至 $M$（$totalBodyPages = M$）。
-- 运行时对外暴露 `getPageKind`、`isSpecialPage`、`isCountedPage`、`physicalToBodyPage`、`bodyToPhysicalPage` 及 `getPageLayout` 等查询与转换 API。
+- 内部缓存提供页类与页码转换查询，仅供编排与算法测试；不属于包根 API。
 
-包根仅导出 `paginateBook(payload)`，将配置、正文分页、目录校准和物理页映射收敛为一次任务。结果复制为可消费的页数组和映射，不暴露缓存实例。Astro Assets 子路径负责浏览器资源加载和阅读器启动；Paginator、Orchestrator 与 TurnAdapter 都是内部实现。
+包根仅导出 `paginateBook(payload)`，将配置、正文分页、目录校准和物理页映射收敛为一次任务。返回页数组和映射副本，不暴露缓存实例。Site 自有资源组件负责脚本加载，Site 自有适配器负责交互；不存在 Runtime Assets 子路径。
 
 外部调用者不得绕过 API 规范直接导入 `internal/` 目录下的私有模块。
 
@@ -153,7 +153,7 @@ Site 页面 -> Cursor.astro --------> 挂载独立光标跟随 DOM (生命周期
          监听用户翻页 / URL 变化 / 视口缩放跨断点 (触发防抖 reload)
 ```
 
-在分页失败路径上，`book-app` 会捕获 `paginateAll()` 抛出的异常，立即调用缓存实例的 `reset()` 清理半成态缓存，并在控制台记录错误栈，同时强制将物理第 5 页渲染为初始目录列表，保留目录列表；它不保证正文页恢复。
+Site 的 book-app 将失败诊断记录到控制台，只在物理第 5 页显示初始目录；这不是正文恢复，也不是可用导航。Runtime 校准失败不会提交新缓存；Site 不调用私有 reset。
 
 目录校准重复候选或耗尽预算时在缓存与封底提交前抛错，直接 API 调用者可修正测量条件后重试；应用仍走上述异常回退。校准成功后不再测量目录，后续资源改变仍可能使布局失效。
 
@@ -191,7 +191,7 @@ Site 页面 -> Cursor.astro --------> 挂载独立光标跟随 DOM (生命周期
 
 当前证据及未覆盖范围如下：
 
-- **逻辑单元测试**：`packages/book-runtime/tests/turnjs-adapter.test.mjs` 与 `packages/book-runtime/tests/paginator-config.test.mjs` 分别核对适配器静态源码约定及共享配置快照行为，不证明实际拆分高度；与构建书壳和 vendor CSS 的配对断言另在 `tests/integration/turnjs-integration.test.mjs`；
+- **逻辑单元测试**：`packages/site/tests/turnjs-adapter.test.mjs` 与 `packages/book-runtime/tests/paginator-config.test.mjs` 分别核对适配器静态源码约定及共享配置快照行为，不证明实际拆分高度；与构建书壳和 vendor CSS 的配对断言另在 `tests/integration/turnjs-integration.test.mjs`；
 - **端到端集成测试**：`tests/e2e/pagination-behavior.spec.mjs` 与 `tests/e2e/homepage-layout.spec.mjs` 在无头 Chromium 环境中验证260/380px测量宽度的富文本连续性及高度，另有传统首页布局测试；pagination-behavior 另验证真实多页目录、1200/390px 目录点击和深链接；test-pages-debug 验证特殊页、封面类型与往返 spread。文本和代码分片新增实体、Unicode、属性和换行回归。键盘翻页仍无独立完整场景。
 
 - 未来演进方向包括：引入 `ResizeObserver` 替代全局 `resize` 监听，探索更细腻的容器级局部重排方案；

@@ -45,7 +45,7 @@ test('Turn.js adapter exposes unique paper texture crops for every configured pa
 
   vm.runInNewContext(source, context);
 
-  const cropForPage = context.window.BookRuntime.TurnAdapter.paperCropForPage;
+  const cropForPage = context.window.SiteReader.TurnAdapter.paperCropForPage;
   assert.equal(typeof cropForPage, 'function');
 
   const dynamicPageSample = 260;

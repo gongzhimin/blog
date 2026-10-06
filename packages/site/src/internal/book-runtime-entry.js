@@ -1,3 +1,4 @@
 // Static imports execute in dependency order; the bootstrap runs after API setup.
 import '@myblog/book-runtime';
+import './turnjs-adapter.js';
 import './book-app.js';

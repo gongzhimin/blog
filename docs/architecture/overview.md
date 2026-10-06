@@ -129,7 +129,7 @@ blog/
 | ------------ | ----------------------------------------------- | ------------------------------------------------------------------------------------------ |
 | Site         | 内容可见性、排序、路由及页面组合                | `buildHomepageModel(input)`；[接口](../../packages/site/docs/reference/api.md)             |
 | Book Build   | 来源无关的模型、渲染、配置和 CSS 样式转换       | `buildBook({ document, config })`；[接口](../../packages/book-build/docs/reference/api.md) |
-| Book Runtime | 浏览器测量、分页、映射、缓存和插件适配          | `paginateBook(payload)`；[接口](../../packages/book-runtime/docs/reference/api.md)         |
+| Book Runtime | 浏览器测量、分页、映射与缓存                    | `paginateBook(payload)`；[接口](../../packages/book-runtime/docs/reference/api.md)         |
 | Publishing   | 输入转换、文件计划、GitHub 提交和 HTTP 生命周期 | `startServer()`；[接口](../../packages/publishing/docs/reference/api.md)                   |
 | Operations   | 探针定义、执行重试和分项报告                    | `runHealthChecks()`；[接口](../../packages/operations/docs/reference/api.md)               |
 | Tooling      | 源码边界、文档契约和配置参考派生                | `inspectRepository(input?)`；[接口](../../packages/tooling/docs/reference/api.md)          |

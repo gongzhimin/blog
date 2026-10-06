@@ -31,8 +31,7 @@ related:
 
 1. 优化或修复文本、表格、代码块或富文本列表的分页拆分算法（`Splitters`）；
 2. 调整全书物理页轴编排、目录罗马数字页码生成或封底定位逻辑（`Orchestrator`）；
-3. 改进移动端触控手势、翻页动画过渡、滑条同步或深链接锚点恢复（`TurnAdapter`）；
-4. 调整视口尺寸变化监听（`resize`）与移动端/桌面端断点切换策略（`book-app`）。
+3. 与 Site 联调目录和深链接；触摸、动画、滑条与窗口断点的实现修改归 Site，不在 Runtime 新增交互入口。
 
 **非适用范围**：
 
@@ -54,12 +53,12 @@ related:
 
 实施变更时，开发人员必须严格对照各核心组件的修改风险矩阵与契约约束：
 
-| 修改范畴                | 核心实现路径                      | 联动风险与向下游传播影响                                 | 验证与防范策略                                        |
-| ----------------------- | --------------------------------- | -------------------------------------------------------- | ----------------------------------------------------- |
-| 拆分算法 (Splitters)    | `internal/paginator-splitters.js` | 文本切分丢失余量、富文本标签断裂导致全书排版崩溃         | 必须在桌面与移动两种视口下对比全文连续性与标签闭合性  |
-| 页轴编排 (Orchestrator) | `internal/orchestrator.js`        | 目录页数计算偏差导致正文物理起页错位、封底未在偶数页末尾 | 必须核对包含单页与多页目录时的物理页到文章映射表      |
-| 翻页适配 (TurnAdapter)  | `internal/turnjs-adapter.js`      | DOM 事件重复绑定、翻页越界或深链接锚点未正确复现         | 必须在真实浏览器中模拟深链接 `?post=<key>` 初始化场景 |
-| 引导控制器 (book-app)   | `internal/book-app.js`            | 断点切换防抖失效引发循环重载、降级目录未正确渲染         | 验证浏览器窗口快速缩放时的防抖重载逻辑                |
+| 修改范畴                | 核心实现路径                                   | 联动风险与向下游传播影响                                 | 验证与防范策略                                       |
+| ----------------------- | ---------------------------------------------- | -------------------------------------------------------- | ---------------------------------------------------- |
+| 拆分算法 (Splitters)    | `internal/paginator-splitters.js`              | 文本切分丢失余量、富文本标签断裂导致全书排版崩溃         | 必须在桌面与移动两种视口下对比全文连续性与标签闭合性 |
+| 页轴编排 (Orchestrator) | `internal/orchestrator.js`                     | 目录页数计算偏差导致正文物理起页错位、封底未在偶数页末尾 | 必须核对包含单页与多页目录时的物理页到文章映射表     |
+| Site 交互（包外）       | `packages/site/src/internal/turnjs-adapter.js` | 错误物理页输入传播到翻页                                 | 真实浏览器验证目录与深链接                           |
+| Site 启动（包外）       | `packages/site/src/internal/book-app.js`       | 分页失败的降级结果不可误用                               | 检查诊断与失败呈现                                   |
 
 ## 操作步骤
 
@@ -69,7 +68,7 @@ related:
 
 ```sh
 # 运行离线切分与自适应单元测试
-node --test packages/book-runtime/tests/paginator-config.test.mjs packages/book-runtime/tests/book-app-mobile.test.mjs
+node --test packages/book-runtime/tests/paginator-config.test.mjs packages/site/tests/book-app-mobile.test.mjs
 
 # 运行端到端分页与排版测试
 npm run test:e2e
@@ -78,7 +77,7 @@ npm run test:e2e
 ### 步骤 2：实施代码改动（写入修改）
 
 1. **核心逻辑编写**：在 `packages/book-runtime/src/internal/` 对应文件中实施改动，严禁在 `vendor/` 第三方原件目录内直接修改代码；
-2. **公共入口维护**：若调整了对外导出的分页或重置方法，必须同步更新 `packages/book-runtime/src/api/index.mjs` 中的导出定义；
+2. **公共入口维护**：分页结果变化同步 index.mjs、index.d.ts 和 Site；重置属于内部缓存，不另导出；
 3. **样式与配置联动**：若修改了测量容器尺寸或样式类名，需同步检查 `packages/site/src/components/BookShell.astro` 注入的 `MEASURE_CSS` 是否匹配。
 
 ### 步骤 3：离线单测与全站构建验证
@@ -87,13 +86,13 @@ npm run test:e2e
 
 ```sh
 # 1. 运行模块轻量单元测试
-node --test packages/book-runtime/tests/paginator-config.test.mjs packages/book-runtime/tests/book-app-mobile.test.mjs
+node --test packages/book-runtime/tests/paginator-config.test.mjs packages/site/tests/book-app-mobile.test.mjs
 
 # 2. 执行静态编译，确保产物组装未报错
 npm run build
 
 # 3. 运行适配器源码契约测试
-node --test packages/book-runtime/tests/turnjs-adapter.test.mjs
+node --test packages/site/tests/turnjs-adapter.test.mjs
 ```
 
 ### 步骤 4：真实浏览器端排版验证

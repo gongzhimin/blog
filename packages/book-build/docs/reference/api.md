@@ -120,6 +120,8 @@ Site 通过 Vite `?raw` 导入主题资源，再调用此函数；包本身不�
 
 调用会渲染 Markdown；本地图片尺寸处理可能读取当前工作目录下的 `public/` 文件。函数不请求网络、不操作 DOM、不写文件。配置是 JSON 副本；`document` 和其嵌套数据仍与输入共享引用。初始总页数是估算值，不能当作浏览器分页后的结果。
 
+成功的 value.config 类型为 BookRuntimeConfig，而不是原始 BookConfig：它额外保证 articles、toc、runtime.pagination/mobilePagination 与 source。该值可直接传给 paginateBook；正反编译夹具验证 Build→Runtime 和 Site→Runtime 的交接，不依赖 any 绕过类型检查。
+
 ## 错误与边界
 
 | 诊断 code             | phase      | 触发条件                              | 调用者处理                               |

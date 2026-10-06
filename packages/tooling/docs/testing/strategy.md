@@ -61,7 +61,7 @@ engineering-boundaries 与 document-contract 验证有限 AST/Markdown 规则；
 
 新增接口字段、配置分支、错误或状态转移时，补充对应的正常、边界和失败断言。仅断言 `ok`、非空数组或文件存在不合格；外部副作用必须检查次数、顺序以及失败后禁止的调用。
 
-公开类型的编译夹具位于 tests/fixtures/public-api-contracts.ts：正常调用必须编译，非法参数必须触发 @ts-expect-error；类型退化为 any 会因未使用的错误标记而失败。契约检查包含 Site/Build 声明文件，skipLibCheck=false，不再掩盖声明路径错误。
+公开类型的编译夹具位于 tests/fixtures/public-api-contracts.ts：六包正常调用必须编译，非法参数必须触发 @ts-expect-error；类型退化为 any 会因未使用的错误标记而失败。skipLibCheck=false，不隐藏声明路径错误。
 
 ## 执行步骤
 
@@ -85,6 +85,8 @@ npm run verify
 - 模块 API、设计和方案同步；[接口参考](../reference/api.md) 不降低源码缺陷的原定要求。
 
 ## 证据与限制
+
+versioning.test.mjs 在临时 npm workspace 运行真实 Changesets version：生产者 minor 升级、消费者 patch 升级和精确依赖更新均须成立，且 privatePackages.tag=false、fixed/linked 为空。check:packages 使用真实 tarball 的运行与类型正反检查，不链接仓库依赖。网络受限不算通过。
 
 AST 不识别所有动态表达式和 require 绑定；Markdown 检查不证明语义、外部链接或完整 shell 安全。Node 摘要与浏览器报告器分别提供运行兜底。test-policy 调用实际 Playwright CLI，用合法案例、动态跳过和预期失败验证退出码 0/1/1，无需启动浏览器。人工审查仍需检查测试判据及读取任务。
 

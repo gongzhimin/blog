@@ -13,11 +13,7 @@ async function exists(path) {
 }
 
 test('book runtime scripts live outside the turnjs vendor directory', async () => {
-  for (const filename of [
-    'paginator.js',
-    'orchestrator.js',
-    'turnjs-adapter.js',
-  ]) {
+  for (const filename of ['paginator.js', 'orchestrator.js']) {
     assert.equal(
       await exists(`../../packages/book-runtime/src/internal/${filename}`),
       true,

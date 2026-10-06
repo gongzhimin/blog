@@ -2,11 +2,10 @@ import '../internal/paginator-core.js';
 import '../internal/paginator-splitters.js';
 import '../internal/paginator.js';
 import '../internal/orchestrator.js';
-import '../internal/turnjs-adapter.js';
 
 /**
  * Paginate one Book Build payload using the browser's measured layout.
- * Turn.js mounting remains the responsibility of the Astro Assets component.
+ * Turn.js mounting remains the responsibility of Site.
  *
  * @param {object} payload Book Build runtime payload, including articles, toc,
  * runtime.pagination, book, and source.
@@ -29,8 +28,8 @@ export function paginateBook(payload) {
     const measureCss = window.MEASURE_CSS || {};
     window.BookRuntime.Paginator.configure({
       ...pagination,
-      articleCSS: pagination.articleCSS || measureCss.article || '',
-      tocCSS: pagination.tocCSS || measureCss.toc || '',
+      articleCSS: pagination.articleCSS ?? measureCss.article ?? '',
+      tocCSS: pagination.tocCSS ?? measureCss.toc ?? '',
     });
 
     const cache = window.BookRuntime.Orchestrator.createPageCache({

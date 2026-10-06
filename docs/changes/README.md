@@ -26,13 +26,13 @@ related: ['docs/standards/documentation.md']
 
 本轮测试门禁和源码回归见 [严格测试整改记录](2026-10-06-strict-testing/record.md)。
 
-| 轮次                   | 方案 / 步骤                                                                                        | 时点结果                                                |
-| ---------------------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
-| 工程模块与门禁         | [设计](2026-10-03-engineering-system/design.md)、[计划](2026-10-03-engineering-system/plan.md)     | [原验收](2026-10-03-engineering-system/completion.md)   |
-| 设计导向文档           | [设计](2026-10-04-design-documentation/design.md)、[计划](2026-10-04-design-documentation/plan.md) | [原验收](2026-10-04-design-documentation/completion.md) |
-| 源码物理模块与公开API  | [计划](2026-10-04-module-boundaries/plan.md)                                                       | [本轮验收](2026-10-04-module-boundaries/completion.md)  |
-| 六项文档契约与归属     | [计划](2026-10-04-document-contract/plan.md)                                                       | [本轮验收](2026-10-04-document-contract/completion.md)  |
-| 六包独立版本 workspace | [计划](2026-10-06-independent-workspace-packages/plan.md)                                          | 实施后补充                                              |
+| 轮次                   | 方案 / 步骤                                                                                        | 时点结果                                                                            |
+| ---------------------- | -------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| 工程模块与门禁         | [设计](2026-10-03-engineering-system/design.md)、[计划](2026-10-03-engineering-system/plan.md)     | [原验收](2026-10-03-engineering-system/completion.md)                               |
+| 设计导向文档           | [设计](2026-10-04-design-documentation/design.md)、[计划](2026-10-04-design-documentation/plan.md) | [原验收](2026-10-04-design-documentation/completion.md)                             |
+| 源码物理模块与公开API  | [计划](2026-10-04-module-boundaries/plan.md)                                                       | [本轮验收](2026-10-04-module-boundaries/completion.md)                              |
+| 六项文档契约与归属     | [计划](2026-10-04-document-contract/plan.md)                                                       | [本轮验收](2026-10-04-document-contract/completion.md)                              |
+| 六包独立版本 workspace | [历史计划](2026-10-06-independent-workspace-packages/plan.md)                                      | [源码、类型与隔离消费验收](2026-10-06-independent-workspace-packages/completion.md) |
 
 最新目录整理见 [根目录收拢记录](2026-10-05-root-layout/record.md)；此前整改见 [文档质量与源码缺陷记录](2026-10-05-documentation-quality/record.md)。
 

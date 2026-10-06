@@ -3,6 +3,51 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
 import { JSDOM } from 'jsdom';
+import { spawnSync } from 'node:child_process';
+
+test('public pagination honors explicit empty CSS over host CSS and earlier tasks', () => {
+  const child = spawnSync(
+    process.execPath,
+    [
+      '--input-type=module',
+      '-e',
+      `
+    import assert from 'node:assert/strict';
+    import { JSDOM } from 'jsdom';
+    const dom = new JSDOM('<html><body></body></html>');
+    globalThis.window = dom.window;
+    globalThis.document = dom.window.document;
+    const { paginateBook } = await import('@myblog/book-runtime');
+    const payload = { articles: [], runtime: { pagination: { articleWidth: 280, articleHeight: 380, tocWidth: 280, tocHeight: 380, articleCSS: 'p {color:red}', tocCSS: 'li {color:red}' } } };
+    try {
+      assert.equal(paginateBook(payload).ok, true);
+      window.MEASURE_CSS = { article: 'p {color:blue}', toc: 'li {color:blue}' };
+      payload.runtime.pagination.articleCSS = '';
+      payload.runtime.pagination.tocCSS = '';
+      assert.equal(paginateBook(payload).ok, true);
+      assert.equal(window.BookRuntime.PaginatorCore.getConfig().articleCSS, '');
+      assert.equal(window.BookRuntime.PaginatorCore.getConfig().tocCSS, '');
+    } finally { dom.window.close(); }
+  `,
+    ],
+    { encoding: 'utf8', timeout: 10000 },
+  );
+  assert.equal(child.status, 0, child.stderr);
+});
+
+test('measurement CSS can be cleared between sequential tasks', async () => {
+  const source = await readFile(
+    new URL('../src/internal/paginator-core.js', import.meta.url),
+    'utf8',
+  );
+  const context = { window: {} };
+  vm.runInNewContext(source, context);
+  const core = context.window.BookRuntime.PaginatorCore;
+  core.configure({ articleCSS: 'old article', tocCSS: 'old toc' });
+  core.configure({ articleCSS: '', tocCSS: '' });
+  assert.equal(core.getConfig().articleCSS, '');
+  assert.equal(core.getConfig().tocCSS, '');
+});
 
 test('runtime package root exposes one book-pagination task', async () => {
   const { existsSync } = await import('node:fs');

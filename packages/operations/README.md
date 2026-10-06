@@ -37,15 +37,17 @@ Operations 提供部署后的只读健康检查及服务器恢复资料。调用
 ## 内部结构
 
 ```text
-packages/operations/src/
-  api/index.cjs           定义、执行与报告的公开入口
-  internal/probes.cjs     固定探针及判据
-  internal/execution.cjs  shell 执行、有限重试、结果汇总
-  internal/report.cjs     stdout 报告
-  assets/blog-webhook.service  唯一 systemd 服务资产
-  cli/health.cjs          CLI 与退出码所有权
-  tests/                 探针定义、调度与报告测试
-  docs/                   验证和恢复资料
+packages/operations/
++-- src/
+|   +-- api/index.cjs         默认健康检查任务
+|   +-- api/index.d.cts       健康报告类型
+|   +-- internal/probes.cjs   固定探针与判据
+|   +-- internal/execution.cjs  shell、重试与汇总
+|   +-- internal/report.cjs   报告格式
+|   +-- assets/blog-webhook.service  systemd 资产
+|   +-- cli/health.cjs        输出与退出码
++-- tests/                    替身探针与 CLI
++-- docs/                     验证与恢复资料
 ```
 
 `packages/operations/src/cli/health.cjs` 调用公开 API 并管理退出码；`packages/operations/src/assets/blog-webhook.service` 启动 Publishing CLI。服务资产通过操作系统连接模块。
@@ -73,6 +75,13 @@ CLI -> 探针定义 -> 顺序执行 -> 系统/HTTP
 完整字段和默认探针见 [接口参考](docs/reference/api.md)。不要把用户输入拼入 command：默认 runner 使用 shell exec。
 
 ## 最小使用示例
+
+本地只检查入口，不执行探针：
+
+```sh
+node -e "const assert=require('node:assert/strict'); const api=require('@myblog/operations'); assert.equal(typeof api.runHealthChecks,'function'); console.log('runHealthChecks available; probes not executed');"
+node --test packages/operations/tests/server-health-check.test.mjs
+```
 
 真实任务会访问目标系统，仅在已授权服务器执行：
 

@@ -1,6 +1,6 @@
 {
   "name": "@myblog/book-runtime",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "type": "module",
   "engines": {
@@ -12,7 +12,10 @@
     "README.md"
   ],
   "exports": {
-    ".": "./src/api/index.mjs"
+    ".": {
+      "types": "./src/api/index.d.ts",
+      "default": "./src/api/index.mjs"
+    }
   },
   "scripts": {
     "test": "node --test tests/*.test.*"

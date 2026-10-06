@@ -13,18 +13,23 @@ test('Site loads the Runtime package root before its page bootstrap', async () =
   assert.ok(
     entry.indexOf("'@myblog/book-runtime'") < entry.indexOf("'./book-app.js'"),
   );
-  assert.match(runtime, /import '\.\.\/internal\/turnjs-adapter\.js'/);
+  assert.doesNotMatch(runtime, /turnjs-adapter/);
+  assert.match(entry, /import '\.\/turnjs-adapter\.js'/);
   assert.doesNotMatch(runtime, /book-app\.js/);
 });
 
-test('Site reader bootstrap delegates pagination and Turn.js to Runtime', async () => {
+test('Site reader bootstrap delegates only pagination to Runtime', async () => {
   const [app, orchestrator] = await Promise.all([
     read('../../packages/site/src/internal/book-app.js'),
     read('../../packages/book-runtime/src/internal/orchestrator.js'),
   ]);
 
   assert.match(app, /window\.BookRuntime\.API\.paginateBook\(BOOK_CONFIG\)/);
-  assert.match(app, /window\.BookRuntime\.TurnAdapter\.create/);
+  assert.match(app, /window\.SiteReader\.TurnAdapter\.create/);
+  assert.doesNotMatch(
+    app,
+    /window\.BookRuntime\.(?:TurnAdapter|Paginator|Orchestrator)/,
+  );
   assert.match(app, /TOC_HTML \+ '<span class="page-number">I<\/span>'/);
   assert.match(orchestrator, /function createBookPageCache/);
   assert.match(orchestrator, /window\.BookRuntime\.Orchestrator/);

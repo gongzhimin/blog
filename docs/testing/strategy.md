@@ -55,7 +55,7 @@ related: ['docs/standards/documentation.md']
 - 浏览器位于 `tests/e2e/`；辅助文件位于 `support/`。
 - 清单为 `packages/tooling/src/modules.json`。同一集成文件可以关联多个包，执行时去重。
 - 工程检查必须扫描真实 package 源码和文档；非法样本注入测试保护这一点。
-- 契约编译包含 Site/Build 公开声明，skipLibCheck=false；编译夹具同时检查合法调用和非法参数，不把类型退化为 any 当成通过。其他包尚未具有等价的完整声明矩阵，运行时契约测试仍是主要证据。
+- 契约编译包含六包公开声明，skipLibCheck=false；编译夹具同时检查合法调用、判别结果和非法参数。声明编译不证明实现符合声明，运行时契约与隔离 tarball 消费另行验证。
 
 ## 环境与数据
 
@@ -148,6 +148,8 @@ npm run verify:release
 ## 证据与限制
 
 浏览器结果位于 `test-results/browser-results.json`；失败案例保留 trace、截图和附加证据。Node 保留原始摘要与退出码。变更记录写 Node/浏览器版本、命令、构建来源、结果、缺口和人工任务，不在策略内维护永久测试数量。
+
+`check:packages` 实际打包六包：先在集成 consumer 调用公开任务并编译六包声明及正反夹具，再为每包单独建立 consumer，只安装该包和它声明的 workspace 依赖闭包。安装目录不得为 workspace 符号链接。Runtime 消费测试显式添加 JSDOM 作为宿主夹具，不把它当 Runtime 依赖。Publishing/Operations 仅导入，不执行生产任务。Tooling 的显式 root 是被检查仓库，不是依赖链接。安装可读取 npm 缓存或 registry；每个子进程最多 120 秒，成功/失败均清理临时目录。这不验证脱离根宿主配置后的独立 Astro 应用构建。
 
 当前限制：
 

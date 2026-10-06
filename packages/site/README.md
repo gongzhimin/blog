@@ -44,30 +44,27 @@ Site 是 Astro 应用，负责仓库内容政策、页面路由和页面组合�
 ## 内部结构
 
 ```text
-packages/site/src/
-+-- api/index.mjs          单一首页组合任务入口
-+-- api/homepage-config.mjs 配置检查实现，由包根入口转出
-+-- internal/
-|   +-- sources/           集合 -> BookDocument
-|   +-- catalog/           传统目录排序/截断
-|   +-- config/            传统首页字段定义与校验
-|   +-- presentation/      书籍页面样式组合
-|   +-- book-app.js        浏览器启动、移动断点和失败回退
-|   +-- book-runtime-entry.js 加载 Runtime 根 API 后启动页面
-|   +-- cursor-dot.*       Site 光标样式和行为
-|   +-- quotes/            上游句子归一与回退
-+-- pages/                 Astro 路由与组合
-+-- components/            书壳、Runtime 资源、光标和显示组件
-+-- layouts/               单篇文章布局
-+-- styles/                站点布局与设计变量
-+-- content/               blog/life 原始写作资产
-+-- content.config.ts      集合 schema 与 loader
-+-- data/                  配置、JSON 书、句子快照
-+-- assets/                参与构建的资产
-+-- cli/update-daily-quote.mjs  显式抓取与快照更新
-+-- tools/cover-generator/  本站封面母版；不参与页面构建
-+-- tests/                 本模块数据、配置与引语测试
-+-- docs/                  模块文档系统
+packages/site/
++-- src/
+|   +-- api/                  首页模型、传统配置校验及类型声明
+|   +-- internal/
+|   |   +-- sources/          集合与 JSON -> BookDocument
+|   |   +-- catalog/          传统目录排序与截断
+|   |   +-- config/           传统配置字段与校验
+|   |   +-- presentation/     页面样式组合
+|   |   +-- quotes/           引语上游归一与回退
+|   |   +-- book-runtime-entry.js  加载分页 API 与 Site 适配器
+|   |   +-- book-app.js       载荷、启动、导航与失败回退
+|   |   +-- turnjs-adapter.js Site 插件交互
+|   |   +-- browser-globals.d.ts   Site 私有宿主声明
+|   |   +-- cursor-dot.*      光标
+|   +-- pages/ layouts/ components/  页面与宿主组件
+|   +-- styles/ assets/       展示资源
+|   +-- content/ data/        写作资产与配置
+|   +-- content.config.ts     集合 Schema 与 loader
+|   +-- cli/ tools/           引语更新与封面工具
++-- tests/                    内容、配置、引语与插件测试
++-- docs/                     模块资料
 ```
 
 Astro 的 `srcDir` 是 `packages/site/src`；旧根 `src/pages` 等目录已删除，不是第二套应用入口。
@@ -91,16 +88,14 @@ Site pages <---------------------------- articles/config/CSS
 
 Site 只通过 `@myblog/book-build` 调用构建、文章转换和主题初始化；浏览器入口只通过 `@myblog/book-runtime` 调用分页。书壳、vendor 加载、浏览器启动和光标都由 Site 组件组合，不跨包导入 Astro 子路径。
 
-Publishing 写内容仓库，不导入 Site；句子更新 CLI 使用 Site API，将快照写入 `data/daily-quote.json`。
+Publishing 写内容仓库，不导入 Site；句子更新 CLI 调用 Site 内部引语服务，将快照写入 `data/daily-quote.json`。该服务不是包根导出。
 
 ## 主要接口
 
 包只声明 `@myblog/site` 一个导入路径。页面模型任务 `buildHomepageModel(input)` 组合集合适配、Book Build、主题挂接、页面 CSS 和引语回退；Tooling 专用的 `inspectHomepageConfig(config)` 也从同一入口调用。Astro 页面和组件负责集合读取、文件读取及 HTML 输出。
 
-| 入口           | 输入                            | 输出/错误                                  |
-| -------------- | ------------------------------- | ------------------------------------------ |
 | 导入路径       | 函数                            | 输入                                       | 输出                                 |
-| ---            | ---                             | ---                                        | ---                                  |
+| -------------- | ------------------------------- | ------------------------------------------ | ------------------------------------ |
 | `@myblog/site` | `buildHomepageModel(input)`     | life/blog 集合、BookConfig、引语快照、主题 | 页面模型、Book 载荷、CSS、引语或诊断 |
 | `@myblog/site` | `inspectHomepageConfig(config)` | 传统首页配置                               | JSON Schema 和校验结果；不写文件     |
 
@@ -142,6 +137,8 @@ NODE
 `node --test tests/integration/public-api.test.mjs tests/integration/book-runtime.test.mjs packages/site/tests/homepage-data.test.mjs packages/site/tests/homepage-config.test.mjs packages/site/tests/daily-quote.test.mjs` 验证数据与失败政策。
 
 先构建，再运行首页/归档产物测试。布局、字体或浏览器协议变化必须运行 `npm run test:e2e`；完整交付执行 `npm run verify`。
+
+插件适配和移动手势的局部回归为 packages/site/tests/turnjs-adapter.test.mjs、book-app-mobile.test.mjs；浏览器断言仍在 tests/e2e。发布候选执行 verify:release，包含 tarball 隔离消费。
 
 单测不证明真实排版高度；构建不证明触摸或无障碍。覆盖与限制见 [测试方案](docs/testing/strategy.md)。
 

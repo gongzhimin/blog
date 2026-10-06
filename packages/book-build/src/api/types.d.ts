@@ -60,7 +60,35 @@ export type BookRuntime = {
   document: BookDocument;
   articles: RuntimeArticle[];
   toc: string;
-  config: BookConfig;
+  config: BookRuntimeConfig;
+};
+
+/** Browser handoff produced after configuration validation and assembly. */
+export type BookRuntimeConfig = BookConfig & {
+  articles: RuntimeArticle[];
+  toc: string;
+  runtime: {
+    pagination: RuntimePagination;
+    mobilePagination: RuntimePagination | null;
+  };
+  source: {
+    documentId: string;
+    documentTitle: string;
+    tocTitle: string;
+    entryCount: number;
+  };
+  book: BookConfig['book'] & {
+    mobileBreakpoint?: number;
+    coverSprite?: Record<string, unknown>;
+  };
+  footer?: { content?: { author?: string } };
+};
+
+export type RuntimePagination = {
+  articleWidth: number;
+  articleHeight: number;
+  tocWidth: number;
+  tocHeight: number;
 };
 
 export type ThemeSources = {

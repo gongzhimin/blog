@@ -24,8 +24,10 @@
       paginationConfig.articleHeight = options.articleHeight;
     if (options.tocWidth) paginationConfig.tocWidth = options.tocWidth;
     if (options.tocHeight) paginationConfig.tocHeight = options.tocHeight;
-    if (options.articleCSS) paginationConfig.articleCSS = options.articleCSS;
-    if (options.tocCSS) paginationConfig.tocCSS = options.tocCSS;
+    if (typeof options.articleCSS === 'string')
+      paginationConfig.articleCSS = options.articleCSS;
+    if (typeof options.tocCSS === 'string')
+      paginationConfig.tocCSS = options.tocCSS;
   }
 
   /**

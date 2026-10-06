@@ -50,7 +50,7 @@ blog/
 |   +-- README.md      六包关系、数据交接与贯通场景
 |   +-- site/          Astro 页面、内容政策与路由
 |   +-- book-build/    来源无关模型、渲染与初始载荷
-|   +-- book-runtime/  浏览器分页、映射与交互
+|   +-- book-runtime/  浏览器分页与映射；插件交互归 Site
 |   +-- publishing/    输入转换、GitHub 提交与服务
 |   +-- operations/    运行探针、报告与服务器操作
 |   `-- tooling/       模块清单、检查、生成与工程配置
@@ -142,7 +142,7 @@ npm run verify
 npm run test:e2e
 ```
 
-verify 串行执行格式、lint、契约类型、文档、边界、测试盘点、Astro、构建和 Node；失败后的阶段不执行。交付候选运行 `npm run verify:release`，追加 Chromium。单独 test:e2e 也先盘点并重新构建。门禁要求非空测试集、零失败、零取消、零跳过、零 TODO、零重试。配置来源变化先生成再检查漂移。
+verify 串行执行格式、lint、六包契约类型、文档、边界、测试盘点、Astro、构建和 Node；失败后的阶段不执行。verify:release 再执行实际 tarball 隔离消费与 Chromium。单独 test:e2e 也先盘点并重新构建。门禁要求非空测试集、零失败、零取消、零跳过、零 TODO、零重试。配置来源变化先生成再检查漂移。
 
 - Node 替身不能证明真实 GitHub；
 - JSDOM 不能证明真实高度；

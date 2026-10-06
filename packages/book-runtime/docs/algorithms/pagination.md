@@ -99,7 +99,7 @@ article pages -> provisional TOC -> candidate T
 8. 注入动态目录页（物理页 $5 \sim 4+T$），写入罗马数字页脚（I, II, ...）；
 9. 注入正文主体页（物理页 $bodyStart \sim bodyEnd$），写入从 1 开始严格递增的阿拉伯数字页脚；全书仅正文页参与页码统计，`totalBodyPages = M`；
 10. 若正文结束在右侧奇数页（`bodyEnd % 2 !== 0`），注入 1 页对齐尾衬页（`renderAlignmentEndpaper`）占位，确保封三与封底始终闭合在左侧偶数页跨页，消除末页多余空白；
-11. 最终计算全书物理页总数并注入封底样式。TurnAdapter 消费物理页缓存，在 missing 事件时按需实例化 DOM 节点；彻底移除翻开封面时的二次打断逻辑，实现平滑单次翻页。
+11. 计算总页数并生成封底样式，返回页面与映射。Site 的适配器消费该结果，在 Turn.js missing 事件中装配页面；交互状态收敛不属于分页算法。
 
 - 目录最多初测一次加校准 8 轮。校准输入的候选页数再次出现时抛 `TOC calibration did not converge: cycle`；
 - 8 轮未稳定时抛 `TOC calibration did not converge: 8 rounds exceeded`。只有稳定后才提交页面缓存、导航映射、封底 class 和样式；

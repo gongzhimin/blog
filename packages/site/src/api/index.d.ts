@@ -1,3 +1,5 @@
+import type { BookDocument, BookRuntimeConfig } from '@myblog/book-build';
+
 export type HomepageConfigInspection =
   | { ok: true; schema: Record<string, unknown> }
   | { ok: false; schema: Record<string, unknown>; diagnostic: string };
@@ -9,13 +11,8 @@ export type SiteDiagnostic = {
 };
 
 export type SiteHomepageModel = {
-  document: {
-    id: string;
-    title: string;
-    tocTitle: string;
-    entries: object[];
-  };
-  runConfig: Record<string, any>;
+  document: BookDocument;
+  runConfig: BookRuntimeConfig;
   homepageStyles: string;
   quote: { english: string; chinese: string; author: string };
 };

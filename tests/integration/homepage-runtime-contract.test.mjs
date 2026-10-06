@@ -14,7 +14,7 @@ test('homepage consumes book config and the shared book runtime', async () => {
     ),
     readFile(
       new URL(
-        '../../packages/book-runtime/src/internal/turnjs-adapter.js',
+        '../../packages/site/src/internal/turnjs-adapter.js',
         import.meta.url,
       ),
       'utf8',
@@ -71,7 +71,7 @@ test('homepage consumes book config and the shared book runtime', async () => {
   assert.doesNotMatch(app, /width: 370, height: 507/);
   assert.match(app, /window\.BookRuntime\.API\.paginateBook\(BOOK_CONFIG\)/);
   assert.match(app, /paginationResult\.articleToPage/);
-  assert.match(app, /window\.BookRuntime\.TurnAdapter\.create/);
+  assert.match(app, /window\.SiteReader\.TurnAdapter\.create/);
   assert.doesNotMatch(app, /Hash\.check\(\)\.update\(\)/);
   assert.doesNotMatch(app, /function updateDepth/);
   assert.doesNotMatch(app, /ARTICLE_H/);

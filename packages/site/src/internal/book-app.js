@@ -2,7 +2,7 @@
  * Site's reader bootstrap. Pagination and page-cache mechanics stay in Runtime.
  *
  * Reads the server-injected #book-data config, prepares pagination, and
- * delegates Turn.js details to BookRuntime.TurnAdapter.
+ * delegates Turn.js details to the Site-owned adapter.
  */
 (function () {
   var _bookData = document.getElementById('book-data');
@@ -71,7 +71,7 @@
   }
 
   function createAdapter() {
-    return window.BookRuntime.TurnAdapter.create({
+    return window.SiteReader.TurnAdapter.create({
       bookSelector: '.sj-book',
       zoomSelector: '#book-zoom',
       sliderSelector: '#slider',
