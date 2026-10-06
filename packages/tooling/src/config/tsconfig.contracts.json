@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": true,
+    "noEmit": true,
+    "strict": true,
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "skipLibCheck": false
+  },
+  "include": [
+    "../../tests/fixtures/public-api-contracts.ts",
+    "../../../book-build/src/api/*.d.ts",
+    "../../../site/src/api/*.d.ts",
+    "../../../book-build/src/api/types.mjs",
+    "../../../book-build/src/internal/assembler/build-book-runtime.mjs",
+    "../../../site/src/internal/sources/json-book-source.mjs",
+    "../../../site/src/internal/sources/astro-blog-source.mjs",
+    "../../../site/src/internal/catalog/homepage.mjs",
+    "../../../site/src/internal/quotes/daily-quote.mjs"
+  ]
+}

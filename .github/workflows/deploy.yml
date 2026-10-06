@@ -1,69 +1,88 @@
-name: Deploy Blog
-
+name: Verify and Deploy Blog
 on:
+  pull_request:
   push:
-    branches: [ main ]
-    paths:
-      - 'astro.config.mjs'
-      - 'package.json'
-      - 'package-lock.json'
-      - 'public/**'
-      - 'src/**'
-      - 'tsconfig.json'
-      - '.github/workflows/deploy.yml'
+    branches: [main]
+  workflow_dispatch:
   schedule:
     - cron: '15 22 * * *'
-
 permissions:
-  contents: write
-
+  contents: read
+concurrency:
+  group: blog-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: false
 jobs:
-  build-and-deploy:
+  compatibility:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run verify
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'npm'
-          cache-dependency-path: 'package-lock.json'
-
-      - name: Install dependencies
-        run: npm install
-
+          cache: npm
+      - run: npm ci
       - name: Update daily quote
         if: github.event_name == 'schedule'
         run: npm run update:daily-quote
-
-      - name: Commit daily quote
+      - run: npm run verify
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+      - name: Save browser acceptance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-evidence
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Commit validated daily quote
         if: github.event_name == 'schedule'
         run: |
-          if git diff --quiet -- src/data/daily-quote.json; then
-            echo "Daily quote is unchanged."
+          if git diff --quiet -- packages/site/src/data/daily-quote.json; then
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add src/data/daily-quote.json
+          git add packages/site/src/data/daily-quote.json
           git commit -m "chore: update daily quote"
           git push origin HEAD:main
-
-      - name: Build
-        run: npm run build
-
+      - uses: actions/upload-artifact@v4
+        with:
+          name: verified-dist
+          path: dist/
+  deploy:
+    needs: [verify, compatibility]
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: verified-dist
+          path: dist/
       - name: Create dist directory on server
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v1.2.0
         with:
           host: 13.193.240.51
           username: ubuntu
           key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
-          script: |
-            mkdir -p /var/www/blog/dist
-
-      - name: Deploy with rsync
+          script: mkdir -p /var/www/blog/dist
+      - name: Deploy verified assets
         uses: Burnett01/rsync-deployments@7.0.1
         with:
           switches: -avzr --delete
@@ -72,6 +91,5 @@ jobs:
           remote_host: 13.193.240.51
           remote_user: ubuntu
           remote_key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
-
       - name: Verify public homepage
         run: curl -fsS --max-time 15 https://zhimin.ink/ >/dev/null

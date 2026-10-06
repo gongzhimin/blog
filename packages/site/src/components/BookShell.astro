@@ -1,0 +1,107 @@
+---
+// The Site owns this Astro presentation component; Book Build supplies its data.
+const {
+  runConfig,
+  measureArticleCSS,
+  measureTocCSS,
+  depth = '5',
+} = Astro.props;
+
+const backPage = runConfig.book.turn.backPage;
+const totalPages = runConfig.book.turn.totalPages;
+const pageDepthAttrs = { depth };
+const ignoredDecorationAttrs = { ignore: '1', 'aria-hidden': 'true' } as const;
+const measureCSS = `window.MEASURE_CSS={article:${JSON.stringify(measureArticleCSS)},toc:${JSON.stringify(measureTocCSS)}};`;
+const title =
+  runConfig.source?.documentTitle ||
+  runConfig.footer?.content?.copyright ||
+  '志民的博客';
+const subtitle = '文字留住瞬间 · 技术笔记与生活随笔';
+const author = '志民';
+const currentYear = new Date().getFullYear();
+---
+
+<main>
+  <div id="canvas">
+    <div id="book-zoom">
+      <div class="sj-book">
+        <div
+          {...ignoredDecorationAttrs}
+          class="depth book-depth book-depth--front"
+        ></div>
+        <div
+          {...ignoredDecorationAttrs}
+          class="depth book-depth book-depth--back"
+        ></div>
+        <div
+          {...ignoredDecorationAttrs}
+          class="book-cover-underlay book-cover-underlay--front"
+        ></div>
+        <div
+          {...ignoredDecorationAttrs}
+          class="book-cover-underlay book-cover-underlay--back"
+        ></div>
+        <div {...pageDepthAttrs} class="hard">
+          <div class="side"></div>
+        </div>
+        <div {...pageDepthAttrs} class="hard front-side"></div>
+        <div class="own-size p3">
+          <div class="book-content special-page title-page">
+            <div class="title-page__container">
+              <div class="title-page__header">
+                <span class="title-page__tag">COLLECTION</span>
+              </div>
+              <h1 class="title-page__title">{title}</h1>
+              <div class="title-page__rule"></div>
+              <p class="title-page__subtitle">{subtitle}</p>
+              <div class="title-page__footer">
+                <span class="title-page__author">{author}</span>
+                <span class="title-page__edition">WEB EDITION</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="own-size even p4">
+          <div class="book-content special-page imprint-page">
+            <div class="imprint-page__container">
+              <h2 class="imprint-page__heading">出版说明 / IMPRINT</h2>
+              <div class="imprint-page__rule"></div>
+              <p class="imprint-page__item">
+                <strong>书名：</strong>
+                {title}
+              </p>
+              <p class="imprint-page__item">
+                <strong>作者：</strong>
+                {author}
+              </p>
+              <p class="imprint-page__item">
+                <strong>版本：</strong>博客文集电子典藏版
+              </p>
+              <p class="imprint-page__item">
+                <strong>出版时间：</strong>
+                {currentYear} 年
+              </p>
+              <div class="imprint-page__statement">
+                <p>本书由 Astro 与 Turn.js 仿真排版引擎驱动生成。</p>
+                <p>
+                  文集收录博主撰写之技术文章与生活随笔，保留原始排版风格与阅读体验。
+                </p>
+                <p class="imprint-page__copyright">
+                  &copy; {currentYear} {author}. 保留所有权利。
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class={`hard fixed back-side p${backPage}`}></div>
+        <div class={`hard p${totalPages}`}></div>
+      </div>
+    </div>
+    <div id="slider-bar" class="turnjs-slider">
+      <div id="slider"></div>
+    </div>
+  </div>
+</main>
+
+<div id="book-data" hidden data-config={JSON.stringify(runConfig)}></div>
+<script is:inline set:html={measureCSS}></script>

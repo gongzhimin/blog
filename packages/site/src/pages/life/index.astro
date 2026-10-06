@@ -1,0 +1,71 @@
+---
+import '../../styles/global.css';
+import { getCollection } from 'astro:content';
+import homepageConfig from '../../data/homepage-config.json';
+import {
+  buildHomepageCssVariables,
+  validateHomepageConfig,
+} from '../../internal/config/homepage-config.mjs';
+
+const lifePosts = (await getCollection('life')).filter((p) => !p.data.draft);
+const sortedPosts = lifePosts.sort((a, b) => {
+  const dateA = a.data.date;
+  const dateB = b.data.date;
+  return dateB.valueOf() - dateA.valueOf();
+});
+validateHomepageConfig(homepageConfig);
+const homepageStyle = buildHomepageCssVariables(homepageConfig);
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Essays Archive · Zhimin</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body style={homepageStyle}>
+    <main
+      class="site-shell site-shell--narrow archive-page"
+      data-section="life"
+    >
+      <a href="/" class="article-page__back">
+        ← Back
+      </a>
+
+      <header class="archive-page__intro">
+        <p class="site-eyebrow">Essays archive</p>
+        <h1>Essays</h1>
+        <p>
+          All life notes and essays, sorted by date in reverse chronological
+          order.
+        </p>
+      </header>
+
+      <div class="archive-list">
+        {sortedPosts.map((post) => {
+          const date = post.data.date;
+          return (
+            <article class="archive-row">
+              <a href={`/life/${post.id}`} class="archive-row__title">
+                {post.data.title}
+              </a>
+              <time class="archive-row__date">
+                {date.toLocaleDateString('en-US', {
+                  month: 'short',
+                  day: 'numeric',
+                  year: 'numeric',
+                })}
+              </time>
+            </article>
+          );
+        })}
+      </div>
+
+      <p class="archive-page__folio">
+        {homepageConfig.directories.life.folio.content}
+      </p>
+    </main>
+  </body>
+</html>

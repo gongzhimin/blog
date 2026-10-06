@@ -2,25 +2,60 @@
   "name": "blog",
   "type": "module",
   "version": "0.0.1",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "engines": {
-    "node": ">=22.12.0"
+    "node": "^22.13.0 || >=24"
   },
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "check": "astro check",
+    "check": "astro check --minimumFailingSeverity hint",
+    "check:contracts": "tsc -p packages/tooling/src/config/tsconfig.contracts.json",
+    "check:docs": "node packages/tooling/src/cli/verify.mjs docs",
+    "check:boundaries": "node packages/tooling/src/cli/verify.mjs boundaries",
+    "docs:generate": "node packages/tooling/src/cli/generate-reference.mjs",
+    "lint": "eslint --max-warnings=0 --config packages/tooling/src/config/eslint.config.mjs .",
+    "format": "prettier --write packages tests docs *.md *.json *.mjs .github/workflows",
+    "format:check": "prettier --check packages tests docs *.md *.json *.mjs .github/workflows",
+    "check:tests": "node packages/tooling/src/cli/test.mjs --check",
+    "test:node": "node packages/tooling/src/cli/test.mjs",
+    "verify": "npm run format:check && npm run lint && npm run check:contracts && npm run check:docs && npm run check:boundaries && npm run check:tests && npm run check && npm run build && npm run test:node",
+    "verify:release": "npm run verify && npm run test:e2e",
     "preview": "astro preview",
-    "test": "npm run build && node --test test/*.test.*",
-    "test:homepage": "npm run build && node --test test/homepage-*.test.mjs",
-    "test:e2e": "playwright test",
-    "update:daily-quote": "node scripts/update-daily-quote.mjs",
-    "server:health": "node scripts/server-health-check.cjs",
-    "astro": "astro"
+    "test": "npm run build && npm run test:node",
+    "test:homepage": "npm run build && node --test packages/site/tests/homepage-*.test.mjs tests/integration/homepage-*.test.mjs",
+    "test:e2e": "playwright test --config packages/tooling/src/config/playwright.config.mjs",
+    "pretest:e2e": "npm run check:tests && npm run build",
+    "update:daily-quote": "node packages/site/src/cli/update-daily-quote.mjs",
+    "server:health": "node packages/operations/src/cli/health.cjs",
+    "astro": "astro",
+    "server:publish": "node packages/publishing/src/cli/publish.cjs"
+  },
+  "prettier": {
+    "semi": true,
+    "singleQuote": true,
+    "tabWidth": 2,
+    "trailingComma": "all",
+    "plugins": [
+      "prettier-plugin-astro"
+    ],
+    "overrides": [
+      {
+        "files": "*.astro",
+        "options": {
+          "parser": "astro"
+        }
+      }
+    ]
   },
   "dependencies": {
     "@astrojs/check": "^0.9.9",
     "@astrojs/rss": "^4.0.18",
     "@tailwindcss/vite": "^4.2.2",
+    "ajv": "^8.20.0",
     "astro": "^6.1.5",
     "astro-icon": "^1.1.5",
     "astro-paper": "^2.2.0",
@@ -39,6 +74,10 @@
   },
   "devDependencies": {
     "@iconify-json/lucide": "^1.2.114",
-    "@playwright/test": "^1.61.0"
+    "@playwright/test": "^1.61.0",
+    "eslint": "^10.12.0",
+    "js-yaml": "^4.3.2",
+    "prettier": "^3.9.9",
+    "prettier-plugin-astro": "^1.1.0"
   }
 }

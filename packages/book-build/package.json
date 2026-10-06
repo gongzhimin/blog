@@ -1,0 +1,35 @@
+{
+  "name": "@myblog/book-build",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "types": "./src/api/index.d.ts",
+  "engines": {
+    "node": "^22.13.0 || >=24"
+  },
+  "files": [
+    "src",
+    "docs",
+    "README.md"
+  ],
+  "exports": {
+    ".": {
+      "types": "./src/api/index.d.ts",
+      "import": "./src/api/index.mjs"
+    }
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.*"
+  },
+  "dependencies": {
+    "ajv": "^8.20.0",
+    "highlight.js": "^11.11.1",
+    "image-size": "^2.0.2",
+    "katex": "^0.17.0",
+    "marked": "^18.0.5",
+    "marked-highlight": "^2.2.4",
+    "tex-linebreak": "^0.9.0",
+    "turndown": "^7.2.4",
+    "turndown-plugin-gfm": "^1.0.2"
+  }
+}

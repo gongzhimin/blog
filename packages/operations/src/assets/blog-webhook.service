@@ -1,0 +1,16 @@
+[Unit]
+Description=Astro Blog Webhook Receiver
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/var/www/blog
+Environment=BLOG_GITHUB_REPO=gongzhimin/blog
+Environment=BLOG_GITHUB_BRANCH=main
+EnvironmentFile=-/etc/blog-webhook.env
+ExecStart=/usr/bin/node /var/www/blog/packages/publishing/src/cli/publish.cjs
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

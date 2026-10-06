@@ -1,0 +1,37 @@
+{
+  "name": "@myblog/site",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "^22.13.0 || >=24"
+  },
+  "files": [
+    "src",
+    "docs",
+    "README.md"
+  ],
+  "exports": {
+    ".": {
+      "types": "./src/api/index.d.ts",
+      "import": "./src/api/index.mjs"
+    }
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.*"
+  },
+  "dependencies": {
+    "@astrojs/rss": "^4.0.18",
+    "@tailwindcss/vite": "^4.2.2",
+    "@myblog/book-build": "0.1.0",
+    "@myblog/book-runtime": "0.1.0",
+    "astro": "^6.1.5",
+    "astro-icon": "^1.1.5",
+    "astro-paper": "^2.2.0",
+    "tailwindcss": "^4.2.2"
+  },
+  "devDependencies": {
+    "@iconify-json/lucide": "^1.2.114",
+    "@astrojs/check": "^0.9.9"
+  }
+}

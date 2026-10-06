@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.astro/
+public/vendor/
+packages/site/src/content/
+docs/archive/
+docs/superpowers/
+package-lock.json

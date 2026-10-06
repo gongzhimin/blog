@@ -1,0 +1,108 @@
+---
+import { readFileSync, readdirSync } from 'fs';
+import { resolve, basename } from 'path';
+import bookConfig from '../../data/book-config.json';
+import { buildBook } from '@myblog/book-build';
+import { buildHomepageStyles } from '../../internal/presentation/build-homepage-styles.mjs';
+import { createJsonBookDocument } from '../../internal/sources/json-book-source.mjs';
+import { loadSiteBookTheme } from '../../internal/load-book-theme.mjs';
+import BookShell from '../../components/BookShell.astro';
+import BookRuntimeAssets from '../../components/BookRuntimeAssets.astro';
+import CursorDot from '../../components/CursorDot.astro';
+import tokensCSS from '../../styles/tokens.css?raw';
+
+export async function getStaticPaths() {
+  const dir = resolve('packages/site/src/data/books');
+  let files: string[] = [];
+  try {
+    files = readdirSync(dir).filter((f) => f.endsWith('.json'));
+  } catch {
+    // No books directory — no standalone book routes.
+  }
+  return files.map((file) => {
+    const slug = basename(file, '.json');
+    return { params: { slug }, props: { file } };
+  });
+}
+
+const { file } = Astro.props;
+const filePath = resolve('packages/site/src/data/books', file);
+const raw = readFileSync(filePath, 'utf8');
+const data = JSON.parse(raw);
+const bookDoc = createJsonBookDocument(data);
+
+const theme = loadSiteBookTheme(bookConfig.theme?.id);
+const bookResult = buildBook({ document: bookDoc, config: bookConfig });
+if (!bookResult.ok) throw new Error(JSON.stringify(bookResult.diagnostics));
+const runtime = bookResult.value;
+const runConfig = runtime.config;
+runConfig.theme = theme.runtime;
+
+const nav = bookConfig.nav;
+const footer = bookConfig.footer;
+const cover = bookConfig.book.coverSprite;
+const mobileCanvas = bookConfig.book.mobileCanvas;
+const mobileContentPage = bookConfig.book.mobileContentPage;
+const light = {
+  nav: nav.light,
+  footer: footer.light,
+  background: bookConfig.backgrounds.light,
+};
+const homepageStyles = buildHomepageStyles({
+  book: bookConfig.book,
+  cover,
+  footer,
+  light,
+  mobileCanvas,
+  mobileContentPage,
+  nav,
+  theme,
+});
+
+const pageTitle = bookDoc.title || data.title || Astro.params.slug;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{pageTitle}</title>
+    <meta name="viewport" content="width=1050, user-scalable=no" />
+    <BookRuntimeAssets />
+    <style is:inline set:html={tokensCSS}></style>
+    <style is:inline set:html={homepageStyles}></style>
+  </head>
+  <body data-cursor-hover="nav">
+    <header class="site-nav">
+      <div class="inner">
+        <a class="brand" href="/">
+          <span class="cursor-text">{nav.brand.text}</span>
+        </a>
+        <span class="nav-slogan">
+          <span class="cursor-text">{nav.slogan}</span>
+        </span>
+        <nav class="links">
+          {nav.links.items.map((item) => (
+            <a href={item.href}>
+              <span class="cursor-text">{item.label}</span>
+            </a>
+          ))}
+        </nav>
+      </div>
+    </header>
+
+    <BookShell
+      runConfig={runConfig}
+      measureArticleCSS={theme.measurement.articleCSS}
+      measureTocCSS={theme.measurement.tocCSS}
+    />
+
+    <footer class="site-footer">
+      <div class="copyright">
+        &copy; {new Date().getFullYear()} &middot; {footer.content.copyright}
+      </div>
+    </footer>
+    <CursorDot />
+  </body>
+</html>

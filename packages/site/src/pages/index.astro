@@ -1,0 +1,117 @@
+---
+import { getCollection } from 'astro:content';
+import quote from '../data/daily-quote.json';
+import bookConfig from '../data/book-config.json';
+import { buildHomepageModel } from '../api/index.mjs';
+import { loadSiteBookTheme } from '../internal/load-book-theme.mjs';
+import BookShell from '../components/BookShell.astro';
+import BookRuntimeAssets from '../components/BookRuntimeAssets.astro';
+import CursorDot from '../components/CursorDot.astro';
+import tokensCSS from '../styles/tokens.css?raw';
+
+const SITE_TITLE = bookConfig.footer.content.copyright;
+const SITE_DESC = '文字留住瞬间。技术笔记与生活随笔。';
+
+// KaTeX CSS is included in the measurement container so pagination uses the
+// same formula metrics that the visible book pages use.
+const theme = loadSiteBookTheme(bookConfig.theme?.id);
+
+const lifePosts = await getCollection('life');
+const blogPosts = await getCollection('blog');
+const nav = bookConfig.nav;
+const footer = bookConfig.footer;
+const homepage = buildHomepageModel({
+  lifePosts,
+  blogPosts,
+  bookConfig,
+  dailyQuote: quote,
+  theme,
+});
+if (!homepage.ok) throw new Error(JSON.stringify(homepage.diagnostics));
+const { runConfig, homepageStyles, quote: displayQuote } = homepage.value;
+
+const {
+  english: quoteEnglish,
+  chinese: quoteChinese,
+  author: quoteAuthor,
+} = displayQuote;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{SITE_TITLE}</title>
+    <meta name="description" content={SITE_DESC} />
+    <meta name="viewport" content="width=1050, user-scalable=no" />
+    <link rel="preconnect" href="https://fonts.loli.net" />
+    <link rel="preconnect" href="https://gstatic.loli.net" crossorigin />
+    <link
+      href="https://fonts.loli.net/css2?family=Chiron+Sung+HK&display=swap"
+      rel="stylesheet"
+    />
+    <BookRuntimeAssets />
+    <style is:inline set:html={tokensCSS}></style>
+    <style is:inline set:html={homepageStyles}></style>
+    <style
+      is:inline
+      set:html={`
+      .home-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        font-size: 11px;
+        color: #999;
+        text-decoration: none;
+        padding: 2px 8px;
+        border: 1px solid rgba(0,0,0,0.12);
+        border-radius: 4px;
+        margin-left: 4px;
+        transition: border-color 0.2s, color 0.2s;
+      }
+      .home-toggle:hover { color: #555; border-color: rgba(0,0,0,0.28); }
+    `}
+    ></style>
+  </head>
+  <body data-cursor-hover="nav">
+    <header class="site-nav">
+      <div class="inner">
+        <a class="brand" href="/">
+          <span class="cursor-text">{nav.brand.text}</span>
+        </a>
+        <span class="nav-slogan">
+          <span class="cursor-text">{nav.slogan}</span>
+        </span>
+        <nav class="links">
+          {nav.links.items.map((item) => (
+            <a href={item.href}>
+              <span class="cursor-text">{item.label}</span>
+            </a>
+          ))}
+          <a href="/classic" class="home-toggle" data-cursor-label="传统视图">
+            <span class="cursor-text">传统视图</span>
+          </a>
+        </nav>
+      </div>
+    </header>
+
+    <BookShell
+      runConfig={runConfig}
+      measureArticleCSS={theme.measurement.articleCSS}
+      measureTocCSS={theme.measurement.tocCSS}
+    />
+
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <div class="quote">"{quoteEnglish}"</div>
+        <div>{quoteChinese}</div>
+        <div style="margin-top:4px;color:#888">— {quoteAuthor}</div>
+      </div>
+      <div class="copyright">
+        &copy; {new Date().getFullYear()} · {footer.content.copyright}
+      </div>
+    </footer>
+    <CursorDot />
+  </body>
+</html>

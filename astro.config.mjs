@@ -5,18 +5,19 @@ import tailwindcss from '@tailwindcss/vite';
 
 // https://astro.build/config
 export default defineConfig({
+  srcDir: './packages/site/src',
   site: 'https://zhimin.ink',
   devToolbar: {
-    enabled: false
+    enabled: false,
   },
   integrations: [
     icon({
       include: {
-        lucide: ['menu', 'moon', 'sun']
-      }
-    })
+        lucide: ['menu', 'moon', 'sun'],
+      },
+    }),
   ],
   vite: {
-    plugins: [tailwindcss()]
-  }
+    plugins: [tailwindcss()],
+  },
 });

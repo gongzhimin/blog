@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=2048, initial-scale=1" />
+    <title>book-sprite-only</title>
+    <link rel="stylesheet" href="editable-book-sprite.css" />
+    <style>
+      /* Sprite-only page */
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        width: 2048px;
+        height: 516px;
+        min-height: 516px;
+        overflow: hidden;
+        background: transparent;
+      }
+
+      body {
+        display: block;
+      }
+
+      .sprite {
+        width: 2048px !important;
+        height: 516px !important;
+        margin: 0 !important;
+        filter: none !important;
+      }
+
+      .sprite::before {
+        display: none !important;
+      }
+
+      .base-svg {
+        width: 2048px !important;
+        height: 516px !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="sprite" id="sprite">
+      <svg
+        class="base-svg"
+        xmlns="http://www.w3.org/2000/svg"
+        width="2812"
+        height="698"
+        viewBox="0 0 2048 516"
+        aria-hidden="true"
+      >
+        <defs>
+          <clipPath id="page2PanelClip">
+            <rect x="483" y="0" width="485" height="600" />
+          </clipPath>
+          <clipPath id="page2Clip">
+            <rect x="727" y="9" width="241" height="584" />
+          </clipPath>
+          <clipPath id="page3Clip">
+            <rect x="1936" y="0" width="464" height="600" />
+          </clipPath>
+
+          <linearGradient
+            id="frontEdge"
+            x1="450"
+            y1="0"
+            x2="483"
+            y2="0"
+            gradientUnits="userSpaceOnUse"
+          >
+            <stop offset="0" stop-color="rgba(0,0,0,0)" />
+            <stop offset=".70" stop-color="rgba(64,44,28,.12)" />
+            <stop offset="1" stop-color="rgba(255,248,238,.16)" />
+          </linearGradient>
+
+          <linearGradient
+            id="page3Edge"
+            x1="1936"
+            y1="0"
+            x2="1966"
+            y2="0"
+            gradientUnits="userSpaceOnUse"
+          >
+            <stop offset="0" stop-color="rgba(56,40,25,.17)" />
+            <stop offset=".48" stop-color="rgba(255,247,238,.18)" />
+            <stop offset="1" stop-color="rgba(0,0,0,0)" />
+          </linearGradient>
+
+          <linearGradient
+            id="page3Veneer"
+            x1="0"
+            y1="0"
+            x2="0"
+            y2="600"
+            gradientUnits="userSpaceOnUse"
+          >
+            <stop offset="0" stop-color="rgba(255,250,244,.09)" />
+            <stop offset=".14" stop-color="rgba(255,250,244,0)" />
+            <stop offset=".84" stop-color="rgba(255,250,244,0)" />
+            <stop offset="1" stop-color="rgba(52,38,24,.045)" />
+          </linearGradient>
+
+          <linearGradient
+            id="globalWarmVeneer"
+            x1="0"
+            y1="0"
+            x2="0"
+            y2="600"
+            gradientUnits="userSpaceOnUse"
+          >
+            <stop offset="0" stop-color="rgba(255,252,247,.09)" />
+            <stop offset=".38" stop-color="rgba(255,249,240,.035)" />
+            <stop offset="1" stop-color="rgba(178,150,118,.025)" />
+          </linearGradient>
+        </defs>
+
+        <rect width="2812" height="698" fill="#f1e2c8" />
+        <image
+          x="0"
+          y="0"
+          width="2812"
+          height="698"
+          href="assets/physical-base-no-text.jpg"
+          preserveAspectRatio="none"
+        />
+
+        <image
+          x="-6"
+          y="-2"
+          width="497"
+          height="605"
+          href="assets/front-cover-image.jpg"
+          preserveAspectRatio="xMidYMid slice"
+          style="
+            filter: saturate(0.78) contrast(0.95) brightness(1.02) sepia(0.16);
+          "
+        />
+        <rect x="450" y="0" width="33" height="600" fill="url(#frontEdge)" />
+
+        <image
+          x="483"
+          y="0"
+          width="485"
+          height="600"
+          href="assets/page2-bg-from-page-neg2-mirrored-exact.jpg"
+          preserveAspectRatio="none"
+          clip-path="url(#page2PanelClip)"
+        />
+
+        <image
+          x="722"
+          y="-2"
+          width="715"
+          height="605"
+          href="assets/page2-page3-spread-reference-v2.jpg"
+          preserveAspectRatio="none"
+          clip-path="url(#page2Clip)"
+          style="
+            filter: saturate(0.75) contrast(0.95) brightness(1.02) sepia(0.15);
+          "
+        />
+
+        <image
+          x="1690"
+          y="-2"
+          width="715"
+          height="605"
+          href="assets/page2-page3-spread-reference-v2.jpg"
+          preserveAspectRatio="none"
+          clip-path="url(#page3Clip)"
+          style="
+            filter: saturate(0.75) contrast(0.95) brightness(1.02) sepia(0.15);
+          "
+        />
+        <rect x="1936" y="0" width="30" height="600" fill="url(#page3Edge)" />
+        <rect
+          x="1936"
+          y="0"
+          width="464"
+          height="600"
+          fill="url(#page3Veneer)"
+        />
+
+        <rect
+          x="0"
+          y="0"
+          width="2812"
+          height="698"
+          fill="url(#globalWarmVeneer)"
+        />
+      </svg>
+      <div
+        class="editable front-title-plaque"
+        contenteditable="true"
+        data-key="front-title"
+      >
+        <div class="book-name">静默的花园</div>
+        <div class="book-sub">A Garden of Silence</div>
+        <div class="byline">Zhimin</div>
+      </div>
+
+      <div
+        class="editable tips-title"
+        contenteditable="true"
+        data-key="tips-title"
+      >
+        卷首
+      </div>
+
+      <div
+        class="editable tips-body"
+        contenteditable="true"
+        data-key="tips-body"
+      >
+        <p>把时间放慢一些，<br />让纸页先于答案发声。</p>
+        <p>在沉默里，<br />每一个念头都有回声。</p>
+      </div>
+
+      <div
+        class="editable copyright"
+        contenteditable="true"
+        data-key="copyright"
+      >
+        Text © Zhimin · 2026<br />
+        Style inspired by turn.js
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,350 @@
+:root {
+  --sprite-w: 2048px;
+  --sprite-h: 516px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(
+      1100px 480px at 50% -8%,
+      rgba(255, 255, 255, 0.98),
+      rgba(255, 244, 224, 0.48) 55%,
+      transparent 76%
+    ),
+    linear-gradient(180deg, #f3eadb 0%, #d0bea8 100%);
+  color: #46392c;
+  font-family:
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    'Noto Sans SC',
+    sans-serif;
+}
+
+.shell {
+  width: min(96vw, 2300px);
+  margin: 0 auto;
+  padding: 34px 0 72px;
+}
+
+.controls {
+  max-width: 1320px;
+  margin: 0 auto 24px;
+  padding: 18px 22px;
+  border-radius: 24px;
+  background: rgba(255, 246, 232, 0.78);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.84),
+    0 18px 42px rgba(54, 40, 28, 0.09);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.controls h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+}
+
+.controls p {
+  max-width: 980px;
+  margin: 7px 0 0;
+  color: #735f4a;
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+.buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+button {
+  appearance: none;
+  border: 0;
+  border-radius: 999px;
+  padding: 9px 12px;
+  background: rgba(145, 105, 52, 0.12);
+  color: #735f4a;
+  cursor: pointer;
+  font:
+    13px/1 system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
+}
+
+button:hover {
+  background: rgba(145, 105, 52, 0.19);
+}
+
+.stage {
+  overflow-x: auto;
+  padding: 42px 22px 62px;
+}
+
+.sprite {
+  position: relative;
+  width: var(--sprite-w);
+  height: var(--sprite-h);
+  margin: 0 auto;
+  filter: drop-shadow(0 18px 15px rgba(38, 27, 18, 0.115));
+}
+
+.sprite::before {
+  content: '';
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: -17px;
+  height: 36px;
+  z-index: -3;
+  background: radial-gradient(
+    ellipse at 50% 44%,
+    rgba(42, 30, 19, 0.25),
+    rgba(42, 30, 19, 0.09) 58%,
+    transparent 77%
+  );
+  filter: blur(8px);
+}
+
+.base-svg {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 2048px;
+  height: 516px;
+  pointer-events: none;
+}
+
+.editable {
+  position: absolute;
+  z-index: 10;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.editable[contenteditable='true'] {
+  caret-color: #342719;
+}
+
+.editable[contenteditable='true']:focus {
+  outline: 1px dashed rgba(91, 61, 32, 0.62);
+  outline-offset: 5px;
+  background: rgba(255, 249, 239, 0.14);
+}
+
+.front-title-plaque {
+  left: 76px;
+  top: 68px;
+  width: 260px;
+  min-height: 92px;
+  padding: 15px 18px 12px;
+  text-align: center;
+  color: rgba(55, 42, 28, 0.88);
+  font-family: Georgia, 'Times New Roman', 'Noto Serif SC', serif;
+  background: linear-gradient(
+    180deg,
+    rgba(252, 244, 230, 0.82),
+    rgba(232, 209, 172, 0.38)
+  );
+  border: 1px solid rgba(151, 109, 48, 0.42);
+  box-shadow:
+    inset 0 0 0 6px rgba(255, 251, 241, 0.28),
+    0 1px 0 rgba(255, 255, 255, 0.35),
+    0 10px 22px rgba(70, 47, 22, 0.1);
+  border-radius: 999px 999px 22px 22px;
+}
+
+.front-title-plaque::before,
+.front-title-plaque::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  width: 58px;
+  height: 1px;
+  transform: translateX(-50%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(139, 104, 56, 0.55),
+    transparent
+  );
+}
+
+.front-title-plaque::before {
+  top: 10px;
+}
+.front-title-plaque::after {
+  bottom: 10px;
+}
+
+.front-title-plaque .book-name {
+  font-size: 23px;
+  line-height: 1.18;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  color: rgba(48, 38, 29, 0.9);
+}
+
+.front-title-plaque .book-sub {
+  margin-top: 7px;
+  font-size: 7px;
+  line-height: 1.2;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(130, 95, 52, 0.72);
+}
+
+.front-title-plaque .byline {
+  margin-top: 9px;
+  font-size: 9px;
+  line-height: 1.2;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(92, 70, 48, 0.74);
+  font-weight: 400;
+}
+
+.tips-title {
+  left: 444px;
+  top: 160px;
+  width: 120px;
+  font-family: Georgia, 'Times New Roman', 'Noto Serif SC', serif;
+  font-size: 23px;
+  font-weight: 400;
+  color: rgba(105, 78, 45, 0.82);
+  letter-spacing: 0.02em;
+}
+
+.tips-body {
+  left: 444px;
+  top: 207px;
+  width: 150px;
+  font-family: Georgia, 'Times New Roman', 'Noto Serif SC', serif;
+  font-size: 13px;
+  font-weight: 400;
+  color: rgba(102, 83, 62, 0.74);
+  line-height: 1.42;
+  letter-spacing: 0.02em;
+}
+
+.tips-body p {
+  margin: 0 0 16px;
+}
+.tips-body p:last-child {
+  margin-bottom: 0;
+}
+
+.copyright {
+  left: 1343px;
+  top: 248px;
+  width: 210px;
+  text-align: center;
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 10.5px;
+  color: rgba(107, 83, 59, 0.7);
+  line-height: 1.25;
+}
+
+.show-edit-boxes .editable {
+  outline: 1px solid rgba(190, 125, 54, 0.55);
+  outline-offset: 3px;
+}
+
+.page-guides {
+  display: none;
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+  grid-template-columns: 412px 414px 413px 413px 396px;
+}
+
+.show-guides .page-guides {
+  display: grid;
+}
+
+.page-guides span {
+  border-left: 1px solid rgba(131, 104, 77, 0.46);
+  border-right: 1px solid rgba(131, 104, 77, 0.46);
+  background: rgba(165, 136, 102, 0.032);
+  position: relative;
+}
+
+.page-guides b {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  padding: 4px 6px;
+  border-radius: 7px;
+  background: rgba(255, 249, 242, 0.84);
+  color: rgba(102, 76, 52, 0.82);
+  font:
+    10px/1.2 system-ui,
+    sans-serif;
+}
+
+.note {
+  max-width: 1180px;
+  margin: 20px auto 0;
+  color: #735f4a;
+  font-size: 13px;
+  line-height: 1.85;
+  text-align: center;
+}
+
+.code-note {
+  max-width: 1180px;
+  margin: 14px auto 0;
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: rgba(255, 245, 229, 0.66);
+  color: #735f4a;
+  font:
+    13px/1.8 ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Consolas,
+    monospace;
+  white-space: pre-wrap;
+}
+
+/* Sprite-only page */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 2048px;
+  height: 516px;
+  min-height: 516px;
+  overflow: hidden;
+  background: transparent;
+}
+
+body {
+  display: block;
+}
+
+.sprite {
+  margin: 0 !important;
+  filter: none !important;
+}
+
+.sprite::before {
+  display: none !important;
+}

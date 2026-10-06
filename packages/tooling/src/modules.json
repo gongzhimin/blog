@@ -1,0 +1,131 @@
+{
+  "modules": [
+    {
+      "id": "site",
+      "root": "packages/site",
+      "sourceRoot": "packages/site/src",
+      "testRoot": "packages/site/tests",
+      "owns": ["packages/site/"],
+      "dependencies": ["book-build", "book-runtime"],
+      "entries": [
+        "packages/site/src/api/index.mjs",
+        "packages/site/src/api/index.d.ts"
+      ],
+      "tests": [
+        "packages/site/tests/daily-quote.test.mjs",
+        "packages/site/tests/public-api.test.mjs",
+        "packages/site/tests/json-book-source.test.mjs",
+        "packages/site/tests/owned-tools.test.mjs",
+        "packages/site/tests/homepage-data.test.mjs",
+        "packages/site/tests/homepage-config.test.mjs",
+        "packages/site/tests/cursor-dot.test.mjs",
+        "packages/site/tests/book-theme-styles.test.mjs",
+        "tests/integration/homepage-render.test.mjs",
+        "tests/integration/archive-render.test.mjs",
+        "tests/integration/homepage-runtime-contract.test.mjs",
+        "tests/integration/site-runtime-composition.test.mjs",
+        "tests/integration/public-api.test.mjs",
+        "tests/e2e/homepage-layout.spec.mjs"
+      ],
+      "applicationEntries": ["packages/site/src/cli/update-daily-quote.mjs"]
+    },
+    {
+      "id": "book-build",
+      "root": "packages/book-build",
+      "sourceRoot": "packages/book-build/src",
+      "testRoot": "packages/book-build/tests",
+      "owns": ["packages/book-build/"],
+      "dependencies": [],
+      "entries": [
+        "packages/book-build/src/api/index.mjs",
+        "packages/book-build/src/api/index.d.ts"
+      ],
+      "tests": [
+        "tests/integration/book-build-task.test.mjs",
+        "packages/book-build/tests/public-api.test.mjs",
+        "packages/book-build/tests/book-theme.test.mjs",
+        "tests/integration/book-runtime.test.mjs",
+        "tests/integration/book-config-schema.test.mjs",
+        "tests/integration/public-api.test.mjs",
+        "tests/integration/book-architecture.test.mjs"
+      ]
+    },
+    {
+      "id": "book-runtime",
+      "root": "packages/book-runtime",
+      "sourceRoot": "packages/book-runtime/src",
+      "testRoot": "packages/book-runtime/tests",
+      "owns": ["packages/book-runtime/"],
+      "dependencies": [],
+      "entries": ["packages/book-runtime/src/api/index.mjs"],
+      "tests": [
+        "packages/book-runtime/tests/paginator-config.test.mjs",
+        "packages/book-runtime/tests/runtime-lifecycle.test.mjs",
+        "packages/book-runtime/tests/turnjs-adapter.test.mjs",
+        "packages/book-runtime/tests/book-app-mobile.test.mjs",
+        "tests/integration/book-runtime-boundary.test.mjs",
+        "tests/integration/book-runtime-demo.test.mjs",
+        "tests/integration/turnjs-integration.test.mjs",
+        "tests/integration/homepage-runtime-contract.test.mjs",
+        "tests/e2e/homepage-layout.spec.mjs",
+        "tests/e2e/pagination-behavior.spec.mjs",
+        "tests/e2e/test-pages-debug.spec.mjs"
+      ]
+    },
+    {
+      "id": "publishing",
+      "root": "packages/publishing",
+      "sourceRoot": "packages/publishing/src",
+      "testRoot": "packages/publishing/tests",
+      "owns": ["packages/publishing/"],
+      "dependencies": [],
+      "entries": ["packages/publishing/src/api/index.cjs"],
+      "tests": [
+        "packages/publishing/tests/webhook-receiver.test.cjs",
+        "packages/publishing/tests/cli.test.cjs",
+        "packages/publishing/tests/publishing-http.test.cjs",
+        "tests/integration/service-api.test.cjs"
+      ],
+      "applicationEntries": ["packages/publishing/src/cli/publish.cjs"]
+    },
+    {
+      "id": "operations",
+      "root": "packages/operations",
+      "sourceRoot": "packages/operations/src",
+      "testRoot": "packages/operations/tests",
+      "owns": ["packages/operations/"],
+      "dependencies": [],
+      "entries": ["packages/operations/src/api/index.cjs"],
+      "tests": [
+        "packages/operations/tests/server-health-check.test.mjs",
+        "packages/operations/tests/cli.test.mjs",
+        "tests/integration/service-api.test.cjs"
+      ],
+      "applicationEntries": ["packages/operations/src/cli/health.cjs"]
+    },
+    {
+      "id": "tooling",
+      "root": "packages/tooling",
+      "sourceRoot": "packages/tooling/src",
+      "testRoot": "packages/tooling/tests",
+      "owns": ["packages/tooling/"],
+      "dependencies": ["site", "book-build"],
+      "entries": ["packages/tooling/src/api/index.mjs"],
+      "tests": [
+        "packages/tooling/tests/engineering-boundaries.test.mjs",
+        "packages/tooling/tests/public-api.test.mjs",
+        "packages/tooling/tests/document-contract.test.mjs",
+        "packages/tooling/tests/workspace-scan.test.mjs",
+        "packages/tooling/tests/test-policy.test.mjs",
+        "tests/integration/engineering-system.test.mjs",
+        "tests/integration/module-layout.test.mjs",
+        "tests/integration/generated-reference.test.mjs"
+      ],
+      "applicationEntries": [
+        "packages/tooling/src/cli/verify.mjs",
+        "packages/tooling/src/cli/generate-reference.mjs",
+        "packages/tooling/src/cli/test.mjs"
+      ]
+    }
+  ]
+}

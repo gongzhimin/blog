@@ -1,0 +1,2005 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Zhimin 首页组件配置",
+  "description": "由 Site homepage-config API 的字段契约生成，禁止手工修改。",
+  "$comment": "比例正数和目录数量关系由 validateHomepageConfig 额外验证。",
+  "type": "object",
+  "required": ["navigation", "book", "footer", "directories"],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "navigation": {
+      "type": "object",
+      "required": [
+        "content",
+        "size",
+        "spacing",
+        "brand",
+        "title",
+        "links",
+        "themeToggle"
+      ],
+      "properties": {
+        "content": {
+          "type": "object",
+          "required": ["siteName", "title"],
+          "properties": {
+            "siteName": {
+              "type": "string",
+              "pattern": "\\S",
+              "description": "text；组件内容或行为参数"
+            },
+            "title": {
+              "type": "string",
+              "pattern": "\\S",
+              "description": "text；组件内容或行为参数"
+            }
+          },
+          "description": "导航中的站点名称和居中标题。"
+        },
+        "size": {
+          "type": "object",
+          "required": ["minimumHeight", "fluidHeight", "maximumHeight"],
+          "properties": {
+            "minimumHeight": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-navigation-size-minimum-height"
+            },
+            "fluidHeight": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-navigation-size-fluid-height"
+            },
+            "maximumHeight": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-navigation-size-maximum-height"
+            }
+          },
+          "description": "导航组件自身的最小、流式和最大高度。"
+        },
+        "spacing": {
+          "type": "object",
+          "required": [
+            "inlineGapFixed",
+            "inlineGapProportional",
+            "sectionGap",
+            "linkGap"
+          ],
+          "properties": {
+            "inlineGapFixed": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-navigation-spacing-inline-gap-fixed"
+            },
+            "inlineGapProportional": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-navigation-spacing-inline-gap-proportional"
+            },
+            "sectionGap": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-navigation-spacing-section-gap"
+            },
+            "linkGap": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-navigation-spacing-link-gap"
+            }
+          },
+          "description": "导航左右留白以及品牌、标题、链接之间的间距。"
+        },
+        "brand": {
+          "type": "object",
+          "required": [
+            "fontFamily",
+            "minimumSize",
+            "fluidSize",
+            "maximumSize",
+            "lightColor",
+            "darkColor"
+          ],
+          "properties": {
+            "fontFamily": {
+              "type": "string",
+              "enum": ["serif", "sans", "monospace"],
+              "description": "font；CSS 变量 --home-navigation-brand-font-family"
+            },
+            "minimumSize": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-navigation-brand-minimum-size"
+            },
+            "fluidSize": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-navigation-brand-fluid-size"
+            },
+            "maximumSize": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-navigation-brand-maximum-size"
+            },
+            "lightColor": {
+              "type": "string",
+              "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+              "description": "color；CSS 变量 --home-navigation-brand-light-color"
+            },
+            "darkColor": {
+              "type": "string",
+              "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+              "description": "color；CSS 变量 --home-navigation-brand-dark-color"
+            }
+          },
+          "description": "站点品牌文字。"
+        },
+        "title": {
+          "type": "object",
+          "required": [
+            "maximumWidth",
+            "hideThreshold",
+            "fontFamily",
+            "minimumSize",
+            "fluidSize",
+            "maximumSize",
+            "lightColor",
+            "darkColor"
+          ],
+          "properties": {
+            "maximumWidth": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-navigation-title-maximum-width"
+            },
+            "hideThreshold": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；组件内容或行为参数"
+            },
+            "fontFamily": {
+              "type": "string",
+              "enum": ["serif", "sans", "monospace"],
+              "description": "font；CSS 变量 --home-navigation-title-font-family"
+            },
+            "minimumSize": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-navigation-title-minimum-size"
+            },
+            "fluidSize": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-navigation-title-fluid-size"
+            },
+            "maximumSize": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-navigation-title-maximum-size"
+            },
+            "lightColor": {
+              "type": "string",
+              "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+              "description": "color；CSS 变量 --home-navigation-title-light-color"
+            },
+            "darkColor": {
+              "type": "string",
+              "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+              "description": "color；CSS 变量 --home-navigation-title-dark-color"
+            }
+          },
+          "description": "导航中央标题及其隐藏阈值。"
+        },
+        "links": {
+          "type": "object",
+          "required": ["life", "technical", "about", "rss"],
+          "properties": {
+            "life": {
+              "type": "object",
+              "required": [
+                "label",
+                "href",
+                "fontFamily",
+                "minimumSize",
+                "fluidSize",
+                "maximumSize",
+                "lightColor",
+                "darkColor"
+              ],
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "pattern": "\\S",
+                  "description": "text；组件内容或行为参数"
+                },
+                "href": {
+                  "type": "string",
+                  "pattern": "\\S",
+                  "description": "text；组件内容或行为参数"
+                },
+                "fontFamily": {
+                  "type": "string",
+                  "enum": ["serif", "sans", "monospace"],
+                  "description": "font；CSS 变量 --home-navigation-links-life-font-family"
+                },
+                "minimumSize": {
+                  "type": "string",
+                  "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+                  "description": "length；CSS 变量 --home-navigation-links-life-minimum-size"
+                },
+                "fluidSize": {
+                  "type": "string",
+                  "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+                  "description": "length；CSS 变量 --home-navigation-links-life-fluid-size"
+                },
+                "maximumSize": {
+                  "type": "string",
+                  "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+                  "description": "length；CSS 变量 --home-navigation-links-life-maximum-size"
+                },
+                "lightColor": {
+                  "type": "string",
+                  "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+                  "description": "color；CSS 变量 --home-navigation-links-life-light-color"
+                },
+                "darkColor": {
+                  "type": "string",
+                  "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+                  "description": "color；CSS 变量 --home-navigation-links-life-dark-color"
+                }
+              }
+            },
+            "technical": {
+              "type": "object",
+              "required": [
+                "label",
+                "href",
+                "fontFamily",
+                "minimumSize",
+                "fluidSize",
+                "maximumSize",
+                "lightColor",
+                "darkColor"
+              ],
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "pattern": "\\S",
+                  "description": "text；组件内容或行为参数"
+                },
+                "href": {
+                  "type": "string",
+                  "pattern": "\\S",
+                  "description": "text；组件内容或行为参数"
+                },
+                "fontFamily": {
+                  "type": "string",
+                  "enum": ["serif", "sans", "monospace"],
+                  "description": "font；CSS 变量 --home-navigation-links-technical-font-family"
+                },
+                "minimumSize": {
+                  "type": "string",
+                  "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+                  "description": "length；CSS 变量 --home-navigation-links-technical-minimum-size"
+                },
+                "fluidSize": {
+                  "type": "string",
+                  "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+                  "description": "length；CSS 变量 --home-navigation-links-technical-fluid-size"
+                },
+                "maximumSize": {
+                  "type": "string",
+                  "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+                  "description": "length；CSS 变量 --home-navigation-links-technical-maximum-size"
+                },
+                "lightColor": {
+                  "type": "string",
+                  "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+                  "description": "color；CSS 变量 --home-navigation-links-technical-light-color"
+                },
+                "darkColor": {
+                  "type": "string",
+                  "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+                  "description": "color；CSS 变量 --home-navigation-links-technical-dark-color"
+                }
+              }
+            },
+            "about": {
+              "type": "object",
+              "required": [
+                "label",
+                "href",
+                "fontFamily",
+                "minimumSize",
+                "fluidSize",
+                "maximumSize",
+                "lightColor",
+                "darkColor"
+              ],
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "pattern": "\\S",
+                  "description": "text；组件内容或行为参数"
+                },
+                "href": {
+                  "type": "string",
+                  "pattern": "\\S",
+                  "description": "text；组件内容或行为参数"
+                },
+                "fontFamily": {
+                  "type": "string",
+                  "enum": ["serif", "sans", "monospace"],
+                  "description": "font；CSS 变量 --home-navigation-links-about-font-family"
+                },
+                "minimumSize": {
+                  "type": "string",
+                  "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+                  "description": "length；CSS 变量 --home-navigation-links-about-minimum-size"
+                },
+                "fluidSize": {
+                  "type": "string",
+                  "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+                  "description": "length；CSS 变量 --home-navigation-links-about-fluid-size"
+                },
+                "maximumSize": {
+                  "type": "string",
+                  "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+                  "description": "length；CSS 变量 --home-navigation-links-about-maximum-size"
+                },
+                "lightColor": {
+                  "type": "string",
+                  "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+                  "description": "color；CSS 变量 --home-navigation-links-about-light-color"
+                },
+                "darkColor": {
+                  "type": "string",
+                  "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+                  "description": "color；CSS 变量 --home-navigation-links-about-dark-color"
+                }
+              }
+            },
+            "rss": {
+              "type": "object",
+              "required": [
+                "label",
+                "href",
+                "fontFamily",
+                "minimumSize",
+                "fluidSize",
+                "maximumSize",
+                "lightColor",
+                "darkColor"
+              ],
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "pattern": "\\S",
+                  "description": "text；组件内容或行为参数"
+                },
+                "href": {
+                  "type": "string",
+                  "pattern": "\\S",
+                  "description": "text；组件内容或行为参数"
+                },
+                "fontFamily": {
+                  "type": "string",
+                  "enum": ["serif", "sans", "monospace"],
+                  "description": "font；CSS 变量 --home-navigation-links-rss-font-family"
+                },
+                "minimumSize": {
+                  "type": "string",
+                  "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+                  "description": "length；CSS 变量 --home-navigation-links-rss-minimum-size"
+                },
+                "fluidSize": {
+                  "type": "string",
+                  "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+                  "description": "length；CSS 变量 --home-navigation-links-rss-fluid-size"
+                },
+                "maximumSize": {
+                  "type": "string",
+                  "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+                  "description": "length；CSS 变量 --home-navigation-links-rss-maximum-size"
+                },
+                "lightColor": {
+                  "type": "string",
+                  "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+                  "description": "color；CSS 变量 --home-navigation-links-rss-light-color"
+                },
+                "darkColor": {
+                  "type": "string",
+                  "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+                  "description": "color；CSS 变量 --home-navigation-links-rss-dark-color"
+                }
+              }
+            }
+          },
+          "description": "生活、技术、关于和 RSS 四个独立导航链接。"
+        },
+        "themeToggle": {
+          "type": "object",
+          "required": ["size", "iconSize"],
+          "properties": {
+            "size": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-navigation-theme-toggle-size"
+            },
+            "iconSize": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-navigation-theme-toggle-icon-size"
+            }
+          },
+          "description": "明暗主题按钮尺寸。"
+        }
+      },
+      "description": "导航组件：文案、尺寸、间距、各链接文字和主题按钮。"
+    },
+    "book": {
+      "type": "object",
+      "required": [
+        "size",
+        "stage",
+        "perspective",
+        "shadow",
+        "cover",
+        "pageEdges",
+        "innerSpine",
+        "paper",
+        "pages"
+      ],
+      "properties": {
+        "size": {
+          "type": "object",
+          "required": ["viewportWidth", "minimumWidth", "aspectRatio"],
+          "properties": {
+            "viewportWidth": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-book-size-viewport-width"
+            },
+            "minimumWidth": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-book-size-minimum-width"
+            },
+            "aspectRatio": {
+              "type": "string",
+              "pattern": "^(?<width>\\d+(?:\\.\\d+)?)\\s*\\/\\s*(?<height>\\d+(?:\\.\\d+)?)$",
+              "description": "ratio；CSS 变量 --home-book-size-aspect-ratio"
+            }
+          },
+          "description": "书本按窗口宽度比例取值，并使用硬最小宽度和固定宽高比。"
+        },
+        "stage": {
+          "type": "object",
+          "required": [
+            "inlineGapFixed",
+            "inlineGapProportional",
+            "paddingTop",
+            "paddingBottom"
+          ],
+          "properties": {
+            "inlineGapFixed": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-book-stage-inline-gap-fixed"
+            },
+            "inlineGapProportional": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-book-stage-inline-gap-proportional"
+            },
+            "paddingTop": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-book-stage-padding-top"
+            },
+            "paddingBottom": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-book-stage-padding-bottom"
+            }
+          },
+          "description": "书本舞台的左右留白和上下内边距。"
+        },
+        "perspective": {
+          "type": "object",
+          "required": ["distance", "rotateX"],
+          "properties": {
+            "distance": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-book-perspective-distance"
+            },
+            "rotateX": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:deg|rad|turn)$",
+              "description": "angle；CSS 变量 --home-book-perspective-rotate-x"
+            }
+          },
+          "description": "书本整体 3D 透视。"
+        },
+        "shadow": {
+          "type": "object",
+          "required": ["offsetY", "blur", "color"],
+          "properties": {
+            "offsetY": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-book-shadow-offset-y"
+            },
+            "blur": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-book-shadow-blur"
+            },
+            "color": {
+              "type": "string",
+              "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+              "description": "color；CSS 变量 --home-book-shadow-color"
+            }
+          },
+          "description": "整本书投影。"
+        },
+        "cover": {
+          "type": "object",
+          "required": [
+            "insetTop",
+            "insetInline",
+            "insetBottom",
+            "radius",
+            "color"
+          ],
+          "properties": {
+            "insetTop": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-book-cover-inset-top"
+            },
+            "insetInline": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-book-cover-inset-inline"
+            },
+            "insetBottom": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-book-cover-inset-bottom"
+            },
+            "radius": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-book-cover-radius"
+            },
+            "color": {
+              "type": "string",
+              "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+              "description": "color；CSS 变量 --home-book-cover-color"
+            }
+          },
+          "description": "硬壳封面的外扩、圆角和颜色。"
+        },
+        "pageEdges": {
+          "type": "object",
+          "required": ["width", "color"],
+          "properties": {
+            "width": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-book-page-edges-width"
+            },
+            "color": {
+              "type": "string",
+              "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+              "description": "color；CSS 变量 --home-book-page-edges-color"
+            }
+          },
+          "description": "左右书口厚度和纸张边缘颜色。"
+        },
+        "innerSpine": {
+          "type": "object",
+          "required": [
+            "width",
+            "color",
+            "centerColor",
+            "seamWidth",
+            "seamColor",
+            "seamShadowBlur",
+            "seamShadowColor",
+            "capWidth",
+            "capHeight",
+            "capRadius"
+          ],
+          "properties": {
+            "width": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-book-inner-spine-width"
+            },
+            "color": {
+              "type": "string",
+              "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+              "description": "color；CSS 变量 --home-book-inner-spine-color"
+            },
+            "centerColor": {
+              "type": "string",
+              "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+              "description": "color；CSS 变量 --home-book-inner-spine-center-color"
+            },
+            "seamWidth": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-book-inner-spine-seam-width"
+            },
+            "seamColor": {
+              "type": "string",
+              "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+              "description": "color；CSS 变量 --home-book-inner-spine-seam-color"
+            },
+            "seamShadowBlur": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-book-inner-spine-seam-shadow-blur"
+            },
+            "seamShadowColor": {
+              "type": "string",
+              "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+              "description": "color；CSS 变量 --home-book-inner-spine-seam-shadow-color"
+            },
+            "capWidth": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-book-inner-spine-cap-width"
+            },
+            "capHeight": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-book-inner-spine-cap-height"
+            },
+            "capRadius": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-book-inner-spine-cap-radius"
+            }
+          },
+          "description": "纸页下方的深色书内脊、1px 中缝、阴影和上下弧形端面。"
+        },
+        "paper": {
+          "type": "object",
+          "required": [
+            "color",
+            "textColor",
+            "mutedColor",
+            "accentColor",
+            "textureOpacity"
+          ],
+          "properties": {
+            "color": {
+              "type": "string",
+              "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+              "description": "color；CSS 变量 --home-book-paper-color"
+            },
+            "textColor": {
+              "type": "string",
+              "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+              "description": "color；CSS 变量 --home-book-paper-text-color"
+            },
+            "mutedColor": {
+              "type": "string",
+              "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+              "description": "color；CSS 变量 --home-book-paper-muted-color"
+            },
+            "accentColor": {
+              "type": "string",
+              "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+              "description": "color；CSS 变量 --home-book-paper-accent-color"
+            },
+            "textureOpacity": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "opacity；CSS 变量 --home-book-paper-texture-opacity"
+            }
+          },
+          "description": "纸张颜色、正文颜色和纹理透明度。"
+        },
+        "pages": {
+          "type": "object",
+          "required": ["shared", "life", "technical"],
+          "properties": {
+            "shared": {
+              "type": "object",
+              "required": ["rotationY", "innerShadowWidth", "innerShadowColor"],
+              "properties": {
+                "rotationY": {
+                  "type": "string",
+                  "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:deg|rad|turn)$",
+                  "description": "angle；CSS 变量 --home-book-pages-shared-rotation-y"
+                },
+                "innerShadowWidth": {
+                  "type": "string",
+                  "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+                  "description": "length；CSS 变量 --home-book-pages-shared-inner-shadow-width"
+                },
+                "innerShadowColor": {
+                  "type": "string",
+                  "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+                  "description": "color；CSS 变量 --home-book-pages-shared-inner-shadow-color"
+                }
+              },
+              "description": "左右页镜像使用的弯曲角度和中缝渐变阴影。"
+            },
+            "life": {
+              "type": "object",
+              "required": [
+                "content",
+                "layout",
+                "catalog",
+                "runningOuter",
+                "runningInner",
+                "partLink",
+                "catalogTitle",
+                "catalogDate",
+                "archiveLink",
+                "folio"
+              ],
+              "properties": {
+                "content": {
+                  "type": "object",
+                  "required": [
+                    "outerRunningLabel",
+                    "innerRunningLabel",
+                    "partLabel",
+                    "partHref",
+                    "archiveLabel",
+                    "archiveHref",
+                    "homepageFolio"
+                  ],
+                  "properties": {
+                    "outerRunningLabel": {
+                      "type": "string",
+                      "pattern": "\\S",
+                      "description": "text；组件内容或行为参数"
+                    },
+                    "innerRunningLabel": {
+                      "type": "string",
+                      "pattern": "\\S",
+                      "description": "text；组件内容或行为参数"
+                    },
+                    "partLabel": {
+                      "type": "string",
+                      "pattern": "\\S",
+                      "description": "text；组件内容或行为参数"
+                    },
+                    "partHref": {
+                      "type": "string",
+                      "pattern": "\\S",
+                      "description": "text；组件内容或行为参数"
+                    },
+                    "archiveLabel": {
+                      "type": "string",
+                      "pattern": "\\S",
+                      "description": "text；组件内容或行为参数"
+                    },
+                    "archiveHref": {
+                      "type": "string",
+                      "pattern": "\\S",
+                      "description": "text；组件内容或行为参数"
+                    },
+                    "homepageFolio": {
+                      "type": "string",
+                      "pattern": "\\S",
+                      "description": "text；组件内容或行为参数"
+                    }
+                  }
+                },
+                "layout": {
+                  "type": "object",
+                  "required": [
+                    "paddingTop",
+                    "paddingInline",
+                    "paddingBottom",
+                    "partMarginTop",
+                    "partMarginBottom",
+                    "partPaddingTop",
+                    "catalogGap",
+                    "catalogColumnGap",
+                    "archiveBottom",
+                    "folioBottom"
+                  ],
+                  "properties": {
+                    "paddingTop": {
+                      "type": "string",
+                      "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+                      "description": "length；CSS 变量 --home-book-pages-life-layout-padding-top"
+                    },
+                    "paddingInline": {
+                      "type": "string",
+                      "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+                      "description": "length；CSS 变量 --home-book-pages-life-layout-padding-inline"
+                    },
+                    "paddingBottom": {
+                      "type": "string",
+                      "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+                      "description": "length；CSS 变量 --home-book-pages-life-layout-padding-bottom"
+                    },
+                    "partMarginTop": {
+                      "type": "string",
+                      "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+                      "description": "length；CSS 变量 --home-book-pages-life-layout-part-margin-top"
+                    },
+                    "partMarginBottom": {
+                      "type": "string",
+                      "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+                      "description": "length；CSS 变量 --home-book-pages-life-layout-part-margin-bottom"
+                    },
+                    "partPaddingTop": {
+                      "type": "string",
+                      "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+                      "description": "length；CSS 变量 --home-book-pages-life-layout-part-padding-top"
+                    },
+                    "catalogGap": {
+                      "type": "string",
+                      "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+                      "description": "length；CSS 变量 --home-book-pages-life-layout-catalog-gap"
+                    },
+                    "catalogColumnGap": {
+                      "type": "string",
+                      "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+                      "description": "length；CSS 变量 --home-book-pages-life-layout-catalog-column-gap"
+                    },
+                    "archiveBottom": {
+                      "type": "string",
+                      "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+                      "description": "length；CSS 变量 --home-book-pages-life-layout-archive-bottom"
+                    },
+                    "folioBottom": {
+                      "type": "string",
+                      "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+                      "description": "length；CSS 变量 --home-book-pages-life-layout-folio-bottom"
+                    }
+                  }
+                },
+                "catalog": {
+                  "type": "object",
+                  "required": [
+                    "wideMaximumEntries",
+                    "narrowMaximumEntries",
+                    "narrowBookWidth",
+                    "extremeBookWidth",
+                    "titleMaximumLines",
+                    "wideDateFormat",
+                    "compactDateFormat",
+                    "narrowRowGap"
+                  ],
+                  "properties": {
+                    "wideMaximumEntries": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "description": "positiveInteger；组件内容或行为参数"
+                    },
+                    "narrowMaximumEntries": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "description": "positiveInteger；组件内容或行为参数"
+                    },
+                    "narrowBookWidth": {
+                      "type": "string",
+                      "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+                      "description": "length；组件内容或行为参数"
+                    },
+                    "extremeBookWidth": {
+                      "type": "string",
+                      "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+                      "description": "length；组件内容或行为参数"
+                    },
+                    "titleMaximumLines": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "description": "positiveInteger；CSS 变量 --home-book-pages-life-catalog-title-maximum-lines"
+                    },
+                    "wideDateFormat": {
+                      "type": "string",
+                      "pattern": "^(?:YYYY|MM|DD|[.\\-/\\s])+$",
+                      "description": "dateFormat；组件内容或行为参数"
+                    },
+                    "compactDateFormat": {
+                      "type": "string",
+                      "pattern": "^(?:YYYY|MM|DD|[.\\-/\\s])+$",
+                      "description": "dateFormat；组件内容或行为参数"
+                    },
+                    "narrowRowGap": {
+                      "type": "string",
+                      "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+                      "description": "length；CSS 变量 --home-book-pages-life-catalog-narrow-row-gap"
+                    }
+                  }
+                },
+                "runningOuter": {
+                  "type": "object",
+                  "required": [
+                    "fontFamily",
+                    "fontSize",
+                    "lightColor",
+                    "darkColor"
+                  ],
+                  "properties": {
+                    "fontFamily": {
+                      "type": "string",
+                      "enum": ["serif", "sans", "monospace"],
+                      "description": "font；CSS 变量 --home-book-pages-life-running-outer-font-family"
+                    },
+                    "fontSize": {
+                      "type": "string",
+                      "allOf": [
+                        {
+                          "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$"
+                        },
+                        {
+                          "pattern": "cqw$"
+                        }
+                      ],
+                      "description": "bookFontSize；CSS 变量 --home-book-pages-life-running-outer-font-size"
+                    },
+                    "lightColor": {
+                      "type": "string",
+                      "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+                      "description": "color；CSS 变量 --home-book-pages-life-running-outer-light-color"
+                    },
+                    "darkColor": {
+                      "type": "string",
+                      "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+                      "description": "color；CSS 变量 --home-book-pages-life-running-outer-dark-color"
+                    }
+                  }
+                },
+                "runningInner": {
+                  "type": "object",
+                  "required": [
+                    "fontFamily",
+                    "fontSize",
+                    "lightColor",
+                    "darkColor"
+                  ],
+                  "properties": {
+                    "fontFamily": {
+                      "type": "string",
+                      "enum": ["serif", "sans", "monospace"],
+                      "description": "font；CSS 变量 --home-book-pages-life-running-inner-font-family"
+                    },
+                    "fontSize": {
+                      "type": "string",
+                      "allOf": [
+                        {
+                          "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$"
+                        },
+                        {
+                          "pattern": "cqw$"
+                        }
+                      ],
+                      "description": "bookFontSize；CSS 变量 --home-book-pages-life-running-inner-font-size"
+                    },
+                    "lightColor": {
+                      "type": "string",
+                      "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+                      "description": "color；CSS 变量 --home-book-pages-life-running-inner-light-color"
+                    },
+                    "darkColor": {
+                      "type": "string",
+                      "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+                      "description": "color；CSS 变量 --home-book-pages-life-running-inner-dark-color"
+                    }
+                  }
+                },
+                "partLink": {
+                  "type": "object",
+                  "required": [
+                    "fontFamily",
+                    "fontSize",
+                    "lightColor",
+                    "darkColor"
+                  ],
+                  "properties": {
+                    "fontFamily": {
+                      "type": "string",
+                      "enum": ["serif", "sans", "monospace"],
+                      "description": "font；CSS 变量 --home-book-pages-life-part-link-font-family"
+                    },
+                    "fontSize": {
+                      "type": "string",
+                      "allOf": [
+                        {
+                          "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$"
+                        },
+                        {
+                          "pattern": "cqw$"
+                        }
+                      ],
+                      "description": "bookFontSize；CSS 变量 --home-book-pages-life-part-link-font-size"
+                    },
+                    "lightColor": {
+                      "type": "string",
+                      "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+                      "description": "color；CSS 变量 --home-book-pages-life-part-link-light-color"
+                    },
+                    "darkColor": {
+                      "type": "string",
+                      "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+                      "description": "color；CSS 变量 --home-book-pages-life-part-link-dark-color"
+                    }
+                  }
+                },
+                "catalogTitle": {
+                  "type": "object",
+                  "required": [
+                    "fontFamily",
+                    "fontSize",
+                    "lightColor",
+                    "darkColor"
+                  ],
+                  "properties": {
+                    "fontFamily": {
+                      "type": "string",
+                      "enum": ["serif", "sans", "monospace"],
+                      "description": "font；CSS 变量 --home-book-pages-life-catalog-title-font-family"
+                    },
+                    "fontSize": {
+                      "type": "string",
+                      "allOf": [
+                        {
+                          "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$"
+                        },
+                        {
+                          "pattern": "cqw$"
+                        }
+                      ],
+                      "description": "bookFontSize；CSS 变量 --home-book-pages-life-catalog-title-font-size"
+                    },
+                    "lightColor": {
+                      "type": "string",
+                      "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+                      "description": "color；CSS 变量 --home-book-pages-life-catalog-title-light-color"
+                    },
+                    "darkColor": {
+                      "type": "string",
+                      "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+                      "description": "color；CSS 变量 --home-book-pages-life-catalog-title-dark-color"
+                    }
+                  }
+                },
+                "catalogDate": {
+                  "type": "object",
+                  "required": [
+                    "fontFamily",
+                    "fontSize",
+                    "lightColor",
+                    "darkColor"
+                  ],
+                  "properties": {
+                    "fontFamily": {
+                      "type": "string",
+                      "enum": ["serif", "sans", "monospace"],
+                      "description": "font；CSS 变量 --home-book-pages-life-catalog-date-font-family"
+                    },
+                    "fontSize": {
+                      "type": "string",
+                      "allOf": [
+                        {
+                          "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$"
+                        },
+                        {
+                          "pattern": "cqw$"
+                        }
+                      ],
+                      "description": "bookFontSize；CSS 变量 --home-book-pages-life-catalog-date-font-size"
+                    },
+                    "lightColor": {
+                      "type": "string",
+                      "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+                      "description": "color；CSS 变量 --home-book-pages-life-catalog-date-light-color"
+                    },
+                    "darkColor": {
+                      "type": "string",
+                      "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+                      "description": "color；CSS 变量 --home-book-pages-life-catalog-date-dark-color"
+                    }
+                  }
+                },
+                "archiveLink": {
+                  "type": "object",
+                  "required": [
+                    "fontFamily",
+                    "fontSize",
+                    "lightColor",
+                    "darkColor"
+                  ],
+                  "properties": {
+                    "fontFamily": {
+                      "type": "string",
+                      "enum": ["serif", "sans", "monospace"],
+                      "description": "font；CSS 变量 --home-book-pages-life-archive-link-font-family"
+                    },
+                    "fontSize": {
+                      "type": "string",
+                      "allOf": [
+                        {
+                          "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$"
+                        },
+                        {
+                          "pattern": "cqw$"
+                        }
+                      ],
+                      "description": "bookFontSize；CSS 变量 --home-book-pages-life-archive-link-font-size"
+                    },
+                    "lightColor": {
+                      "type": "string",
+                      "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+                      "description": "color；CSS 变量 --home-book-pages-life-archive-link-light-color"
+                    },
+                    "darkColor": {
+                      "type": "string",
+                      "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+                      "description": "color；CSS 变量 --home-book-pages-life-archive-link-dark-color"
+                    }
+                  }
+                },
+                "folio": {
+                  "type": "object",
+                  "required": [
+                    "fontFamily",
+                    "fontSize",
+                    "lightColor",
+                    "darkColor"
+                  ],
+                  "properties": {
+                    "fontFamily": {
+                      "type": "string",
+                      "enum": ["serif", "sans", "monospace"],
+                      "description": "font；CSS 变量 --home-book-pages-life-folio-font-family"
+                    },
+                    "fontSize": {
+                      "type": "string",
+                      "allOf": [
+                        {
+                          "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$"
+                        },
+                        {
+                          "pattern": "cqw$"
+                        }
+                      ],
+                      "description": "bookFontSize；CSS 变量 --home-book-pages-life-folio-font-size"
+                    },
+                    "lightColor": {
+                      "type": "string",
+                      "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+                      "description": "color；CSS 变量 --home-book-pages-life-folio-light-color"
+                    },
+                    "darkColor": {
+                      "type": "string",
+                      "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+                      "description": "color；CSS 变量 --home-book-pages-life-folio-dark-color"
+                    }
+                  }
+                }
+              },
+              "description": "生活书页的文案、间距、目录和各文字角色。"
+            },
+            "technical": {
+              "type": "object",
+              "required": [
+                "content",
+                "layout",
+                "catalog",
+                "runningOuter",
+                "runningInner",
+                "partLink",
+                "catalogTitle",
+                "catalogDate",
+                "archiveLink",
+                "folio"
+              ],
+              "properties": {
+                "content": {
+                  "type": "object",
+                  "required": [
+                    "outerRunningLabel",
+                    "innerRunningLabel",
+                    "partLabel",
+                    "partHref",
+                    "archiveLabel",
+                    "archiveHref",
+                    "homepageFolio"
+                  ],
+                  "properties": {
+                    "outerRunningLabel": {
+                      "type": "string",
+                      "pattern": "\\S",
+                      "description": "text；组件内容或行为参数"
+                    },
+                    "innerRunningLabel": {
+                      "type": "string",
+                      "pattern": "\\S",
+                      "description": "text；组件内容或行为参数"
+                    },
+                    "partLabel": {
+                      "type": "string",
+                      "pattern": "\\S",
+                      "description": "text；组件内容或行为参数"
+                    },
+                    "partHref": {
+                      "type": "string",
+                      "pattern": "\\S",
+                      "description": "text；组件内容或行为参数"
+                    },
+                    "archiveLabel": {
+                      "type": "string",
+                      "pattern": "\\S",
+                      "description": "text；组件内容或行为参数"
+                    },
+                    "archiveHref": {
+                      "type": "string",
+                      "pattern": "\\S",
+                      "description": "text；组件内容或行为参数"
+                    },
+                    "homepageFolio": {
+                      "type": "string",
+                      "pattern": "\\S",
+                      "description": "text；组件内容或行为参数"
+                    }
+                  }
+                },
+                "layout": {
+                  "type": "object",
+                  "required": [
+                    "paddingTop",
+                    "paddingInline",
+                    "paddingBottom",
+                    "partMarginTop",
+                    "partMarginBottom",
+                    "partPaddingTop",
+                    "catalogGap",
+                    "catalogColumnGap",
+                    "archiveBottom",
+                    "folioBottom"
+                  ],
+                  "properties": {
+                    "paddingTop": {
+                      "type": "string",
+                      "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+                      "description": "length；CSS 变量 --home-book-pages-technical-layout-padding-top"
+                    },
+                    "paddingInline": {
+                      "type": "string",
+                      "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+                      "description": "length；CSS 变量 --home-book-pages-technical-layout-padding-inline"
+                    },
+                    "paddingBottom": {
+                      "type": "string",
+                      "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+                      "description": "length；CSS 变量 --home-book-pages-technical-layout-padding-bottom"
+                    },
+                    "partMarginTop": {
+                      "type": "string",
+                      "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+                      "description": "length；CSS 变量 --home-book-pages-technical-layout-part-margin-top"
+                    },
+                    "partMarginBottom": {
+                      "type": "string",
+                      "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+                      "description": "length；CSS 变量 --home-book-pages-technical-layout-part-margin-bottom"
+                    },
+                    "partPaddingTop": {
+                      "type": "string",
+                      "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+                      "description": "length；CSS 变量 --home-book-pages-technical-layout-part-padding-top"
+                    },
+                    "catalogGap": {
+                      "type": "string",
+                      "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+                      "description": "length；CSS 变量 --home-book-pages-technical-layout-catalog-gap"
+                    },
+                    "catalogColumnGap": {
+                      "type": "string",
+                      "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+                      "description": "length；CSS 变量 --home-book-pages-technical-layout-catalog-column-gap"
+                    },
+                    "archiveBottom": {
+                      "type": "string",
+                      "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+                      "description": "length；CSS 变量 --home-book-pages-technical-layout-archive-bottom"
+                    },
+                    "folioBottom": {
+                      "type": "string",
+                      "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+                      "description": "length；CSS 变量 --home-book-pages-technical-layout-folio-bottom"
+                    }
+                  }
+                },
+                "catalog": {
+                  "type": "object",
+                  "required": [
+                    "wideMaximumEntries",
+                    "narrowMaximumEntries",
+                    "narrowBookWidth",
+                    "extremeBookWidth",
+                    "titleMaximumLines",
+                    "wideDateFormat",
+                    "compactDateFormat",
+                    "narrowRowGap"
+                  ],
+                  "properties": {
+                    "wideMaximumEntries": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "description": "positiveInteger；组件内容或行为参数"
+                    },
+                    "narrowMaximumEntries": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "description": "positiveInteger；组件内容或行为参数"
+                    },
+                    "narrowBookWidth": {
+                      "type": "string",
+                      "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+                      "description": "length；组件内容或行为参数"
+                    },
+                    "extremeBookWidth": {
+                      "type": "string",
+                      "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+                      "description": "length；组件内容或行为参数"
+                    },
+                    "titleMaximumLines": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "description": "positiveInteger；CSS 变量 --home-book-pages-technical-catalog-title-maximum-lines"
+                    },
+                    "wideDateFormat": {
+                      "type": "string",
+                      "pattern": "^(?:YYYY|MM|DD|[.\\-/\\s])+$",
+                      "description": "dateFormat；组件内容或行为参数"
+                    },
+                    "compactDateFormat": {
+                      "type": "string",
+                      "pattern": "^(?:YYYY|MM|DD|[.\\-/\\s])+$",
+                      "description": "dateFormat；组件内容或行为参数"
+                    },
+                    "narrowRowGap": {
+                      "type": "string",
+                      "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+                      "description": "length；CSS 变量 --home-book-pages-technical-catalog-narrow-row-gap"
+                    }
+                  }
+                },
+                "runningOuter": {
+                  "type": "object",
+                  "required": [
+                    "fontFamily",
+                    "fontSize",
+                    "lightColor",
+                    "darkColor"
+                  ],
+                  "properties": {
+                    "fontFamily": {
+                      "type": "string",
+                      "enum": ["serif", "sans", "monospace"],
+                      "description": "font；CSS 变量 --home-book-pages-technical-running-outer-font-family"
+                    },
+                    "fontSize": {
+                      "type": "string",
+                      "allOf": [
+                        {
+                          "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$"
+                        },
+                        {
+                          "pattern": "cqw$"
+                        }
+                      ],
+                      "description": "bookFontSize；CSS 变量 --home-book-pages-technical-running-outer-font-size"
+                    },
+                    "lightColor": {
+                      "type": "string",
+                      "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+                      "description": "color；CSS 变量 --home-book-pages-technical-running-outer-light-color"
+                    },
+                    "darkColor": {
+                      "type": "string",
+                      "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+                      "description": "color；CSS 变量 --home-book-pages-technical-running-outer-dark-color"
+                    }
+                  }
+                },
+                "runningInner": {
+                  "type": "object",
+                  "required": [
+                    "fontFamily",
+                    "fontSize",
+                    "lightColor",
+                    "darkColor"
+                  ],
+                  "properties": {
+                    "fontFamily": {
+                      "type": "string",
+                      "enum": ["serif", "sans", "monospace"],
+                      "description": "font；CSS 变量 --home-book-pages-technical-running-inner-font-family"
+                    },
+                    "fontSize": {
+                      "type": "string",
+                      "allOf": [
+                        {
+                          "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$"
+                        },
+                        {
+                          "pattern": "cqw$"
+                        }
+                      ],
+                      "description": "bookFontSize；CSS 变量 --home-book-pages-technical-running-inner-font-size"
+                    },
+                    "lightColor": {
+                      "type": "string",
+                      "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+                      "description": "color；CSS 变量 --home-book-pages-technical-running-inner-light-color"
+                    },
+                    "darkColor": {
+                      "type": "string",
+                      "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+                      "description": "color；CSS 变量 --home-book-pages-technical-running-inner-dark-color"
+                    }
+                  }
+                },
+                "partLink": {
+                  "type": "object",
+                  "required": [
+                    "fontFamily",
+                    "fontSize",
+                    "lightColor",
+                    "darkColor"
+                  ],
+                  "properties": {
+                    "fontFamily": {
+                      "type": "string",
+                      "enum": ["serif", "sans", "monospace"],
+                      "description": "font；CSS 变量 --home-book-pages-technical-part-link-font-family"
+                    },
+                    "fontSize": {
+                      "type": "string",
+                      "allOf": [
+                        {
+                          "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$"
+                        },
+                        {
+                          "pattern": "cqw$"
+                        }
+                      ],
+                      "description": "bookFontSize；CSS 变量 --home-book-pages-technical-part-link-font-size"
+                    },
+                    "lightColor": {
+                      "type": "string",
+                      "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+                      "description": "color；CSS 变量 --home-book-pages-technical-part-link-light-color"
+                    },
+                    "darkColor": {
+                      "type": "string",
+                      "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+                      "description": "color；CSS 变量 --home-book-pages-technical-part-link-dark-color"
+                    }
+                  }
+                },
+                "catalogTitle": {
+                  "type": "object",
+                  "required": [
+                    "fontFamily",
+                    "fontSize",
+                    "lightColor",
+                    "darkColor"
+                  ],
+                  "properties": {
+                    "fontFamily": {
+                      "type": "string",
+                      "enum": ["serif", "sans", "monospace"],
+                      "description": "font；CSS 变量 --home-book-pages-technical-catalog-title-font-family"
+                    },
+                    "fontSize": {
+                      "type": "string",
+                      "allOf": [
+                        {
+                          "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$"
+                        },
+                        {
+                          "pattern": "cqw$"
+                        }
+                      ],
+                      "description": "bookFontSize；CSS 变量 --home-book-pages-technical-catalog-title-font-size"
+                    },
+                    "lightColor": {
+                      "type": "string",
+                      "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+                      "description": "color；CSS 变量 --home-book-pages-technical-catalog-title-light-color"
+                    },
+                    "darkColor": {
+                      "type": "string",
+                      "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+                      "description": "color；CSS 变量 --home-book-pages-technical-catalog-title-dark-color"
+                    }
+                  }
+                },
+                "catalogDate": {
+                  "type": "object",
+                  "required": [
+                    "fontFamily",
+                    "fontSize",
+                    "lightColor",
+                    "darkColor"
+                  ],
+                  "properties": {
+                    "fontFamily": {
+                      "type": "string",
+                      "enum": ["serif", "sans", "monospace"],
+                      "description": "font；CSS 变量 --home-book-pages-technical-catalog-date-font-family"
+                    },
+                    "fontSize": {
+                      "type": "string",
+                      "allOf": [
+                        {
+                          "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$"
+                        },
+                        {
+                          "pattern": "cqw$"
+                        }
+                      ],
+                      "description": "bookFontSize；CSS 变量 --home-book-pages-technical-catalog-date-font-size"
+                    },
+                    "lightColor": {
+                      "type": "string",
+                      "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+                      "description": "color；CSS 变量 --home-book-pages-technical-catalog-date-light-color"
+                    },
+                    "darkColor": {
+                      "type": "string",
+                      "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+                      "description": "color；CSS 变量 --home-book-pages-technical-catalog-date-dark-color"
+                    }
+                  }
+                },
+                "archiveLink": {
+                  "type": "object",
+                  "required": [
+                    "fontFamily",
+                    "fontSize",
+                    "lightColor",
+                    "darkColor"
+                  ],
+                  "properties": {
+                    "fontFamily": {
+                      "type": "string",
+                      "enum": ["serif", "sans", "monospace"],
+                      "description": "font；CSS 变量 --home-book-pages-technical-archive-link-font-family"
+                    },
+                    "fontSize": {
+                      "type": "string",
+                      "allOf": [
+                        {
+                          "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$"
+                        },
+                        {
+                          "pattern": "cqw$"
+                        }
+                      ],
+                      "description": "bookFontSize；CSS 变量 --home-book-pages-technical-archive-link-font-size"
+                    },
+                    "lightColor": {
+                      "type": "string",
+                      "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+                      "description": "color；CSS 变量 --home-book-pages-technical-archive-link-light-color"
+                    },
+                    "darkColor": {
+                      "type": "string",
+                      "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+                      "description": "color；CSS 变量 --home-book-pages-technical-archive-link-dark-color"
+                    }
+                  }
+                },
+                "folio": {
+                  "type": "object",
+                  "required": [
+                    "fontFamily",
+                    "fontSize",
+                    "lightColor",
+                    "darkColor"
+                  ],
+                  "properties": {
+                    "fontFamily": {
+                      "type": "string",
+                      "enum": ["serif", "sans", "monospace"],
+                      "description": "font；CSS 变量 --home-book-pages-technical-folio-font-family"
+                    },
+                    "fontSize": {
+                      "type": "string",
+                      "allOf": [
+                        {
+                          "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$"
+                        },
+                        {
+                          "pattern": "cqw$"
+                        }
+                      ],
+                      "description": "bookFontSize；CSS 变量 --home-book-pages-technical-folio-font-size"
+                    },
+                    "lightColor": {
+                      "type": "string",
+                      "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+                      "description": "color；CSS 变量 --home-book-pages-technical-folio-light-color"
+                    },
+                    "darkColor": {
+                      "type": "string",
+                      "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+                      "description": "color；CSS 变量 --home-book-pages-technical-folio-dark-color"
+                    }
+                  }
+                }
+              },
+              "description": "技术书页的文案、间距、目录和各文字角色。"
+            }
+          },
+          "description": "纸页共享弯曲参数，以及生活页和技术页的独立内容与排版。"
+        }
+      },
+      "description": "首页双开书组件及全部物理、材质和页内排版参数。"
+    },
+    "footer": {
+      "type": "object",
+      "required": [
+        "content",
+        "size",
+        "spacing",
+        "quoteEnglish",
+        "quoteTranslation",
+        "quoteAuthor",
+        "copyright"
+      ],
+      "properties": {
+        "content": {
+          "type": "object",
+          "required": ["copyrightLabel"],
+          "properties": {
+            "copyrightLabel": {
+              "type": "string",
+              "pattern": "\\S",
+              "description": "text；组件内容或行为参数"
+            }
+          }
+        },
+        "size": {
+          "type": "object",
+          "required": ["minimumHeight"],
+          "properties": {
+            "minimumHeight": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-footer-size-minimum-height"
+            }
+          }
+        },
+        "spacing": {
+          "type": "object",
+          "required": [
+            "inlineGapFixed",
+            "inlineGapProportional",
+            "paddingTop",
+            "paddingBottom",
+            "englishTranslationGap",
+            "translationMetaGap",
+            "authorCopyrightGap"
+          ],
+          "properties": {
+            "inlineGapFixed": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-footer-spacing-inline-gap-fixed"
+            },
+            "inlineGapProportional": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-footer-spacing-inline-gap-proportional"
+            },
+            "paddingTop": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-footer-spacing-padding-top"
+            },
+            "paddingBottom": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-footer-spacing-padding-bottom"
+            },
+            "englishTranslationGap": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-footer-spacing-english-translation-gap"
+            },
+            "translationMetaGap": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-footer-spacing-translation-meta-gap"
+            },
+            "authorCopyrightGap": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-footer-spacing-author-copyright-gap"
+            }
+          }
+        },
+        "quoteEnglish": {
+          "type": "object",
+          "required": [
+            "fontFamily",
+            "minimumSize",
+            "fluidSize",
+            "maximumSize",
+            "lightColor",
+            "darkColor"
+          ],
+          "properties": {
+            "fontFamily": {
+              "type": "string",
+              "enum": ["serif", "sans", "monospace"],
+              "description": "font；CSS 变量 --home-footer-quote-english-font-family"
+            },
+            "minimumSize": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-footer-quote-english-minimum-size"
+            },
+            "fluidSize": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-footer-quote-english-fluid-size"
+            },
+            "maximumSize": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-footer-quote-english-maximum-size"
+            },
+            "lightColor": {
+              "type": "string",
+              "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+              "description": "color；CSS 变量 --home-footer-quote-english-light-color"
+            },
+            "darkColor": {
+              "type": "string",
+              "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+              "description": "color；CSS 变量 --home-footer-quote-english-dark-color"
+            }
+          }
+        },
+        "quoteTranslation": {
+          "type": "object",
+          "required": [
+            "fontFamily",
+            "minimumSize",
+            "fluidSize",
+            "maximumSize",
+            "lightColor",
+            "darkColor"
+          ],
+          "properties": {
+            "fontFamily": {
+              "type": "string",
+              "enum": ["serif", "sans", "monospace"],
+              "description": "font；CSS 变量 --home-footer-quote-translation-font-family"
+            },
+            "minimumSize": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-footer-quote-translation-minimum-size"
+            },
+            "fluidSize": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-footer-quote-translation-fluid-size"
+            },
+            "maximumSize": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-footer-quote-translation-maximum-size"
+            },
+            "lightColor": {
+              "type": "string",
+              "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+              "description": "color；CSS 变量 --home-footer-quote-translation-light-color"
+            },
+            "darkColor": {
+              "type": "string",
+              "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+              "description": "color；CSS 变量 --home-footer-quote-translation-dark-color"
+            }
+          }
+        },
+        "quoteAuthor": {
+          "type": "object",
+          "required": [
+            "fontFamily",
+            "minimumSize",
+            "fluidSize",
+            "maximumSize",
+            "lightColor",
+            "darkColor"
+          ],
+          "properties": {
+            "fontFamily": {
+              "type": "string",
+              "enum": ["serif", "sans", "monospace"],
+              "description": "font；CSS 变量 --home-footer-quote-author-font-family"
+            },
+            "minimumSize": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-footer-quote-author-minimum-size"
+            },
+            "fluidSize": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-footer-quote-author-fluid-size"
+            },
+            "maximumSize": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-footer-quote-author-maximum-size"
+            },
+            "lightColor": {
+              "type": "string",
+              "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+              "description": "color；CSS 变量 --home-footer-quote-author-light-color"
+            },
+            "darkColor": {
+              "type": "string",
+              "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+              "description": "color；CSS 变量 --home-footer-quote-author-dark-color"
+            }
+          }
+        },
+        "copyright": {
+          "type": "object",
+          "required": [
+            "fontFamily",
+            "minimumSize",
+            "fluidSize",
+            "maximumSize",
+            "lightColor",
+            "darkColor"
+          ],
+          "properties": {
+            "fontFamily": {
+              "type": "string",
+              "enum": ["serif", "sans", "monospace"],
+              "description": "font；CSS 变量 --home-footer-copyright-font-family"
+            },
+            "minimumSize": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-footer-copyright-minimum-size"
+            },
+            "fluidSize": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-footer-copyright-fluid-size"
+            },
+            "maximumSize": {
+              "type": "string",
+              "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+              "description": "length；CSS 变量 --home-footer-copyright-maximum-size"
+            },
+            "lightColor": {
+              "type": "string",
+              "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+              "description": "color；CSS 变量 --home-footer-copyright-light-color"
+            },
+            "darkColor": {
+              "type": "string",
+              "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+              "description": "color；CSS 变量 --home-footer-copyright-dark-color"
+            }
+          }
+        }
+      },
+      "description": "每日一句和版权页脚组件。"
+    },
+    "directories": {
+      "type": "object",
+      "required": ["life", "technical"],
+      "properties": {
+        "life": {
+          "type": "object",
+          "required": ["folio"],
+          "properties": {
+            "folio": {
+              "type": "object",
+              "required": [
+                "content",
+                "fontFamily",
+                "fontSize",
+                "lightColor",
+                "darkColor"
+              ],
+              "properties": {
+                "content": {
+                  "type": "string",
+                  "pattern": "\\S",
+                  "description": "text；组件内容或行为参数"
+                },
+                "fontFamily": {
+                  "type": "string",
+                  "enum": ["serif", "sans", "monospace"],
+                  "description": "font；CSS 变量 --home-directories-life-folio-font-family"
+                },
+                "fontSize": {
+                  "type": "string",
+                  "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+                  "description": "length；CSS 变量 --home-directories-life-folio-font-size"
+                },
+                "lightColor": {
+                  "type": "string",
+                  "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+                  "description": "color；CSS 变量 --home-directories-life-folio-light-color"
+                },
+                "darkColor": {
+                  "type": "string",
+                  "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+                  "description": "color；CSS 变量 --home-directories-life-folio-dark-color"
+                }
+              }
+            }
+          }
+        },
+        "technical": {
+          "type": "object",
+          "required": ["folio"],
+          "properties": {
+            "folio": {
+              "type": "object",
+              "required": [
+                "content",
+                "fontFamily",
+                "fontSize",
+                "lightColor",
+                "darkColor"
+              ],
+              "properties": {
+                "content": {
+                  "type": "string",
+                  "pattern": "\\S",
+                  "description": "text；组件内容或行为参数"
+                },
+                "fontFamily": {
+                  "type": "string",
+                  "enum": ["serif", "sans", "monospace"],
+                  "description": "font；CSS 变量 --home-directories-technical-folio-font-family"
+                },
+                "fontSize": {
+                  "type": "string",
+                  "pattern": "^-?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:rem|px|%|svh|svw|vw|vh|em|cqw|cqh|cqi|cqb)$",
+                  "description": "length；CSS 变量 --home-directories-technical-folio-font-size"
+                },
+                "lightColor": {
+                  "type": "string",
+                  "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+                  "description": "color；CSS 变量 --home-directories-technical-folio-light-color"
+                },
+                "darkColor": {
+                  "type": "string",
+                  "pattern": "^(?:#[\\da-fA-F]{3,8}|[rR][gG][bB][aA]?\\(\\s*[\\d.%\\s,/-]+\\))$",
+                  "description": "color；CSS 变量 --home-directories-technical-folio-dark-color"
+                }
+              }
+            }
+          }
+        }
+      },
+      "description": "生活目录页和技术目录页的独立页码组件。"
+    }
+  }
+}
