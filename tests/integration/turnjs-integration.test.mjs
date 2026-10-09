@@ -54,6 +54,39 @@ test('book shell keeps depth decorations outside Turn.js managed pages', async (
   dom.window.close();
 });
 
+test('initial six special pages use the exact HTML serialized for runtime reconstruction on every book route', async () => {
+  for (const route of [
+    'index.html',
+    'book/sample/index.html',
+    'demos/book-runtime/index.html',
+  ]) {
+    const dom = new JSDOM(
+      await readFile(new URL('../../dist/' + route, import.meta.url), 'utf8'),
+    );
+    try {
+      const document = dom.window.document;
+      const payload = JSON.parse(
+        document.querySelector('#book-data').dataset.config,
+      );
+      const roles = payload.specialPages;
+      assert.equal(Object.keys(roles).length, 6);
+      for (const page of Object.values(roles)) {
+        const roleClass = page.className
+          .split(' ')
+          .find((name) => name.startsWith('book-page--'));
+        const expected = document.createElement('div');
+        expected.innerHTML = page.html;
+        assert.equal(
+          document.querySelector('.sj-book > .' + roleClass).innerHTML,
+          expected.innerHTML,
+        );
+      }
+    } finally {
+      dom.window.close();
+    }
+  }
+});
+
 test('Turn.js adapter updates stable depth layers instead of page children', async () => {
   const [adapter, styles] = await Promise.all([
     readFile(

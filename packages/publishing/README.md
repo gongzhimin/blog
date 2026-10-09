@@ -85,7 +85,9 @@ GitHub 是外部网络边界。模块不依赖本地工作树。Operations 负�
 node -e "console.log(Object.keys(require('@myblog/publishing')))"
 ```
 
-预期仅输出 `startServer`。该只读 smoke 检查不启动 listener；请求转换与提交替身练习见[教程](docs/tutorials/getting-started.md)。
+预期输出 `[ 'startServer' ]`。此检查只验证导出集合，不调用 `startServer()`，不验证监听就绪、鉴权或 GitHub 提交。
+
+请求转换、失败传播与回环 HTTP 的安全验证步骤见[教程](docs/tutorials/getting-started.md)。其中使用内部请求替身，不是公开 API 的生产调用；真实发布须另行授权。
 
 ## 配置
 

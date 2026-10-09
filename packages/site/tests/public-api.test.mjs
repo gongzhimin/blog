@@ -1,7 +1,57 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { getRssString } from '@astrojs/rss';
+import { JSDOM } from 'jsdom';
 import config from '../src/data/book-config.json' with { type: 'json' };
 import * as site from '../src/api/index.mjs';
+import { createSpecialPages } from '../src/internal/presentation/special-pages/index.mjs';
+
+for (const field of ['source', 'enclosure']) {
+  test(`RSS preserves ${field} values as data, not injected XML`, async () => {
+    const title = '<injected>unexpected</injected>';
+    const type = 'audio/mpeg" injected="unexpected';
+    const item = {
+      title: 'Article',
+      link: '/article',
+      ...(field === 'source'
+        ? { source: { url: 'https://example.test/feed', title } }
+        : {
+            enclosure: {
+              url: 'https://example.test/audio.mp3',
+              length: 1,
+              type,
+            },
+          }),
+    };
+    const xml = await getRssString({
+      title: 'Feed',
+      description: 'Example',
+      site: 'https://example.test',
+      items: [item],
+    });
+    const dom = new JSDOM(xml, { contentType: 'application/xml' });
+    try {
+      const document = dom.window.document;
+      assert.equal(document.querySelector('parsererror'), null);
+      assert.equal(document.querySelector('injected'), null);
+      assert.equal(document.querySelector('[injected]'), null);
+      assert.equal(document.querySelectorAll('item').length, 1);
+      assert.equal(
+        document.querySelector('item > title').textContent,
+        'Article',
+      );
+      if (field === 'source')
+        assert.equal(document.querySelector('source').textContent, title);
+      else
+        assert.equal(
+          document.querySelector('enclosure').getAttribute('type'),
+          type,
+        );
+    } finally {
+      dom.window.close();
+    }
+  });
+}
 
 const theme = {
   runtime: { id: 'classic-paper' },
@@ -9,10 +59,88 @@ const theme = {
   measurement: { articleCSS: '', tocCSS: '' },
 };
 
+test('special pages escape title text and freeze the edition year in the serialized payload', () => {
+  const input = { source: { documentTitle: '<img src=x onerror=alert(1)>' } };
+  const pages = createSpecialPages(input, 2026);
+  const later = createSpecialPages(
+    { source: { documentTitle: '另一本书' } },
+    2026,
+  );
+  const dom = new JSDOM(pages.titlePage.html + pages.imprintPage.html);
+  try {
+    assert.equal(dom.window.document.querySelector('img'), null);
+    assert.equal(
+      dom.window.document.querySelector('h1').textContent,
+      input.source.documentTitle,
+    );
+    assert.match(pages.imprintPage.html, /2026 年/);
+    for (const role of ['frontCover', 'frontInside', 'backInside', 'backCover'])
+      assert.deepEqual(pages[role], later[role]);
+    assert.deepEqual(input, {
+      source: { documentTitle: '<img src=x onerror=alert(1)>' },
+    });
+  } finally {
+    dom.window.close();
+  }
+});
+
+for (const titlePage of ['-321px 12px', undefined]) {
+  test(`title artwork consumes configured coordinates (${titlePage ?? 'fallback'})`, () => {
+    const custom = structuredClone(config);
+    custom.book.coverSprite.positions.backInside = '-654px 8px';
+    if (titlePage === undefined)
+      delete custom.book.coverSprite.positions.titlePage;
+    else custom.book.coverSprite.positions.titlePage = titlePage;
+    const result = site.buildHomepageModel({
+      lifePosts: [],
+      blogPosts: [],
+      bookConfig: custom,
+      theme,
+    });
+    assert.equal(result.ok, true);
+    assert.ok(
+      result.value.homepageStyles.includes(
+        `background-position: ${titlePage ?? '-654px 8px'} !important;`,
+      ),
+    );
+  });
+}
+
 const post = (id, date, extra = {}) => ({
   id,
   body: `# ${id}\n\n正文`,
   data: { title: id, date: new Date(date), ...extra },
+});
+
+test('homepage supplies six independent special page definitions without using quote attribution', () => {
+  const result = site.buildHomepageModel({
+    lifePosts: [],
+    blogPosts: [],
+    bookConfig: config,
+    theme,
+  });
+  assert.equal(result.ok, true);
+  const pages = result.value.runConfig.specialPages;
+  assert.deepEqual(Object.keys(pages), [
+    'frontCover',
+    'frontInside',
+    'titlePage',
+    'imprintPage',
+    'backInside',
+    'backCover',
+  ]);
+  assert.deepEqual(JSON.parse(JSON.stringify(pages)), pages);
+  assert.match(pages.titlePage.html, /志民/);
+  assert.doesNotMatch(pages.imprintPage.html, /Joan Didion/);
+  assert.match(pages.frontCover.html, /class="side"/);
+  assert.equal(
+    pages.backInside.className,
+    'hard fixed back-side book-page--back-inside',
+  );
+  assert.match(
+    result.value.homepageStyles,
+    /\.sj-book \.book-page--back-inside/,
+  );
 });
 
 test('Site root exposes its page task and configuration inspection facade', () => {

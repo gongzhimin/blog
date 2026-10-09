@@ -3,7 +3,7 @@ id: 'decision-task-oriented-module-apis'
 type: 'decision'
 status: 'active'
 created: '2026-10-05'
-modified: '2026-10-06'
+modified: '2026-10-09'
 scope: '六个私有 workspace 包的 API、协作和版本'
 owner: '项目维护者'
 parent: 'docs/decisions/README.md'
@@ -92,7 +92,7 @@ Runtime 每次调用选择当前测量 CSS，空字符串可以清空旧值。�
 
 包均 private，各自维护 version；Changesets 配置 privatePackages.version=true、tag=false，fixed/linked 为空。版本更新同步消费者精确依赖及锁文件。未配置 publish；不生成 registry tag。工具行为参考 [Changesets 配置](https://changesets.dev/guide/config)。
 
-根 verify 执行结构、类型、构建和 Node；verify:release 再执行六包 tarball 隔离安装/类型编译与 Chromium。实际打包而非仅 dry-run；隔离安装禁 lifecycle scripts，允许从 npm 取得缺失依赖；服务包只导入，不执行生产任务。包根封装由 [Node exports](https://nodejs.org/api/packages.html#package-entry-points) 约束，不是安全沙箱。
+根 verify 执行结构、类型、构建和 Node；verify:release 再执行六包 tarball 隔离安装/类型编译与 Chromium/WebKit。实际打包而非仅 dry-run；隔离安装禁 lifecycle scripts，允许从 npm 取得缺失依赖；服务包只导入，不执行生产任务。包根封装由 [Node exports](https://nodejs.org/api/packages.html#package-entry-points) 约束，不是安全沙箱。
 
 ## 后果
 

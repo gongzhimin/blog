@@ -91,7 +91,8 @@
       "positions": {
         "front": "0 0",
         "frontInside": "-483px 0",
-        "backInside": "-1936px 0",
+        "titlePage": "-1936px 0",
+        "backInside": "-968px 0",
         "back": "-968px 0",
         "backOuter": "-1452px 0"
       }

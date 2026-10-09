@@ -83,6 +83,8 @@ node -e "const assert=require('node:assert/strict'); const api=require('@myblog/
 node --test packages/operations/tests/server-health-check.test.mjs
 ```
 
+第一条命令预期输出 `runHealthChecks available; probes not executed`，只验证导入与函数存在。第二条命令通过测试内 runner 替身核对成功、普通失败、重试和异常；不会调用公开任务的默认生产探针。它们不证明目标服务器健康，也不是公开 API 的端到端验收。
+
 真实任务会访问目标系统，仅在已授权服务器执行：
 
 ```sh

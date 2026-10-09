@@ -42,7 +42,7 @@ related:
 
 ## 练习步骤
 
-1. 查看 [Operations 单元测试](../../tests/server-health-check.test.mjs)，确认 runner 在测试中如何注入，以及每个结果如何断言。测试 helper 属于模块内部，不是应用调用示例。
+1. 阅读 [API 的输出与副作用](../reference/api.md#输出与副作用)，确认普通检查失败会保留结果并继续，执行器异常则拒绝 Promise。无需先读私有实现；[单元测试](../../tests/server-health-check.test.mjs) 仅供进一步核对替身断言。
 
 2. 运行该文件：
 
@@ -62,13 +62,15 @@ related:
 
 测试进程退出码为 0，输出显示相关用例通过。用例断言重试次数、单项结果顺序、总体 `ok` 状态和错误项保留；这些结果证明内存执行路径，不证明真实服务健康。
 
+重点观察 `server health checks report pass and fail without throwing early` 与 `runner and validator exceptions reject immediately without running later probes` 两项通过。前者验证普通失败保留报告，后者验证异常阻止后续调用；这不是在本机执行公开默认探针得到的报告。
+
 真实探针命令的通过判据、依赖权限和目标地址见[健康检查参考](../reference/api.md)及[服务器指南](../guides/server-runtime/README.md)。
 
 ## 排错与清理
 
 - 若 Node 版本不符，切换到项目规定版本后重跑；不要改测试以绕过运行时差异。
 - 若测试试图连接生产主机或执行 `systemctl`，停止执行并检查是否运行了错误脚本。本教程只允许运行列出的测试命令。
-- 用例运行结束后会释放其内存替身和临时 DOM；不产生文件、网络或服务器状态变更，无额外清理步骤。
+- 用例运行结束后释放内存替身；本教程不创建 DOM、不产生文件或服务器状态变更，无额外清理步骤。
 
 ## 后续阅读
 

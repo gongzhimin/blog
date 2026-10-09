@@ -296,6 +296,12 @@ for (const width of [1200, 390]) {
     await expect(page.locator(`.sj-book .p${target} h1`)).toHaveText(title);
     await expect(page.locator(`.sj-book .p${target} h1`)).toBeVisible();
     await page.goto(`/?post=${encodeURIComponent(key)}`);
+    // Navigation finishes before deferred plugin initialization on some engines.
+    await page.waitForFunction(
+      () =>
+        typeof window.jQuery?.fn?.turn === 'function' &&
+        window.jQuery('.sj-book').turn('is'),
+    );
     await expect
       .poll(() => page.evaluate(() => window.jQuery?.('.sj-book').turn('view')))
       .toContain(target);

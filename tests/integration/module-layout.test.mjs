@@ -281,6 +281,12 @@ test('acceptance configuration prevents warning, retry, stale build and CI compa
   assert.equal(browserConfig.failOnFlakyTests, true);
   assert.equal(browserConfig.retries, 0);
   assert.equal(browserConfig.webServer.reuseExistingServer, false);
+  assert.equal(browserConfig.use.baseURL, 'http://127.0.0.1:4392');
+  assert.match(browserConfig.webServer.command, /--port 4392/);
+  assert.deepEqual(
+    browserConfig.projects.map((project) => project.name),
+    ['chromium', 'webkit'],
+  );
   assert.ok(
     browserConfig.reporter.some(([path]) =>
       path.endsWith('strict-browser-reporter.mjs'),
@@ -306,6 +312,12 @@ test('acceptance configuration prevents warning, retry, stale build and CI compa
   }
   assert.ok(
     workflow.jobs.verify.steps.some((step) => step.run === 'npm run test:e2e'),
+  );
+  assert.ok(
+    workflow.jobs.verify.steps.some(
+      (step) =>
+        step.run === 'npx playwright install --with-deps chromium webkit',
+    ),
   );
   assert.ok(
     workflow.jobs.verify.steps.some(

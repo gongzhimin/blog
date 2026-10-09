@@ -5,6 +5,39 @@ import vm from 'node:vm';
 import { JSDOM } from 'jsdom';
 import { spawnSync } from 'node:child_process';
 
+test('public pagination returns an actionable duplicate-key diagnostic without partial pages', () => {
+  const child = spawnSync(
+    process.execPath,
+    [
+      '--input-type=module',
+      '-e',
+      `
+    import assert from 'node:assert/strict';
+    import { JSDOM } from 'jsdom';
+    const dom = new JSDOM('<html><body></body></html>');
+    globalThis.window = dom.window; globalThis.document = dom.window.document;
+    const { paginateBook } = await import('@myblog/book-runtime');
+    const entry = {key:'same',title:'chapter',dateStr:'',bodyHTML:'<p>body</p>'};
+    const payload = {articles:[entry, {...entry}], runtime:{pagination:{articleWidth:280,articleHeight:380,tocWidth:280,tocHeight:380}}};
+    try {
+      const result = paginateBook(payload);
+      assert.equal(result.ok, false);
+      assert.equal(result.diagnostics[0].code, 'BOOK_RUNTIME_DUPLICATE_KEY');
+      assert.equal(result.diagnostics[0].phase, 'paginate');
+      assert.match(result.diagnostics[0].message, /indices 0 and 1/);
+      assert.equal('value' in result, false);
+      assert.equal(document.head.children.length, 0);
+      assert.equal(document.body.children.length, 0);
+      payload.articles[1].key = 'other';
+      assert.equal(paginateBook(payload).ok, true);
+    } finally { dom.window.close(); }
+  `,
+    ],
+    { encoding: 'utf8', timeout: 10000 },
+  );
+  assert.equal(child.status, 0, child.stderr);
+});
+
 test('public pagination honors explicit empty CSS over host CSS and earlier tasks', () => {
   const child = spawnSync(
     process.execPath,

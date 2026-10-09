@@ -63,78 +63,28 @@
     BACK_COVER: 'back_cover', // 物理页 totalPages (封底外壳)
   };
 
-  /**
-   * 渲染物理页 3（扉页正面）典雅排版内容。
-   *
-   * @param {Object} metadata 文档元信息
-   * @returns {string} 扉页 HTML
-   */
-  function renderTitlePage(metadata) {
-    var title =
-      (metadata && (metadata.documentTitle || metadata.title)) || '志民的博客';
-    var subtitle =
-      (metadata && metadata.subtitle) || '文字留住瞬间 · 技术笔记与生活随笔';
-    var author = (metadata && metadata.author) || '志民';
-    return (
-      '<div class="book-content special-page title-page">' +
-      '<div class="title-page__container">' +
-      '<div class="title-page__header"><span class="title-page__tag">COLLECTION</span></div>' +
-      '<h1 class="title-page__title">' +
-      escapeHTML(title) +
-      '</h1>' +
-      '<div class="title-page__rule"></div>' +
-      '<p class="title-page__subtitle">' +
-      escapeHTML(subtitle) +
-      '</p>' +
-      '<div class="title-page__footer">' +
-      '<span class="title-page__author">' +
-      escapeHTML(author) +
-      '</span>' +
-      '<span class="title-page__edition">WEB EDITION</span>' +
-      '</div>' +
-      '</div>' +
-      '</div>'
-    );
-  }
-
-  /**
-   * 渲染物理页 4（扉页反面 / 版权题记页）典雅排版内容。
-   *
-   * @param {Object} metadata 文档元信息
-   * @returns {string} 版权页 HTML
-   */
-  function renderImprintPage(metadata) {
-    var title =
-      (metadata && (metadata.documentTitle || metadata.title)) || '志民的博客';
-    var author = (metadata && metadata.author) || '志民';
-    var year = (metadata && metadata.year) || new Date().getFullYear();
-    return (
-      '<div class="book-content special-page imprint-page">' +
-      '<div class="imprint-page__container">' +
-      '<h2 class="imprint-page__heading">出版说明 / IMPRINT</h2>' +
-      '<div class="imprint-page__rule"></div>' +
-      '<p class="imprint-page__item"><strong>书名：</strong>' +
-      escapeHTML(title) +
-      '</p>' +
-      '<p class="imprint-page__item"><strong>作者：</strong>' +
-      escapeHTML(author) +
-      '</p>' +
-      '<p class="imprint-page__item"><strong>版本：</strong>博客文集电子典藏版</p>' +
-      '<p class="imprint-page__item"><strong>出版时间：</strong>' +
-      escapeHTML(String(year)) +
-      ' 年</p>' +
-      '<div class="imprint-page__statement">' +
-      '<p>本书由 Astro 与 Turn.js 仿真排版引擎驱动生成。</p>' +
-      '<p>文集收录博主撰写之技术文章与生活随笔，保留原始排版风格与阅读体验。</p>' +
-      '<p class="imprint-page__copyright">&copy; ' +
-      escapeHTML(String(year)) +
-      ' ' +
-      escapeHTML(author) +
-      '. 保留所有权利。</p>' +
-      '</div>' +
-      '</div>' +
-      '</div>'
-    );
+  // Generic fallback for consumers without Site's edition payload.
+  function defaultSpecialPages(options) {
+    var title = escapeHTML((options && options.documentTitle) || '');
+    return {
+      frontCover: { html: '<div class="side"></div>' },
+      frontInside: { html: '' },
+      titlePage: {
+        html:
+          '<div class="book-content special-page title-page"><h1 class="title-page__title">' +
+          title +
+          '</h1></div>',
+      },
+      imprintPage: {
+        html: '<div class="book-content special-page imprint-page"></div>',
+      },
+      backInside: {
+        html: '<div class="book-content special-page back-inside-page"></div>',
+      },
+      backCover: {
+        html: '<div class="book-content special-page back-cover-page"></div>',
+      },
+    };
   }
 
   /**
@@ -232,86 +182,35 @@
   }
 
   /**
-   * 解析封面精灵图配置，提供默认雪碧图资产与贴图坐标回退。
-   *
-   * @param {Object} [options] 运行参数
-   * @param {Object} [options.coverSprite] 外部自定义精灵图配置
-   * @returns {{image: string, backgroundSize: string, positions: {back: string, backOuter: string}}}
-   */
-  function getCoverSprite(options) {
-    var sprite = options && options.coverSprite;
-    return (
-      sprite || {
-        image: '/vendor/turnjs/pics/book-covers.jpg',
-        backgroundSize: '2400px 600px',
-        positions: {
-          back: '-968px 0',
-          backInside: '-1936px 0',
-          backOuter: '-1452px 0',
-        },
-      }
-    );
-  }
-
-  /**
-   * 动态注入封底与封底外壳的 CSS 背景定位样式规则。
-   *
-   * @param {number} backPage 封底内侧物理页号（totalPages - 1）
-   * @param {number} totalPages 封底外壳物理页号（偶数闭合总页数）
-   * @param {{image: string, backgroundSize: string, positions: {back?: string, backInside?: string, backOuter?: string}}} coverSprite 精灵图定位信息
-   */
-  function injectBackCoverCSS(backPage, totalPages, coverSprite) {
-    var positions = coverSprite.positions || {};
-    var spriteCSS = document.createElement('style');
-    spriteCSS.textContent =
-      '.sj-book .p' +
-      backPage +
-      '{background-color:white;background-image:url(' +
-      coverSprite.image +
-      ')!important;background-repeat:no-repeat;background-size:' +
-      coverSprite.backgroundSize +
-      ';background-position:' +
-      (positions.backInside || positions.back) +
-      '!important}' +
-      '.sj-book .p' +
-      totalPages +
-      '{background-color:white;background-image:url(' +
-      coverSprite.image +
-      ')!important;background-repeat:no-repeat;background-size:' +
-      coverSprite.backgroundSize +
-      ';background-position:' +
-      positions.backOuter +
-      '!important}';
-    document.head.appendChild(spriteCSS);
-    return spriteCSS;
-  }
-
-  /**
    * 创建整书页面缓存管理器实例。
    *
    * @param {Object} [options] 配置选项
    * @param {string} [options.tocTitle='目录'] 目录标题文字
-   * @param {Object} [options.coverSprite] 封面精灵图设置
+   * @param {Object} [options.specialPages] 六种特殊页的受信 HTML
    * @returns {Object} 包含分页驱动、缓存读写与 URL 映射解析的页面缓存对象
    */
   function createBookPageCache(options) {
     var pageCache = {};
     var paginated = false;
     var tocTitle = (options && options.tocTitle) || '目录';
-    var coverSprite = getCoverSprite(options);
     var articleToPage = {};
     var pageToArticle = {};
     var paginationResult = null;
-    var backCoverStyle = null;
 
-    var metadata = {
-      documentTitle:
-        (options && (options.documentTitle || options.title)) || '志民的博客',
-      subtitle:
-        (options && options.subtitle) || '文字留住瞬间 · 技术笔记与生活随笔',
-      author: (options && options.author) || '志民',
-      year: (options && options.year) || new Date().getFullYear(),
-    };
+    var suppliedPages = options && options.specialPages;
+    var specialPages = suppliedPages || defaultSpecialPages(options);
+    [
+      'frontCover',
+      'frontInside',
+      'titlePage',
+      'imprintPage',
+      'backInside',
+      'backCover',
+    ].forEach(function (role) {
+      if (!specialPages[role] || typeof specialPages[role].html !== 'string') {
+        throw new TypeError('specialPages.' + role + '.html must be a string');
+      }
+    });
 
     function getPageContent(page) {
       return pageCache[page];
@@ -331,8 +230,6 @@
       articleToPage = {};
       pageToArticle = {};
       paginationResult = null;
-      if (backCoverStyle) backCoverStyle.remove();
-      backCoverStyle = null;
     }
 
     /**
@@ -348,6 +245,24 @@
     function paginateAll(articles, _initialTOC) {
       if (paginated) {
         return paginationResult;
+      }
+
+      // Reject ambiguous navigation before measuring or committing DOM/cache.
+      var navigationKeys = new Map();
+      for (var index = 0; index < articles.length; index++) {
+        var navigationKey = articles[index].key;
+        if (!navigationKey) continue;
+        if (navigationKeys.has(navigationKey)) {
+          var duplicate = new Error(
+            'Duplicate article navigation key at indices ' +
+              navigationKeys.get(navigationKey) +
+              ' and ' +
+              index,
+          );
+          duplicate.code = 'BOOK_RUNTIME_DUPLICATE_KEY';
+          throw duplicate;
+        }
+        navigationKeys.set(navigationKey, index);
       }
 
       // ── Step 1: paginate articles, cache results + record starts ──
@@ -431,9 +346,11 @@
 
       // ── Step 4: store Front Special Pages (Pages 3-4) & TOC pages (Roman numeral footer) ──
       // Physical Page 3: Title Page (扉页正面，典雅书名、作者、题记，不显示页码)
-      pageCache[3] = renderTitlePage(metadata);
+      pageCache[1] = specialPages.frontCover.html;
+      pageCache[2] = specialPages.frontInside.html;
+      pageCache[3] = specialPages.titlePage.html;
       // Physical Page 4: Imprint / Colophon (扉页反面 / 版权页，出版信息与版权声明，不显示页码)
-      pageCache[4] = renderImprintPage(metadata);
+      pageCache[4] = specialPages.imprintPage.html;
 
       // TOC Pages: Physical Page 5 ~ 4 + N (动态 N 页，罗马数字页码，不计入正文统计)
       pg = 5;
@@ -489,10 +406,8 @@
       }
 
       // 预填充封底内页与封底外壳，均为特殊页面，不显示正文页码
-      pageCache[backPage] =
-        '<div class="book-content special-page back-inside-page"></div>';
-      pageCache[totalPages] =
-        '<div class="book-content special-page back-cover-page"></div>';
+      pageCache[backPage] = specialPages.backInside.html;
+      pageCache[totalPages] = specialPages.backCover.html;
 
       // Update back-cover DOM.
       var oldBack = document.querySelector('.sj-book .back-side');
@@ -521,8 +436,6 @@
           }
         }
       }
-
-      backCoverStyle = injectBackCoverCSS(backPage, totalPages, coverSprite);
 
       paginated = true;
 
@@ -668,8 +581,6 @@
     isCountedPage: isCountedPage,
     physicalToBodyPage: physicalToBodyPage,
     bodyToPhysicalPage: bodyToPhysicalPage,
-    renderTitlePage: renderTitlePage,
-    renderImprintPage: renderImprintPage,
     renderAlignmentEndpaper: renderAlignmentEndpaper,
   };
 })();

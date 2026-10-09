@@ -3,7 +3,7 @@ id: 'src-site-readme'
 type: 'readme'
 status: 'active'
 created: '2026-10-04'
-modified: '2026-10-06'
+modified: '2026-10-09'
 scope: 'site'
 owner: 'Site 维护者'
 parent: 'packages/README.md'
@@ -101,6 +101,8 @@ Publishing 写内容仓库，不导入 Site；句子更新 CLI 调用 Site 内�
 
 内容、配置、目录和样式转换函数是包内实现，不属于跨包调用契约。快照读写和远端句子抓取由 Site CLI 处理，不在 `buildHomepageModel` 中执行。
 
+模型调用链渲染根路径图片时可能读取 `cwd/public` 文件以补充尺寸；不请求网络、不写文件。配置与主题的共享引用约束见 [API 的输出与副作用](docs/reference/api.md#输出与副作用)。
+
 ## 最小使用示例
 
 在 blog 根运行，Node 22.13+ 或 24+，已安装依赖：
@@ -123,6 +125,8 @@ NODE
 ```
 
 预期 `zhimin-blog 1`。无文件写入、无网络、无浏览器挂载。内存主题替身只证明组合流程，不证明真实主题资源或浏览器排版。实际页面执行 `npm run dev` 后访问终端显示的地址。
+
+六页个性化入口：`src/data/book-edition.json` 保存当前文案；`src/internal/presentation/special-pages/` 每页一个模板文件，并保存专用主题 CSS 与资源角色映射。初始书壳和运行时使用同一份 HTML，不改分页代码即可调整版面。详见 [六页设计](docs/explanation/special-pages.md)。
 
 ## 配置
 

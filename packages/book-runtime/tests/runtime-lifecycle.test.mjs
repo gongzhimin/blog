@@ -37,6 +37,80 @@ const article = (key) => ({
   bodyHTML: `<p>${key} body</p>`,
 });
 
+test('six supplied special pages retain their content at fixed and measured physical positions', async (t) => {
+  const { api } = await runtime(t);
+  const roles = [
+    'frontCover',
+    'frontInside',
+    'titlePage',
+    'imprintPage',
+    'backInside',
+    'backCover',
+  ];
+  const specialPages = Object.fromEntries(
+    roles.map((role) => [role, { html: `<p>${role}</p>` }]),
+  );
+  const before = JSON.stringify(specialPages);
+  const cache = api.Orchestrator.createPageCache({ specialPages });
+  const result = cache.paginateAll([article('one')], '');
+  for (const [role, page] of [
+    ['frontCover', 1],
+    ['frontInside', 2],
+    ['titlePage', 3],
+    ['imprintPage', 4],
+    ['backInside', result.backPage],
+    ['backCover', result.totalPages],
+  ]) {
+    assert.equal(result.pageCache[page], specialPages[role].html);
+  }
+  assert.equal(JSON.stringify(specialPages), before);
+});
+
+test('an incomplete special-page payload fails without publishing partial pages', async (t) => {
+  const { api } = await runtime(t);
+  assert.throws(
+    () =>
+      api.Orchestrator.createPageCache({
+        specialPages: { titlePage: { html: 'title' } },
+      }),
+    /specialPages.frontCover/,
+  );
+});
+
+test('generic pagination does not invent Site artwork or mutate host styles', async (t) => {
+  const { api, dom } = await runtime(t);
+  const cache = api.Orchestrator.createPageCache({ documentTitle: 'Generic' });
+  const result = cache.paginateAll([article('one')], '');
+  assert.equal(dom.window.document.head.children.length, 0);
+  assert.match(result.pageCache[3], /Generic/);
+  assert.doesNotMatch(JSON.stringify(result.pageCache), /志民|Joan|典藏版/);
+});
+
+test('duplicate navigation keys fail before measurement or cache and DOM mutation', async (t) => {
+  const { api, dom } = await runtime(t);
+  let measurements = 0;
+  api.Paginator.paginateArticle = () => {
+    measurements++;
+    return ['body'];
+  };
+  const cache = api.Orchestrator.createPageCache();
+  cache.setPageContent(99, 'caller-owned');
+  assert.throws(
+    () => cache.paginateAll([article('same'), article('same')], ''),
+    (error) =>
+      error.code === 'BOOK_RUNTIME_DUPLICATE_KEY' &&
+      /indices 0 and 1/.test(error.message),
+  );
+  assert.equal(measurements, 0);
+  assert.equal(cache.isPaginated(), false);
+  assert.equal(cache.getPageContent(99), 'caller-owned');
+  assert.deepEqual(Object.keys(cache.getArticleToPage()), []);
+  assert.equal(dom.window.document.head.children.length, 0);
+  const result = cache.paginateAll([article('one'), article('two')], '');
+  assert.equal(result.articleToPage.one, result.bodyStart);
+  assert.equal(result.articleToPage.two, result.bodyStart + 1);
+});
+
 test('text splitting preserves entities, Unicode and nested link attributes', async (t) => {
   const { api, dom } = await runtime(t);
   const document = dom.window.document;
@@ -204,7 +278,7 @@ test('page cache reuse preserves the complete pagination result without measurin
   assert.equal(repeated, first);
 });
 
-test('page cache reset clears maps and only its own cover style before recomputation', async (t) => {
+test('page cache reset clears maps while preserving host styles and plugin nodes', async (t) => {
   const { api, dom } = await runtime(t);
   const document = dom.window.document;
   const unrelated = document.createElement('style');
@@ -214,26 +288,22 @@ test('page cache reset clears maps and only its own cover style before recomputa
   document.body.appendChild(plugin);
   const other = api.Orchestrator.createPageCache();
   other.paginateAll([article('other')], '');
-  const otherStyle = document.head.lastElementChild;
   const cache = api.Orchestrator.createPageCache();
   cache.paginateAll([article('old')], '');
-  const oldStyle = document.head.lastElementChild;
   cache.reset();
   assert.equal(cache.isPaginated(), false);
   assert.equal(cache.getPageContent(6), undefined);
   assert.deepEqual(Object.keys(cache.getArticleToPage()), []);
   assert.deepEqual(Object.keys(cache.getPageToArticle()), []);
-  assert.equal(oldStyle.isConnected, false);
-  assert.equal(otherStyle.isConnected, true);
   assert.equal(unrelated.isConnected, true);
   assert.equal(plugin.isConnected, true);
   const fresh = cache.paginateAll([article('new')], '');
   assert.deepEqual(Object.keys(fresh.articleToPage), ['new']);
   assert.equal(fresh.articleToPage.new, 6);
-  assert.equal(document.head.querySelectorAll('style').length, 3);
+  assert.equal(document.head.querySelectorAll('style').length, 1);
   cache.reset();
   cache.reset();
-  assert.equal(document.head.querySelectorAll('style').length, 2);
+  assert.equal(document.head.querySelectorAll('style').length, 1);
 });
 
 test('measure containers select their own inner node when an existing node has the same id', async (t) => {
@@ -348,9 +418,18 @@ test('article pagination rejects 3001 simple paragraphs instead of returning tru
 test('special pages abstraction isolates front four, TOC, and back covers from body page counting', async (t) => {
   const { api } = await runtime(t);
   const cache = api.Orchestrator.createPageCache({
-    documentTitle: '测试文集',
-    author: '测试作者',
-    subtitle: '测试副标题',
+    specialPages: {
+      frontCover: { html: '' },
+      frontInside: { html: '' },
+      titlePage: {
+        html: '<div class="special-page title-page">测试文集 测试副标题 测试作者</div>',
+      },
+      imprintPage: {
+        html: '<div class="special-page imprint-page">出版说明 测试作者</div>',
+      },
+      backInside: { html: '' },
+      backCover: { html: '' },
+    },
   });
 
   // Mock 2 articles: first article 2 pages, second article 1 page (total 3 body pages).

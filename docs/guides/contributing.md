@@ -3,7 +3,7 @@ id: 'contributing'
 type: 'guide'
 status: 'active'
 created: '2026-10-04'
-modified: '2026-10-06'
+modified: '2026-10-09'
 scope: '跨模块工程'
 owner: '项目维护者'
 parent: 'README.md'
@@ -86,7 +86,7 @@ npm run verify
 
 配置定义/生成来源改变时先运行 npm run docs:generate。浏览器运行时、布局、字体、图片、翻页和触摸改变时，在构建后运行 npm run test:e2e。发布、健康检查或门禁变化还需执行对应模块测试。
 
-交付候选运行 `npm run verify:release`：包含完整门禁、实际 tarball 隔离消费/类型编译与 Chromium。隔离安装允许从 npm 获取缺失依赖，禁安装脚本，不链接原仓库 node_modules；网络或缓存不足是未通过，不跳过。不得以各包局部 test 替代递归盘点与零跳过门禁。
+交付候选运行 `npm run verify:release`：包含完整门禁、实际 tarball 隔离消费/类型编译与 Chromium/WebKit。首次浏览器测试先执行 `npx playwright install chromium webkit`。测试 preview 独占 4392，不复用或停止 4321 开发服务。隔离安装允许从 npm 获取缺失依赖，禁安装脚本，不链接原仓库 node_modules；网络或缓存不足是未通过，不跳过。不得以各包局部 test 替代递归盘点与零跳过门禁。
 
 私有包版本：先 `npm run changeset` 登记受影响包，再查看 `npm run version:status`；经审查执行 `npm run version:packages`，同步锁文件后重跑验收。包版本独立，消费者的精确依赖随生产者变化更新；不运行 publish、不创建 registry tag。
 

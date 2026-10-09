@@ -28,7 +28,9 @@ related:
 
 本教程通过 Site 包根唯一常见任务 `buildHomepageModel`，把 Astro 内容集合、Book 配置、主题和引语快照组合成页面模型。读者将观察成功结果、草稿过滤和输入失败诊断，不需要手动调用内容适配、Book Build 和样式生成函数。
 
-模型任务不读取文件、不联网、不启动 DOM；Astro 页面仍负责读取真实集合和主题资源，并把结果渲染成 HTML。
+模型任务不加载集合、配置或主题文件；这些来源由调用者提供。渲染根路径图片时，Book Build 可能读取当前工作目录下的 `public/` 文件以补充尺寸。调用链不联网、不写文件、不操作 DOM。
+
+本教程导入仓库 JSON 配置，正文不含图片，因此不触发图片尺寸读取。Astro 页面负责加载真实来源并把模型渲染成 HTML。
 
 ## 准备环境
 
@@ -81,8 +83,11 @@ related:
 4. 运行回归用例：
 
    ```sh
+   npm run build
    node --test packages/site/tests/public-api.test.mjs tests/integration/homepage-render.test.mjs
    ```
+
+   构建会写入 `dist/`；产物测试必须使用本次构建，不能复用旧产物。
 
 ## 预期结果
 
@@ -94,7 +99,7 @@ related:
 
 - `BOOK_CONFIG_INVALID` 或 `BOOK_BUILD_FAILED` 表示诊断来自 Book Build 阶段；按 message 中字段定位配置，不在 Site 复制另一份校验规则。
 - `SITE_MODEL_FAILED` 表示主题或 CSS 组合失败；检查替身是否提供完整 theme 字段。
-- 本练习不创建文件或启动网络请求，进程结束即可清理内存。
+- 模型示例不创建文件或启动网络请求，进程结束即可清理内存。回归步骤的 build 写入 `dist/`，无需通过删除工作区目录恢复。
 
 ## 后续阅读
 

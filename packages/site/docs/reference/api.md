@@ -3,7 +3,7 @@ id: 'src-site-docs-reference-interface'
 type: 'interface'
 status: 'active'
 created: '2026-10-04'
-modified: '2026-10-06'
+modified: '2026-10-09'
 scope: 'site'
 owner: 'Site 维护者'
 parent: 'packages/site/README.md'
@@ -26,7 +26,9 @@ related:
 
 ## 适用范围
 
-`@myblog/site` 是 Site 唯一导入路径。`buildHomepageModel` 为翻页首页组合模型；`inspectHomepageConfig` 供 Tooling 生成传统首页配置参考。Astro 路由读取集合和文件、装载主题；`buildHomepageModel` 不读盘、不请求网络，也不操作 DOM。
+`@myblog/site` 是 Site 唯一导入路径。`buildHomepageModel` 为翻页首页组合模型；`inspectHomepageConfig` 供 Tooling 生成传统首页配置参考。
+
+Astro 路由读取集合、配置与主题文件。模型任务不加载这些来源，但调用 Book Build 渲染根路径图片时可能读取当前工作目录下的 `public/` 文件以补充尺寸。整个模型调用链不请求网络、不写文件、不操作 DOM。
 
 页面和 CLI 在同一包内直接使用 `internal/` 实现；跨包调用只能导入包根，不使用配置子路径。
 
@@ -43,7 +45,7 @@ related:
 
 ### `buildHomepageModel(input)`
 
-**签名**：`buildHomepageModel(input: BuildHomepageModelInput): Result<SiteHomepageModel>`
+**签名**：`buildHomepageModel(input: SiteHomepageInput): SiteHomepageResult`
 
 | 字段         | 类型            | 必填 | 用途与限制                                                                                                                                                                                       |
 | ------------ | --------------- | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -54,6 +56,8 @@ related:
 | `theme`      | `BookTheme`     | 是   | Site 内部 `loadSiteBookTheme()` 通过 Vite 导入原始 CSS，再调用 `@myblog/book-build` 的 `createBookTheme()`；须含 `runtime`、`styles.visualCSS`、`measurement.articleCSS` 和 `measurement.tocCSS` |
 
 `AstroPost` 的最小字段为 `{ id, body?, data: { title, date?, pubDatetime?, draft? } }`。有效日期是有限值 `Date`。非草稿缺日期或日期无效会失败；草稿不参与日期检查或输出。
+
+`bookConfig.book.coverSprite.positions.titlePage` 是可选扉页插画位置，使用 `coverSprite.backgroundSize` 的 CSS 坐标尺度；省略时兼容使用 `backInside`。Site 当前实例显式区分扉页与封底内侧切片。该配置影响角色表面样式。成功模型在 `runConfig.specialPages` 增加六种页面定义，见下文。
 
 ### `inspectHomepageConfig(config)`
 
@@ -83,6 +87,8 @@ type Result<T> =
 
 函数不请求引语上游、不写文件、不操作浏览器 DOM。Book Build 渲染本地图片时可能读取 cwd/public 下的尺寸。document.entries 中的 Date 与 metadata 保留来源引用；runConfig 是新配置对象，但 runConfig.theme 与输入 theme.runtime 共享引用。生成模型后不得原地修改这些共享输入。声明见 [index.d.ts](../../src/api/index.d.ts)；编译夹具验证 runConfig 可直接交给 paginateBook。
 
+`runConfig.specialPages` 是六角色的新对象，每项返回 `html`（页内 HTML）、`className`（Site 挂载类）和可选 `artwork`（coverSprite 坐标字段）。角色、页号和编辑位置见 [六页设计](../explanation/special-pages.md)。HTML 年份在本次构建时确定，文本被转义；浏览器原样使用，不从 quote.author 推导书籍作者。
+
 ## 错误与边界
 
 - Astro 集合适配失败返回 `SITE_INPUT_INVALID`，phase 为 `input`。
@@ -94,7 +100,7 @@ type Result<T> =
 
 ## 兼容与示例
 
-以下示例从仓库根执行，使用内存主题替身，不读写文件、不发网络请求：
+以下示例从仓库根执行，导入仓库配置，使用内存主题和无图片正文。配置导入读取 JSON；模型调用不写文件、不发网络请求，此正文不触发图片尺寸读取：
 
 ```js
 import { buildHomepageModel } from '@myblog/site';

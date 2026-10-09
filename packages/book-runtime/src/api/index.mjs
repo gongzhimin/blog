@@ -33,10 +33,9 @@ export function paginateBook(payload) {
     });
 
     const cache = window.BookRuntime.Orchestrator.createPageCache({
-      coverSprite: payload.book?.coverSprite,
+      specialPages: payload.specialPages,
       tocTitle: payload.source?.tocTitle || '目录',
       documentTitle: payload.source?.documentTitle || '',
-      author: payload.footer?.content?.author || '志民',
     });
     const layout = cache.paginateAll(payload.articles, payload.toc || '');
     const pages = Object.keys(layout.pageCache)
@@ -64,7 +63,10 @@ export function paginateBook(payload) {
       ok: false,
       diagnostics: [
         {
-          code: 'BOOK_RUNTIME_PAGINATION_FAILED',
+          code:
+            error?.code === 'BOOK_RUNTIME_DUPLICATE_KEY'
+              ? 'BOOK_RUNTIME_DUPLICATE_KEY'
+              : 'BOOK_RUNTIME_PAGINATION_FAILED',
           phase: 'paginate',
           message: error instanceof Error ? error.message : String(error),
         },

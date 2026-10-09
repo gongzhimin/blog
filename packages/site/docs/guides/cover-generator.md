@@ -3,7 +3,7 @@ id: 'site-cover-generator-guide'
 type: 'guide'
 status: 'active'
 created: '2026-10-05'
-modified: '2026-10-05'
+modified: '2026-10-09'
 scope: 'site'
 owner: 'Site 维护者'
 parent: 'packages/site/README.md'
@@ -63,7 +63,7 @@ packages/site/src/tools/cover-generator/
 
 - `image`：浏览器资源 URL，例如自有文件对应的 `/images/book-cover-custom.jpg`。
 - `backgroundSize`：实际渲染的背景尺寸，不必等于原图像素尺寸。
-- `positions`：各封面区域的背景偏移；必须结合最终显示尺寸核对。
+- `positions`：各封面区域的背景偏移；必须结合最终显示尺寸核对。`frontInside` 为封二，`titlePage` 为扉页插画，`backInside` 为封底内侧；`titlePage` 缺省兼容 `backInside`，设计不同画面时显式配置。
 
 这两份 HTML 是不同交付形式，不会自动互相生成。调整主母版后，若还要交付独立版本，必须同步文案、样式和素材并核对两者结果。
 
@@ -74,9 +74,10 @@ packages/site/src/tools/cover-generator/
 3. 等待图片与字体就绪。设置页面缩放为 100%，用节点截图选中 `#sprite`，核对导出图片像素尺寸；设备像素比可能使截图像素大于 CSS 尺寸。
 4. 将截图导出为 JPEG，保存到本次新建且命名明确的 `public/images/` 文件。避免覆盖不属于本次任务的已有资产。
 5. 将 `book.coverSprite.image` 改为新 URL；按切片布局核对 `backgroundSize` 和全部 `positions`，不要直接照搬旧图偏移。
-6. 在 blog 根执行以下命令，再打开预览核对封面与封底：
+6. 在 blog 根执行以下命令，再打开预览核对封面与封底。测试使用独立 4392 端口，不复用已运行的开发站点；4392 冲突时先识别进程归属，不自动终止其他服务。首次浏览器测试先安装两个引擎：
 
 ```sh
+npx playwright install chromium webkit
 npm run verify
 npm run test:e2e
 npm run preview

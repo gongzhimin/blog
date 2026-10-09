@@ -3,7 +3,7 @@ id: 'docs-changes-readme'
 type: 'index'
 status: 'active'
 created: '2026-10-04'
-modified: '2026-10-06'
+modified: '2026-10-09'
 scope: '项目工程资料'
 owner: '项目维护者'
 parent: 'docs/README.md'
@@ -24,6 +24,10 @@ related: ['docs/standards/documentation.md']
 
 ## 资料清单
 
+封面开合、内封页遮挡、扉页切片及特殊页验收见 [封面预览整改](2026-10-08-cover-preview/record.md)。
+
+本轮阅读缺陷修正和完整公告命中清单见 [阅读任务与依赖公告核对](2026-10-06-reading-advisory-review/record.md)。版本命中不等于已确认可利用。
+
 本轮测试门禁和源码回归见 [严格测试整改记录](2026-10-06-strict-testing/record.md)。
 
 | 轮次                   | 方案 / 步骤                                                                                        | 时点结果                                                                            |
@@ -37,6 +41,8 @@ related: ['docs/standards/documentation.md']
 最新目录整理见 [根目录收拢记录](2026-10-05-root-layout/record.md)；此前整改见 [文档质量与源码缺陷记录](2026-10-05-documentation-quality/record.md)。
 
 已完成资料标 historical，保留当时问题和结果；当前事实维护在 [文档规范](../standards/documentation.md)、架构和模块接口，不把时点证据当作持续保障。
+
+[六页抽取计划与证据](2026-10-09-special-pages/record.md) 记录页面角色、单源 HTML、资源归属和本轮验收。
 
 ## 维护规则
 

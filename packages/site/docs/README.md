@@ -3,7 +3,7 @@ id: 'src-site-docs-readme'
 type: 'index'
 status: 'active'
 created: '2026-10-04'
-modified: '2026-10-05'
+modified: '2026-10-09'
 scope: 'site'
 owner: 'Site 维护者'
 parent: 'packages/site/README.md'
@@ -41,6 +41,8 @@ related:
 内容模型与通用组装见 [Book Build](../../../packages/book-build/README.md)。实际分页、缓存与交互见 [Book Runtime](../../book-runtime/README.md)。
 
 回到 [模块入口](../README.md) 或 [系统文档](../../../docs/README.md)。
+
+六种非正文页的内容、版面和素材归属见 [六页设计](explanation/special-pages.md)。
 
 ## 维护规则
 

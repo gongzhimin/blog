@@ -1,3 +1,5 @@
+import { specialPageStyles } from './special-pages/styles.mjs';
+
 /**
  * 组装经典拟物书籍主页的内联 CSS 样式块（涵盖桌面双页、移动端单页、纸张纹理与书本阴影）。
  *
@@ -154,6 +156,8 @@ export function buildHomepageStyles({
   .sj-book {
     width: ${book.width}px !important;
     height: ${book.height}px !important;
+    /* Keep Turn.js fixed pages at z=-1 above the outer page background. */
+    isolation: isolate;
   }
 
   .sj-book .book-cover-underlay {
@@ -163,7 +167,8 @@ export function buildHomepageStyles({
     height: ${book.hardPage.height}px;
     z-index: 0;
     pointer-events: none;
-    background-color: #f2f1ec;
+    /* Only the clipped pseudo-element paints the frame; the centre is clear. */
+    background-color: transparent;
   }
 
   .sj-book .book-cover-underlay::before {
@@ -235,7 +240,11 @@ export function buildHomepageStyles({
   .sj-book.book-at-first .book-cover-underlay,
   .sj-book.book-at-last .book-cover-underlay,
   .sj-book.book-at-first .book-depth--back,
-  .sj-book.book-at-last .book-depth--front {
+  .sj-book.book-at-last .book-depth--front,
+  .sj-book.book-cover-moving-front .book-cover-underlay--front,
+  .sj-book.book-cover-moving-front .book-depth--front,
+  .sj-book.book-cover-moving-back .book-cover-underlay--back,
+  .sj-book.book-cover-moving-back .book-depth--back {
     display: none;
   }
 
@@ -260,18 +269,7 @@ export function buildHomepageStyles({
     height: ${book.depth.height}px;
   }
 
-  /* ── Cover sprites & content surface ───────────────── */
-  .sj-book .p1,
-  .sj-book .p2 {
-    background-color: white;
-    background-image: url(${cover.image}) !important;
-    background-repeat: no-repeat;
-    background-size: ${cover.backgroundSize};
-  }
-  .sj-book .p1  { background-position: ${cover.positions.front} !important; }
-  .sj-book .p2  { background-position: ${cover.positions.frontInside} !important; }
-  /* Back-cover pages are injected at runtime by orchestrator.js to avoid stale
-     estimated page numbers. */
+${specialPageStyles(cover)}
 
   /* ── Paper texture ──────────────────────────────────────── */
   .sj-book .own-size {

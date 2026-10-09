@@ -3,7 +3,7 @@ id: 'project-readme'
 type: 'readme'
 status: 'active'
 created: '2026-10-04'
-modified: '2026-10-06'
+modified: '2026-10-09'
 scope: '跨模块工程'
 owner: '项目维护者'
 parent: 'README.md'
@@ -35,7 +35,7 @@ related:
 
 ## 能力与限制
 
-首页为书籍阅读，/classic 为传统文章入口，文章路由和 JSON 书示例共享统一书模型。分页按浏览器真实高度进行，构建估算页数不是最终页数。图片与字体、viewport 会影响结果；自动浏览器证据覆盖 Chromium，不承诺所有 iOS 真机一致。
+首页为书籍阅读，/classic 为传统文章入口，文章路由和 JSON 书示例共享统一书模型。分页按浏览器真实高度进行，构建估算页数不是最终页数。图片与字体、viewport 会影响结果；自动浏览器矩阵覆盖 Chromium/WebKit，不承诺 Safari/iOS 真机一致。
 
 五个应用模块和一个 Tooling 工具域共享安装与锁文件，各包独立维护 workspace 版本但仍为私有包。Publishing 提交成功仅证明 GitHub 仓库更新，静态交付另行验证。当前原始 HTML 基于受信作者，发布输入体积与速率仍有局限。
 
@@ -142,7 +142,7 @@ npm run verify
 npm run test:e2e
 ```
 
-verify 串行执行格式、lint、六包契约类型、文档、边界、测试盘点、Astro、构建和 Node；失败后的阶段不执行。verify:release 再执行实际 tarball 隔离消费与 Chromium。单独 test:e2e 也先盘点并重新构建。门禁要求非空测试集、零失败、零取消、零跳过、零 TODO、零重试。配置来源变化先生成再检查漂移。
+verify 串行执行格式、lint、六包契约类型、文档、边界、测试盘点、Astro、构建和 Node；失败后的阶段不执行。verify:release 再执行实际 tarball 隔离消费与 Chromium/WebKit。单独 test:e2e 也先盘点并重新构建；测试 preview 使用独立 4392 端口，不复用 4321 开发服务。首次执行先运行 `npx playwright install chromium webkit`。门禁要求非空测试集、零失败、零取消、零跳过、零 TODO、零重试。配置来源变化先生成再检查漂移。
 
 - Node 替身不能证明真实 GitHub；
 - JSDOM 不能证明真实高度；

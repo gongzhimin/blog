@@ -38,6 +38,18 @@ test('Site cover templates retain editable regions and resolve all local assets 
     const dom = new JSDOM(await readFile(url, 'utf8'));
     try {
       assert.ok(dom.window.document.querySelector('#sprite'));
+      // This is the fixed template's geometry, not a constraint on user config.
+      const titleClip = dom.window.document.querySelector('#page3Clip rect');
+      const geometry =
+        name === 'sprite-only.html'
+          ? ['1936', '464', '600']
+          : ['1652', '396', '516'];
+      assert.deepEqual(
+        ['x', 'width', 'height'].map((attribute) =>
+          titleClip.getAttribute(attribute),
+        ),
+        geometry,
+      );
       assert.equal(
         dom.window.document.querySelectorAll('[contenteditable="true"]').length,
         4,

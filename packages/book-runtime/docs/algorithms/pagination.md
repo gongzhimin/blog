@@ -3,7 +3,7 @@ id: 'book-runtime-docs-algorithms-pagination'
 type: 'algorithm'
 status: 'active'
 created: '2026-10-04'
-modified: '2026-10-06'
+modified: '2026-10-09'
 scope: 'book-runtime'
 owner: 'Book Runtime 模块维护者'
 parent: 'packages/book-runtime/README.md'
@@ -34,7 +34,7 @@ related: ['docs/standards/documentation.md']
 2. **盒模型物理适配**：每一页在实际浏览器中的渲染高度严格小于或等于容器可用高度（不产生垂直滚动条或被容器硬裁剪）；
 3. **导航一致性**：目录链接、文章导航键映射和缓存中的正文起页必须一致。key 是导航键，不是无碰撞的身份标识；正确定位要求输入键不冲突、测量期间资源稳定且目录校准成功。
 
-本文说明文本前缀二分搜索与有界目录校准。上述是设计验收目标，不是当前全部能力已得到证明：不可拆分超高块仍可能溢出，跨页行内语义仍需专项测试，导航键碰撞尚无检测。资源晚到和任意 HTML 不在无溢出保证范围内。
+本文说明文本前缀二分搜索与有界目录校准。上述是设计验收目标，不是当前全部能力已得到证明：不可拆分超高块仍可能溢出，跨页行内语义仍需专项测试。重复非空导航键在测量前被拒绝；资源晚到和任意 HTML 不在无溢出保证范围内。
 
 ## 输入与输出
 
@@ -95,7 +95,7 @@ article pages -> provisional TOC -> candidate T
 4. 代码块按解码后文本的换行位置切分，Range 保留嵌套属性并将换行保留在前片，避免拼接时丢失行分隔符；列表按子项、表格按行处理；可保留部分内容时把余量插入 elems，继续下一轮。
 5. 本页无法放入则保存并开新页。文本、代码块、列表与表格在新页再次尝试分割；不能分割的元素可能整块放入并溢出。
 6. Orchestrator 先分页文章，再用预估起页测量目录，得到候选 T。按 bodyStart=5+T 重建目录链接并重新测量；测得页数等于 T 才接受，否则更新 T，继续校准。
-7. 注入前置特殊页：物理页 3 写入扉页正面（`renderTitlePage`），物理页 4 写入出版说明/扉页反面（`renderImprintPage`），消除翻开封面时的无内容空白；
+7. 写入前置特殊页：将载荷的 frontCover、frontInside、titlePage、imprintPage 原样映射到 1、2、3、4。文案和版面由 Site 生成，Runtime 不维护第二套模板；
 8. 注入动态目录页（物理页 $5 \sim 4+T$），写入罗马数字页脚（I, II, ...）；
 9. 注入正文主体页（物理页 $bodyStart \sim bodyEnd$），写入从 1 开始严格递增的阿拉伯数字页脚；全书仅正文页参与页码统计，`totalBodyPages = M`；
 10. 若正文结束在右侧奇数页（`bodyEnd % 2 !== 0`），注入 1 页对齐尾衬页（`renderAlignmentEndpaper`）占位，确保封三与封底始终闭合在左侧偶数页跨页，消除末页多余空白；
@@ -113,7 +113,7 @@ article pages -> provisional TOC -> candidate T
 
 测量 CSS 同源不保证字体、图片和设备相同。分页正常及异常路径均在 finally 中删除本调用测量容器，Core 从局部 measure 查找 inner，不抓取其它同 ID 节点。共享配置仍不提供并发会话隔离。
 
-reset 清本实例缓存、两份映射、保存结果和注入的封底 style，不清插件 DOM；缓存生成后资源变化不会自动重排。
+reset 清本实例缓存、两份映射和保存结果，不清插件 DOM 或宿主样式；Runtime 不再注入封底 style。缓存生成后资源变化不会自动重排。
 
 ## 复杂度
 
@@ -133,11 +133,11 @@ reset 清本实例缓存、两份映射、保存结果和注入的封底 style�
 
 接受目录时，生成链接所用候选 T 与实际页数组长度相等。因此正文缓存从 5+T 开始，链接 data-page、articleToPage 与 pageToArticle 都采用同一偏移；正文显示页码严格从 1 开始独立递增至 M，不计入特殊页面。
 
-该依据要求导航键无冲突且测量资源稳定；代码仍未检测键碰撞。字体/图片测量后变化会破坏高度前提。偶数总页数及封底位置不证明正文均完整。
+编排先用 Map 记录每个非空导航键的文章索引，重复时抛出 `BOOK_RUNTIME_DUPLICATE_KEY`，不测量正文、不提交缓存、映射或封底 DOM。检查需 O(A) 次键查询及 O(A) 空间，A 为文章数；不证明哈希本身无碰撞。字体/图片测量后变化会破坏高度前提。偶数总页数及封底位置不证明正文均完整。
 
 ## 测试案例
 
-文本与代码切分回归位于 runtime-lifecycle.test.mjs：实体、emoji、含 `>` 的属性、嵌套链接和代码 token 的属性必须保留；前后片 textContent 拼接必须等于原文，代码换行不可丢失。Chromium 的 pagination-behavior.spec.mjs 另验证 rich text 与 80 行代码的独立高度，不以 JSDOM 代替布局证据。
+文本与代码切分回归位于 runtime-lifecycle.test.mjs：实体、emoji、含 `>` 的属性、嵌套链接和代码 token 的属性必须保留；前后片 textContent 拼接必须等于原文，代码换行不可丢失。重复键回归检查零测量、状态不提交及修正后可重试；公开入口检查失败 code、phase、索引和无部分 value。Chromium/WebKit 的 pagination-behavior.spec.mjs 另验证 rich text 与 80 行代码的独立高度，不以 JSDOM 代替布局证据。
 
 ### 具体缓存与映射追踪
 
@@ -162,12 +162,12 @@ finish         bodyEnd=8 (偶数，无衬页) total=10,back=9    9=封三(未计
 - isSpecialPage(p) 对 1, 2, 3, 4, 9, 10 返回 true；对 6, 7, 8 返回 false。
 - isCountedPage(p) 仅对 6, 7, 8 返回 true。
 - 目录 data-page 为 6 和 8，显示页码为 1 和 3；Turn.js 接收物理页码。
-- 封底 class 为 p9、外封底为 p10，并注入对应 CSS。
+- 封三 class 为 p9、外封底为 p10；Site 的角色类背景保持不变，不注入按页号绑定的 CSS。
 
 复用与 reset：
 
 - 再次 paginateAll 返回同一个对象，不重新测量；totalPages=10、backPage=9、bodyStart=articleStart=6、totalBodyPages=3。
-- reset 清本实例缓存、两份映射、完成标志、保存结果和封底 style。
+- reset 清本实例缓存、两份映射、完成标志和保存结果，保留宿主样式。
 - reset 不卸载插件 DOM，缓存重建不是插件重新挂载。
 
 | 输入 / 条件                | 应断言                           | 当前证据与缺口                                                                     |

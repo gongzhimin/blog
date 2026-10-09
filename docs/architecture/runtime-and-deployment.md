@@ -3,7 +3,7 @@ id: 'docs-architecture-runtime-and-deployment'
 type: 'architecture'
 status: 'active'
 created: '2026-10-04'
-modified: '2026-10-05'
+modified: '2026-10-09'
 scope: '跨模块工程'
 owner: '项目维护者'
 parent: 'docs/architecture/overview.md'
@@ -94,7 +94,7 @@ PR / main push / 手动 / 定时
    verify: 格式/静态/文档/边界/Astro/build/Node
                |-- 失败 --> 停止后续交付
                v
-       安装 Chromium + test:e2e
+       安装 Chromium/WebKit + test:e2e (preview 4392)
                |-- 失败 --> 保存 trace/截图，停止交付
                v
      定时任务提交已验证引语（仅有差异）

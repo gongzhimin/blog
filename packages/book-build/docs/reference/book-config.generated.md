@@ -3,7 +3,7 @@ id: 'book-config-reference'
 type: 'interface'
 status: 'active'
 created: '2026-10-04'
-modified: '2026-10-06'
+modified: '2026-10-08'
 scope: 'packages/book-build'
 owner: 'Book Build 维护者'
 parent: 'packages/book-build/README.md'
@@ -73,7 +73,8 @@ related:
 | `book.coverSprite.positions` | object | 是 | 见配置 |  | 封面、内封、封底对应的 background-position。 |
 | `book.coverSprite.positions.front` | string | 是 | "0 0" |  | 封面位置 front |
 | `book.coverSprite.positions.frontInside` | string | 是 | "-483px 0" |  | 封面位置 frontInside |
-| `book.coverSprite.positions.backInside` | string | 是 | "-1936px 0" |  | 封面位置 backInside |
+| `book.coverSprite.positions.titlePage` | string | 否 | "-1936px 0" |  | 扉页插画位置；省略时兼容使用 backInside。Site 当前配置显式指定，不能与封底内侧混用。 |
+| `book.coverSprite.positions.backInside` | string | 是 | "-968px 0" |  | 封面位置 backInside |
 | `book.coverSprite.positions.back` | string | 是 | "-968px 0" |  | 封面位置 back |
 | `book.coverSprite.positions.backOuter` | string | 是 | "-1452px 0" |  | 封面位置 backOuter |
 | `book.paperTexture` | object | 否 | 见配置 |  | 纸张背景图集配置。启用后，每个正文页会从同一张大背景图中确定性裁剪不同位置，避免所有页面纸纹完全重复。 |

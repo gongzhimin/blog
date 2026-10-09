@@ -75,13 +75,23 @@ const result = paginateBook({
 
 assert.equal(result.ok, true);
 if (!result.ok) throw new Error(JSON.stringify(result.diagnostics));
-assert.ok(result.value.pages.length > 0);
+assert.equal(result.value.pages.length, 6);
+assert.equal(result.value.totalPages, 8);
+assert.equal(result.value.bodyStart, 6);
 assert.equal(
   result.value.articleToPage['chapter-1'],
   result.value.bodyStart,
 );
 assert.match(result.value.pages.map((page) => page.html).join(''), /加粗内容/);
+assert.equal(document.querySelector('#__bap_inner'), null);
 console.log(`分页成功：${result.value.pages.length} 页，正文起页 ${result.value.bodyStart}`);
+
+const invalid = paginateBook({});
+assert.equal(invalid.ok, false);
+assert.equal(invalid.diagnostics[0].code, 'BOOK_RUNTIME_PAGINATION_FAILED');
+assert.equal(invalid.diagnostics[0].phase, 'paginate');
+assert.equal('value' in invalid, false);
+console.log(`输入失败：${invalid.diagnostics[0].code}`);
 dom.window.close();
 NODE
 ```
@@ -90,12 +100,12 @@ NODE
 
 ## 预期结果
 
-- 输出以“分页成功”开头；页数至少为 1。
+- 第一行输出 `分页成功：6 页，正文起页 6`。六项 HTML 对应物理页 3–8；整本物理页数为 8，不等于页数组长度。
 - `articleToPage['chapter-1']` 与 `bodyStart` 相同。
 - 页面 HTML 保留示例正文内容。
-- 输入缺少 `articles` 或 `runtime.pagination` 时，函数返回 `ok: false` 和诊断，不提供可交付的部分映射。
+- 第二行输出 `输入失败：BOOK_RUNTIME_PAGINATION_FAILED`。故障输入 `{}` 返回 `ok: false`，phase 为 `paginate`，没有 `value`；这是主动执行的失败路径，不是从成功输出推断。
 
-JSDOM 不执行真实 CSS 排版，因此结果不能证明页面不溢出。浏览器几何和导航需运行 `npm run test:e2e`。
+这些页数只适用于本教程的固定 JSDOM 输入。JSDOM 不执行真实 CSS 排版，因此结果不能证明页面不溢出。浏览器几何和导航需运行 `npm run test:e2e`。
 
 ## 排错与清理
 

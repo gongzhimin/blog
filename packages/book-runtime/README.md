@@ -3,7 +3,7 @@ id: 'book-runtime-readme'
 type: 'readme'
 status: 'active'
 created: '2026-10-04'
-modified: '2026-10-06'
+modified: '2026-10-09'
 scope: 'book-runtime'
 owner: 'Book Runtime 模块维护者'
 parent: 'packages/README.md'
@@ -28,13 +28,19 @@ related:
 
 ## 用途与边界
 
-在浏览器把 Book Build 提供的文章 HTML 切成页面，建立目录与文章起页映射，再接入 Turn.js。输入是 BookShell 的 `#book-data`；输出是 HTML 页缓存与阅读交互。
+在浏览器把 Book Build 提供的文章 HTML 切成页面，建立目录与文章起页映射。输入是 `paginateBook(payload)` 的运行载荷；输出是页面 HTML、物理页轴和双向文章映射。
+
+Site 从 BookShell 的 `#book-data` 读取载荷，调用本包，再将结果交给 Site 的 Turn.js 适配器。DOM 数据读取和翻页交互不属于 Runtime。
 
 不读取 Astro 集合，不渲染 Markdown，不管理发布。
 
 ## 能力与限制
 
-提供正文与目录分页、文本/列表/表格/代码块分割、目录点击、URL 定位、键盘及触摸。包根只提供 `paginateBook(payload)`，一次配置测量并完成整本分页，返回物理页和文章映射。物理页用于 Turn.js，显示页是正文数字或目录罗马数字，不能互换。分页同步执行，没有字体/图片统一就绪屏障或自动缓存失效。超高不可拆分元素仍可能溢出。
+提供正文与目录分页，以及文本、列表、表格和代码块分割。包根只提供 `paginateBook(payload)`，一次完成配置选择、测量和整本分页。
+
+- 物理页用于宿主装配页面；显示页是正文数字或目录罗马数字，不能互换。
+- 目录点击、URL 定位、键盘、触摸和 Turn.js 装配归 Site；Runtime 仅提供这些交互所需的页码映射。
+- 分页同步执行，没有字体/图片统一就绪屏障或自动缓存失效。超高不可拆分元素仍可能溢出。
 
 Runtime 包只处理浏览器分页；Turn.js 适配、Astro 页面、启动和光标属于 Site。Site 从包根调用分页，不读取 Runtime 内部缓存或适配器。Runtime 不创建持久交互资源，也不提供 destroy 生命周期。
 
@@ -79,7 +85,7 @@ Site 的 `BookShell.astro` 输出 DOM 和 `window.MEASURE_CSS`；Site 的 `BookR
 | `@myblog/book-runtime` | `paginateBook(payload)` | 浏览器 DOM、Book Build 载荷、主题测量 CSS | `Result<BookPagination>`：页 HTML、物理页轴、文章映射或诊断 |
 
 - 内部目录校准最多 8 轮；循环或未稳定时 `paginateBook` 返回失败诊断，不交付新导航结果；
-- 输入 key 冲突仍未检测。完整条件见 [接口](docs/reference/api.md)。
+- 重复非空 key 在正文测量前拒绝，返回 `BOOK_RUNTIME_DUPLICATE_KEY`，不交付部分页面或覆盖后的映射。完整条件见 [接口](docs/reference/api.md)。
 
 ## 最小使用示例
 
@@ -87,6 +93,7 @@ Site 的 `BookShell.astro` 输出 DOM 和 `window.MEASURE_CSS`；Site 的 `BookR
 
 ```sh
 node --input-type=module <<'NODE'
+import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
 const dom = new JSDOM('<!doctype html><html><body></body></html>');
 globalThis.window = dom.window;
@@ -101,12 +108,19 @@ const result = paginateBook({
   source: { tocTitle: '目录' },
 });
 if (!result.ok) throw new Error(JSON.stringify(result.diagnostics));
+assert.equal(result.value.pages.length, 6);
+assert.equal(result.value.totalPages, 8);
+assert.equal(result.value.bodyStart, 6);
+assert.equal(result.value.articleToPage.example, result.value.bodyStart);
+assert.equal(document.querySelector('#__bap_inner'), null);
 console.log(result.value.pages.length, document.querySelector('#__bap_inner') === null);
 dom.window.close();
 NODE
 ```
 
-预期输出页数和 `true`，表示分页完成且临时测量节点已清理。JSDOM 不提供真实字体几何；浏览器阅读器由 Astro Assets 入口集成。
+预期输出 `6 true`。本夹具返回物理页 3–8 的六项 HTML，`totalPages` 为 8；页数组长度不是整本物理页数。正文起页和 `example` 映射均为 6，临时测量节点已清理。
+
+这些数值仅是上述固定 JSDOM 夹具的判据，不是主题默认值。JSDOM 不提供真实字体几何；浏览器阅读器由 Site 的 Astro Assets 入口集成。
 
 [离线练习](docs/tutorials/getting-started.md) 给出完整断言及其限制。
 

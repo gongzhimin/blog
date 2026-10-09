@@ -3,7 +3,7 @@ id: 'book-runtime-docs-guides-change'
 type: 'guide'
 status: 'active'
 created: '2026-10-04'
-modified: '2026-10-06'
+modified: '2026-10-09'
 scope: 'book-runtime'
 owner: 'Book Runtime 模块维护者'
 parent: 'packages/book-runtime/README.md'
@@ -47,7 +47,7 @@ related:
 3. **工作树基线与备份点**：
    - 执行 `git status -s` 并记录原有暂存、未暂存及未跟踪文件；工作区不必干净，原有修改必须保留；
    - 记录当前分支的提交哈希：`git rev-parse HEAD` 作为安全回滚标记；
-4. **测试资源就绪**：由于运行时高度依赖无头浏览器排版，必须确保 Playwright 的 Chromium 浏览器内核已安装（可运行 `npx playwright install chromium`）。
+4. **测试资源就绪**：安装两个测试引擎（`npx playwright install chromium webkit`）；测试 preview 使用独立 4392 端口，不复用开发服务。
 
 ## 输入与配置
 
@@ -114,7 +114,7 @@ npm run verify
 1. **全文连续性**：验证长文章跨页切分后，上一页末尾文本与下一页起始文本无遗漏或重复，嵌套 `<strong>`/`<em>` 标签在跨页处均正常闭合；
 2. **目录与起页对齐**：核对目录点击跳转的目标物理页是否精确对应目标文章的首个正文页；
 3. **封底位置合规**：确认整书总物理页数为偶数，封底始终准确固定在最后一页；
-4. **清理机制健全**：确认离屏测量结束后，`document.body` 下的临时测量容器 `#__bap_inner` 已被彻底移除。
+4. **清理机制健全**：确认本次调用创建的离屏测量容器及其 `#__bap_inner` 子节点被移除，调用前已有同 ID 节点须保留；正常和异常路径都检查，不能要求整个文档不存在同 ID 节点。
 
 ## 失败与恢复
 

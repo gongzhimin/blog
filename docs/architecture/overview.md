@@ -3,7 +3,7 @@ id: 'docs-architecture-overview'
 type: 'architecture'
 status: 'active'
 created: '2026-10-04'
-modified: '2026-10-06'
+modified: '2026-10-09'
 scope: '跨模块工程'
 owner: '项目维护者'
 parent: 'README.md'
@@ -170,7 +170,7 @@ GitHub 仓库
    |
    +-- deploy.yml --> Node/Astro 构建机
    |                     |
-   |                verify (含 build) + Chromium E2E
+   |                verify (含 build) + Chromium/WebKit E2E
    |                     |
    |                verified-dist artifact
    |                     |
@@ -208,7 +208,7 @@ verify 已包含 build，不另重复构建后替换已验证产物。详细阶�
 
 ## 风险与验证
 
-Node 用例验证确定性转换、规划和替身请求；Chromium 用例验证受测几何和交互；静态门禁验证有限结构。任何一层都不能独立证明需求、文档语义、真实 GitHub 或全设备兼容。
+Node 用例验证确定性转换、规划和替身请求；Chromium/WebKit 用例验证受测几何和交互；静态门禁验证有限结构。任何一层都不能独立证明需求、文档语义、真实 GitHub 或全设备兼容。
 
 当前重要缺口包括发布体积/速率和幂等策略、跨进程及网络不确定结果恢复、多实例插件生命周期、Safari/iOS、性能基线及生产恢复演练。HTTP 鉴权、状态映射和实例队列已有回环案例。详见 [风险台账](evolution.md)。
 

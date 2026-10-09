@@ -3,7 +3,7 @@ id: 'src-book-docs-algorithms-runtime-assembly'
 type: 'algorithm'
 status: 'active'
 created: '2026-10-04'
-modified: '2026-10-04'
+modified: '2026-10-09'
 scope: 'book-build'
 owner: 'Book Build 维护者'
 parent: 'packages/book-build/README.md'
@@ -70,7 +70,7 @@ CRC32 使用 32 位寄存器、初值 0xffffffff、反射多项式 0xedb88320、
 ## 边界与失败
 
 - 相同 id 即使 collection 不同也得到相同 key；
-- 不同 id 的 CRC32 也可能碰撞，没有检测或重试。标题及 tocTitle 拼接进 HTML，当前信任边界不是净化器。循环配置 JSON clone 失败；
+- 不同 id 的 CRC32 也可能碰撞，本包生成阶段不检测或重试；Runtime 分页前拒绝重复非空导航键，错误码为 `BOOK_RUNTIME_DUPLICATE_KEY`。标题及 tocTitle 拼接进 HTML，当前信任边界不是净化器。循环配置 JSON clone 失败；
 - undefined、函数等值不能完整保留。原配置不修改，但返回 document 是原引用。缺 book.turn 等嵌套结构可直接抛 TypeError。没有事务或部分载荷恢复。
 
 ## 复杂度

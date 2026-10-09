@@ -40,7 +40,13 @@ related:
 
 ## 练习步骤
 
-1. 检查 [包根导出测试](../../tests/webhook-receiver.test.cjs)，确认公开导出只有 `startServer`，单纯导入模块不监听端口。
+1. 在 blog 根运行导入检查：
+
+   ```sh
+   node -e "console.log(Object.keys(require('@myblog/publishing')))"
+   ```
+
+   预期 `[ 'startServer' ]`，进程退出 0。此步骤不调用启动函数，仅验证导出；导入无监听的断言由下一步测试核对，无需先读私有实现。
 
 2. 运行不需要 HTTP listener 的发布规划与入口测试：
 
@@ -59,6 +65,8 @@ related:
 ## 预期结果
 
 无 listener 的测试应退出 0，并证明包根只暴露默认服务任务、导入本身没有网络副作用。HTTP 测试在支持 loopback 的环境中验证响应码、body.token 鉴权、失败传播及队列顺序；`EPERM` 仅表明当前运行环境禁止绑定本地端口，需在获准的本地或 CI 环境补测。
+
+无 listener 阶段应看到 `Publishing package root exposes one task entry and starts nothing on import` 和 `publication stops after refs rejection without later writes or automatic retry` 通过。前者是入口边界判据，后者是失败后禁止继续写入的判据。请求替身不证明真实 GitHub 写入；回环 HTTP 不证明生产 `startServer()` 的部署环境和凭据可用。
 
 HTTP `200` 的语义、失败结果不确定时的核对方式和重试限制见 [Publishing API 参考](../reference/api.md)。
 

@@ -14,6 +14,15 @@ export type BookRuntimePayload = {
     bodyHTML: string;
   }>;
   toc?: string;
+  specialPages?: Record<
+    | 'frontCover'
+    | 'frontInside'
+    | 'titlePage'
+    | 'imprintPage'
+    | 'backInside'
+    | 'backCover',
+    { html: string }
+  >;
   runtime: {
     pagination: PaginationConfig;
     mobilePagination?: PaginationConfig | null;
@@ -36,7 +45,7 @@ export type PaginationResult =
   | {
       ok: false;
       diagnostics: Array<{
-        code: 'BOOK_RUNTIME_PAGINATION_FAILED';
+        code: 'BOOK_RUNTIME_PAGINATION_FAILED' | 'BOOK_RUNTIME_DUPLICATE_KEY';
         phase: 'paginate';
         message: string;
       }>;

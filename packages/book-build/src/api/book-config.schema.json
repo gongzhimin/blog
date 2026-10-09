@@ -221,6 +221,11 @@
                   "minLength": 1,
                   "description": "封面位置 frontInside"
                 },
+                "titlePage": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "扉页插画位置；省略时兼容使用 backInside。Site 当前配置显式指定，不能与封底内侧混用。"
+                },
                 "backInside": {
                   "type": "string",
                   "minLength": 1,

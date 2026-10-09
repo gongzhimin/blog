@@ -1,6 +1,7 @@
 import { buildBook } from '@myblog/book-build';
 import { createAstroBlogDocument } from '../internal/sources/astro-blog-source.mjs';
 import { buildHomepageStyles } from '../internal/presentation/build-homepage-styles.mjs';
+import { createSpecialPages } from '../internal/presentation/special-pages/index.mjs';
 
 export { inspectHomepageConfig } from './homepage-config.mjs';
 
@@ -46,6 +47,7 @@ export function buildHomepageModel(input) {
   try {
     const runConfig = book.value.config;
     runConfig.theme = theme.runtime;
+    runConfig.specialPages = createSpecialPages(runConfig);
     const nav = bookConfig.nav;
     const footer = bookConfig.footer;
     const homepageStyles = buildHomepageStyles({

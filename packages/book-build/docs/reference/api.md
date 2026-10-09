@@ -3,7 +3,7 @@ id: 'src-book-docs-reference-api'
 type: 'interface'
 status: 'active'
 created: '2026-10-04'
-modified: '2026-10-06'
+modified: '2026-10-08'
 scope: 'book-build'
 owner: 'Book Build 维护者'
 parent: 'packages/book-build/README.md'
@@ -52,6 +52,8 @@ Node 任务要求 Node `^22.13.0 || >=24`。Astro 书壳归 Site；Book Build �
 | `input` | `document` | `BookDocument` | 是   | 需要转换的书籍模型，结构见下表                        |
 | `input` | `config`   | `BookConfig`   | 是   | Book 配置；使用权威 Schema 校验，不在调用者侧另行校验 |
 
+BookConfig 的可选 `book.coverSprite.positions.titlePage` 定义扉页插画的 CSS background-position，必须为非空字符串；它与 `backgroundSize` 使用同一尺度。显示样式由 Site 消费，缺省时兼容使用 `backInside`，不改变本包输出字段。当前 Site 将扉页与封底内侧切片分别指定；字段及实例值见生成配置参考。
+
 `BookDocument` 字段：
 
 | 字段           | 类型                      | 含义               |
@@ -82,7 +84,7 @@ console.log(result.value.articles.length);
 | `body`  | `string` | 是   | Markdown 正文；空字符串得到空渲染结果                |
 | `title` | `string` | 是   | 用于移除正文开头重复的同名标题；不匹配时正文标题保留 |
 
-返回 HTML 字符串。该函数不净化 HTML，不读取文件、不访问网络。仅用于受信文章正文。
+返回 HTML 字符串。仅用于受信文章正文，不净化 HTML。根路径图片可能触发当前工作目录下 `public/` 文件的尺寸读取；没有网络请求、文件写入或 DOM 操作。
 
 ### `createBookTheme(themeId, sources)`
 

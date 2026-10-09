@@ -41,7 +41,7 @@ jobs:
         if: github.event_name == 'schedule'
         run: npm run update:daily-quote
       - run: npm run verify
-      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install --with-deps chromium webkit
       - run: npm run test:e2e
       - name: Save browser acceptance evidence
         if: always()

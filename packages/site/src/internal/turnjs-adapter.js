@@ -77,6 +77,7 @@
         return '';
       };
     var isTurning = false;
+    var committedTurn = false;
     var coverSettlementFrame = null;
 
     function applyPaperCrop(element, page) {
@@ -142,6 +143,15 @@
       book.toggleClass('book-at-last', page >= pages);
     }
 
+    // A hard cover has one physical leaf with two faces. Its stationary
+    // decoration must not draw a second full-size cover behind that leaf.
+    function markCoverMotion(book, page) {
+      var pages = book.turn('pages');
+      if (page === 1 || page === 2) book.addClass('book-cover-moving-front');
+      if (page === pages - 1 || page === pages)
+        book.addClass('book-cover-moving-back');
+    }
+
     function cancelCoverSettlement() {
       if (coverSettlementFrame !== null)
         cancelAnimationFrame(coverSettlementFrame);
@@ -160,6 +170,8 @@
           return;
         }
         updateCoverUnderlays(book);
+        book.removeClass('book-cover-moving-front book-cover-moving-back');
+        committedTurn = false;
         updateDepth(book);
         $(sliderSelector).slider('value', getViewNumber(book));
       }
@@ -429,6 +441,20 @@
 
     function mountTurn() {
       var flipbook = $(bookSelector);
+      // The plugin ignores a hover exit while its expansion effect is active.
+      // Cancel only an uncommitted preview through its public API; never stop a
+      // mouse drag or a committed page turn, and never replace cached page DOM.
+      flipbook.on('mouseleave', function () {
+        if (
+          !committedTurn &&
+          flipbook.turn('is') &&
+          flipbook.turn('animating') &&
+          !flipbook.turn('corner')
+        ) {
+          flipbook.turn('peel', false, false);
+          settleCoverUnderlays(flipbook);
+        }
+      });
       flipbook.turn({
         display: isMobile ? 'single' : 'double',
         elevation: turnOptions.elevation,
@@ -441,14 +467,24 @@
         when: {
           turning: function (_e, page) {
             var book = $(this);
+            var view = book.turn('view');
+            var movingPage = isMobile
+              ? view[0]
+              : page > view[view.length - 1]
+                ? view[1]
+                : view[0];
+            markCoverMotion(book, movingPage);
+            if (page === 1 || page === book.turn('pages'))
+              markCoverMotion(book, page);
+            committedTurn = true;
             cancelCoverSettlement();
             book.removeClass('book-at-first book-at-last');
             updateDepth(book, page);
-            if (page >= 2) $('.sj-book .p2').addClass('fixed');
-            else $('.sj-book .p2').removeClass('fixed');
+            if (page >= 2) book.find('.p2').addClass('fixed');
+            else book.find('.p2').removeClass('fixed');
             if (page < book.turn('pages'))
-              $('.sj-book .p' + backPage).addClass('fixed');
-            else $('.sj-book .p' + backPage).removeClass('fixed');
+              book.find('.p' + backPage).addClass('fixed');
+            else book.find('.p' + backPage).removeClass('fixed');
             Hash.go('page/' + page).update();
           },
           turned: function (_event, page) {
@@ -468,10 +504,12 @@
               }
             }
           },
-          start: function () {
+          start: function (_event, pageOptions) {
             isTurning = true;
             cancelCoverSettlement();
-            $(this).removeClass('book-at-first book-at-last');
+            markCoverMotion($(this), pageOptions.page);
+            // start also means hover preview, not necessarily a page turn.
+            // Endpoint underlays remain hidden until turning commits a target.
             moveBar(true);
           },
           end: function () {

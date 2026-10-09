@@ -12,7 +12,17 @@ export type SiteDiagnostic = {
 
 export type SiteHomepageModel = {
   document: BookDocument;
-  runConfig: BookRuntimeConfig;
+  runConfig: BookRuntimeConfig & {
+    specialPages: Record<
+      | 'frontCover'
+      | 'frontInside'
+      | 'titlePage'
+      | 'imprintPage'
+      | 'backInside'
+      | 'backCover',
+      { html: string; className: string; artwork?: string }
+    >;
+  };
   homepageStyles: string;
   quote: { english: string; chinese: string; author: string };
 };

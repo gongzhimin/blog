@@ -3,7 +3,7 @@ id: 'docs-operations-deployment'
 type: 'guide'
 status: 'active'
 created: '2026-10-04'
-modified: '2026-10-05'
+modified: '2026-10-09'
 scope: '跨模块工程'
 owner: '项目维护者'
 parent: 'README.md'
@@ -36,7 +36,7 @@ related: ['docs/standards/documentation.md']
 
 必须记录目标 commit、变更类型、受影响模块、预期线上结果和恢复版本。确认依赖版本与服务器 Node 满足 package engines，凭据通过受控配置存在，不输出值。
 
-站点需 verify 和 Chromium；服务需发布/健康/工程测试。工作流定义可解析是基础，不足以证明上传路径、依赖安装或真实执行正常。发布操作者应核对 CI 日志和产物来源，不能仅凭本地 build。
+站点需 verify 和 Chromium/WebKit；服务需发布/健康/工程测试。工作流定义可解析是基础，不足以证明上传路径、依赖安装或真实执行正常。发布操作者应核对 CI 日志和产物来源，不能仅凭本地 build。
 
 ## 输入与配置
 

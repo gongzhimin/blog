@@ -3,7 +3,7 @@ id: 'book-runtime-contract'
 type: 'interface'
 status: 'active'
 created: '2026-10-04'
-modified: '2026-10-06'
+modified: '2026-10-09'
 scope: '跨模块工程'
 owner: '项目维护者'
 parent: 'docs/architecture/overview.md'
@@ -74,9 +74,11 @@ typedef 不是完整运行校验。新增来源必须定义可信输入、身份
 | book.contentPage/mobileContentPage | 插件页面宽高，与正文测量可用空间分别配置                                                  |
 | book.mobileBreakpoint              | 按浏览器窗口宽度切换模式；缺省消费值 800                                                  |
 
-- key 为条目 id 的 CRC32 转两个 proquint 音节，存在有限空间碰撞风险；
+- key 为条目 id 的 CRC32 转两个 proquint 音节，存在有限空间碰撞风险；Runtime 在正文测量前拒绝重复非空 key，返回 `BOOK_RUNTIME_DUPLICATE_KEY`，不交付歧义映射；
 - 它支持 ?post 导航，不是无限唯一标识。dateStr 已格式化，不再传 Date；
 - source.entryCount 不等于物理页数。
+
+Site 在 Book Build 载荷上追加可选 `specialPages`：六角色键 frontCover、frontInside、titlePage、imprintPage、backInside、backCover，各项含字符串 html；Site 另保存 className 和可选 artwork。Book Build 不生成个人版次模板。Runtime 提供时校验完整性，原样缓存 HTML，分别分配到 1、2、3、4、N−1、N；不读取 Site 挂载类和资源定位。未提供时使用通用空衬页与来源标题，无个人版权或插画。
 
 ### 测量一致性
 
@@ -120,12 +122,12 @@ totalPages 始终为末物理页编号，包含书壳的前四页，不是缓存
 
 全书页面拓扑与页码不变量：
 
-1. **前置特殊页**：物理页 1（封面）、2（封二）、3（扉页正面）、4（扉页反面/出版说明）；物理页 3 与 4 包含在 `pageCache` 中并由静态书壳提供预渲染骨架，消除开卷空白；
+1. **前置特殊页**：物理页 1（封面）、2（封二）、3（扉页正面）、4（扉页反面/出版说明）；四页均包含在 `pageCache` 中；Site 书壳与 Runtime 消费相同的 `specialPages` HTML；
 2. **动态目录页**：从物理页 5 开始，占 $T$ 页（$5 \sim 4+T$），页脚使用大写罗马数字（`I`, `II`, ...）；
 3. **正文主体页**：从物理页 $bodyStart = 5+T$ 开始，到 $bodyEnd = bodyStart + M - 1$；
 4. **后置特殊页**：若 $bodyEnd$ 为奇数，自动注入 1 页对齐尾衬页保持偶数跨页闭合，消除末页多余空白；紧随物理倒数第二页（封三）和物理最后一页（封底）；
 5. **页码统计隔离**：前四页、目录页、对齐尾衬页和最后两页均**不计入**正文页码统计与计数；正文页面是全书唯一参与页码统计的范围，显示页码严格为 $1 \sim M$（$totalBodyPages = M$）；
-6. **Site 翻页交互**：Site 的适配器处理封面、视图计数与动画收敛；其验证见 Site 测试和 Chromium E2E，不由分页成功推导交互正确。
+6. **Site 翻页交互**：Site 的适配器处理封面、视图计数与动画收敛；其验证见 Site 测试和 Chromium/WebKit E2E，不由分页成功推导交互正确。
 
 目录初测后最多校准 8 轮，测得页数与候选相等才提交；此时 bodyStart=articleStart=5+最终目录页数，链接和映射采用同一偏移。`paginateBook` 仅在收敛后返回页面和映射。
 
@@ -135,7 +137,7 @@ totalPages 始终为末物理页编号，包含书壳的前四页，不是缓存
 
 - Runtime 持有测量容器和页缓存；正文/目录分页通过 finally 移除本调用测量节点，查询限定在本容器内。
 - 插件拥有管理页 DOM；装饰以 ignore 标记放在管理区外。
-- cache.reset 清本实例缓存、双向映射、结果和完成标志，并移除本实例封底 style。
+- cache.reset 清本实例缓存、双向映射、结果和完成标志；Runtime 不注入封底 style。
 - reset 不删除其他样式或插件 DOM，不承担插件销毁或重新 mount。
 
 默认 app 在本次加载分页一次，尚无完整 mount/destroy 管理器。

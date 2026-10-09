@@ -46,6 +46,21 @@ test('valid book config passes runtime validation', () => {
   assert.equal(config.book.paperTexture.blendMode, 'normal');
 });
 
+test('title artwork position is optional for compatibility and validated when present', () => {
+  const compatible = structuredClone(config);
+  delete compatible.book.coverSprite.positions.titlePage;
+  assert.doesNotThrow(() => validateBookConfig(compatible));
+  assert.equal(config.book.coverSprite.positions.titlePage, '-1936px 0');
+  for (const position of ['', 42]) {
+    const invalid = structuredClone(config);
+    invalid.book.coverSprite.positions.titlePage = position;
+    assert.throws(
+      () => validateBookConfig(invalid),
+      /book\.coverSprite\.positions\.titlePage/,
+    );
+  }
+});
+
 test('book config validation reports precise paths', () => {
   const invalid = structuredClone(config);
   delete invalid.book.coverSprite.positions.back;

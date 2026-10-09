@@ -1,6 +1,8 @@
 import { createBookTheme } from '@myblog/book-build';
 import katexCSS from 'katex/dist/katex.min.css?raw';
 import classicFontsCSS from '../styles/book-themes/classic-paper/fonts.css?raw';
+import classicSpecialCSS from './presentation/special-pages/classic-paper.css?raw';
+import manuscriptSpecialCSS from './presentation/special-pages/plain-manuscript.css?raw';
 import classicContentCSS from '../styles/book-themes/classic-paper/content.css?raw';
 import classicHighlightCSS from '../styles/book-themes/classic-paper/code-highlight.css?raw';
 import classicTocCSS from '../styles/book-themes/classic-paper/toc.css?raw';
@@ -28,8 +30,11 @@ const THEME_SOURCES = {
 
 export function loadSiteBookTheme(themeId) {
   const id = themeId || 'classic-paper';
-  return createBookTheme(id, {
+  const theme = createBookTheme(id, {
     ...THEME_SOURCES[id],
     katexCSS,
   });
+  theme.styles.visualCSS +=
+    id === 'classic-paper' ? classicSpecialCSS : manuscriptSpecialCSS;
+  return theme;
 }

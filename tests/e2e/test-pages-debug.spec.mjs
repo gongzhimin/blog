@@ -35,6 +35,35 @@ test('initial physical pages contain title, imprint and both hard covers', async
   expect(state.imprint).toContain('出版说明');
 });
 
+test('special page extraction preserves the artwork policy of every book route', async ({
+  page,
+}) => {
+  for (const [route, artwork] of [
+    ['/', true],
+    ['/book/sample/', true],
+    ['/demos/book-runtime/', false],
+  ]) {
+    await page.goto(route, { waitUntil: 'load' });
+    await page.waitForFunction(() => window.jQuery?.('.sj-book').turn('is'));
+    const state = await page.evaluate(() => {
+      const book = window.jQuery('.sj-book');
+      const node = book.data().pageObjs[3][0];
+      const config = JSON.parse(
+        document.querySelector('#book-data').dataset.config,
+      );
+      return {
+        image: getComputedStyle(node).backgroundImage,
+        sprite: config.book.coverSprite.image,
+      };
+    });
+    if (artwork) expect(state.image).toContain(state.sprite);
+    else {
+      expect(state.image).toContain('linear-gradient');
+      expect(state.image).not.toContain(state.sprite);
+    }
+  }
+});
+
 test('turning to page four shows the imprint in the correct spread', async ({
   page,
 }) => {
@@ -49,6 +78,14 @@ test('turning to page four shows the imprint in the correct spread', async ({
 test('forward and backward turns preserve the requested physical spread', async ({
   page,
 }, testInfo) => {
+  await page.evaluate(() => {
+    const config = JSON.parse(
+      document.querySelector('#book-data').dataset.config,
+    );
+    window
+      .jQuery('.sj-book')
+      .turn('options', { duration: config.book.turn.duration });
+  });
   const views = [];
   for (const target of [1, 2, 4, 6, 12, 4, 5]) {
     await page.evaluate(
@@ -62,10 +99,35 @@ test('forward and backward turns preserve the requested physical spread', async 
     await expect
       .poll(() => page.evaluate(() => window.jQuery('.sj-book').turn('view')))
       .toEqual(spread);
+    await page.waitForFunction(
+      () => !window.jQuery('.sj-book').turn('animating'),
+    );
     const view = await page.evaluate(() =>
       window.jQuery('.sj-book').turn('view'),
     );
     expect(view).toEqual(spread);
+    if (spread.includes(4)) {
+      const imprint = page.locator('.sj-book .p4 .imprint-page');
+      await expect(imprint).toBeVisible();
+      await expect(imprint).toContainText('出版说明');
+      const visible = await imprint.evaluate((node) => {
+        const rect = node.getBoundingClientRect();
+        const heading = node.querySelector('h2');
+        const titleRect = heading.getBoundingClientRect();
+        const painted = document.elementFromPoint(
+          titleRect.x + titleRect.width / 2,
+          titleRect.y + titleRect.height / 2,
+        );
+        return {
+          width: rect.width,
+          height: rect.height,
+          uncovered: node.contains(painted),
+        };
+      });
+      expect(visible.width).toBeGreaterThan(0);
+      expect(visible.height).toBeGreaterThan(0);
+      expect(visible.uncovered).toBe(true);
+    }
     views.push({ target, view });
   }
   await testInfo.attach('verified-spreads', {
