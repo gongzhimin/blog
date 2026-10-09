@@ -67,6 +67,8 @@ deploy-webhook.yml 对相关路径执行局部检查和 Node 测试，包含回�
 
 服务部署安装启动 CLI、publishing/operations 实现、service、package/lock，执行 npm ci --omit=dev，再 reload/restart 和健康检查。
 
+上传的 workspace 目录通过 sudo 复制后，先将 `/var/www/blog/packages` 的所有权设为 `ubuntu:ubuntu`，再由 ubuntu 执行依赖安装。只修正该部署目录，不改服务器其他目录，不使用 root 运行 npm，也不设置全员可写权限。依赖可能安装在各包自己的 `node_modules`，不能仅保证仓库顶层可写。
+
 当前启动路径为 /var/www/blog/packages/publishing/src/cli/publish.cjs。恢复时不能只复制这个薄文件，缺模块实现目录就不能启动。PUPPETEER_SKIP_DOWNLOAD=1 避免服务依赖安装时浏览器下载，是否与目标环境相容仍需实测。
 
 远端 script 的 set -eu 阻止安装失败后继续宣称成功；它不会回滚已经安装的文件，也不能让覆盖式安装成为事务。依赖安装失败时应保留输出并处理当前服务状态，不盲目反复重启。

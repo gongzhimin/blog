@@ -186,6 +186,15 @@ test('webhook workflow uploads existing entries and creates their installation d
     /packages\/operations\/src\/assets\/blog-webhook\.service/,
   );
   assert.match(install, /packages\/operations\/src\/cli\/health\.cjs/);
+  const copy = install.indexOf('sudo cp -R ');
+  const ownership = install.indexOf(
+    'sudo chown -R ubuntu:ubuntu /var/www/blog/packages',
+  );
+  const dependencies = install.indexOf('npm ci --omit=dev');
+  assert.ok(
+    copy >= 0 && ownership > copy && dependencies > ownership,
+    'uploaded workspace directories must belong to the npm installation user before dependency installation',
+  );
 });
 
 test('Astro application and six documentation systems match physical module ownership', () => {

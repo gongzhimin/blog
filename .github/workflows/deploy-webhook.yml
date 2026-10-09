@@ -55,6 +55,7 @@ jobs:
             set -eu
             sudo install -d -o ubuntu -g ubuntu /var/www/blog/packages
             sudo cp -R /tmp/blog-webhook-deploy/packages/. /var/www/blog/packages/
+            sudo chown -R ubuntu:ubuntu /var/www/blog/packages
             sudo install -m 0644 -o ubuntu -g ubuntu /tmp/blog-webhook-deploy/package.json /var/www/blog/package.json
             sudo install -m 0644 -o ubuntu -g ubuntu /tmp/blog-webhook-deploy/package-lock.json /var/www/blog/package-lock.json
             cd /var/www/blog
