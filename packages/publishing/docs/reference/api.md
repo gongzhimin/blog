@@ -3,7 +3,7 @@ id: 'scripts-publishing-docs-reference-interface'
 type: 'interface'
 status: 'active'
 created: '2026-10-04'
-modified: '2026-10-06'
+modified: '2026-10-09'
 scope: 'publishing'
 owner: 'Publishing 维护者'
 parent: 'packages/publishing/README.md'
@@ -43,6 +43,8 @@ Publishing 是仓库内移动文章发布服务，不是通用 GitHub SDK。包�
 **签名**：`startServer(): http.Server`
 
 公开声明见 [index.d.cts](../../src/api/index.d.cts)。监听尚未就绪时句柄仍会返回；宿主须处理 listening/error 事件，尤其端口占用不是同步成功。
+
+包的生产依赖包含 `@types/node`，用于解析返回值 `http.Server`。TypeScript 消费者不应依赖其他 workspace 包偶然安装的 Node 类型；这些声明不会在运行时启动或加载服务。
 
 无参数。调用前必须通过环境变量提供非空 `BLOG_WEBHOOK_TOKEN`；GitHub 仓库、分支和访问 Token 由服务环境配置。服务固定监听 `127.0.0.1:9000`，外部请求应通过受控反向代理进入。
 

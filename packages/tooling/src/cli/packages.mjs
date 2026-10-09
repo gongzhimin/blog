@@ -147,7 +147,9 @@ try {
     const harness =
       name === '@myblog/book-runtime'
         ? ['jsdom@' + rootManifest.dependencies.jsdom]
-        : [];
+        : name === '@myblog/publishing'
+          ? ['typescript@' + rootManifest.dependencies.typescript]
+          : [];
     run(
       'npm',
       [
@@ -166,6 +168,34 @@ try {
         (await lstat(join(single, 'node_modules', installed))).isSymbolicLink()
       )
         throw new Error('Unexpected workspace symlink');
+    if (name === '@myblog/publishing') {
+      await cp(
+        join(
+          repository,
+          'packages/tooling/tests/fixtures/publishing-contracts.mts',
+        ),
+        join(single, 'contracts.mts'),
+      );
+      run(
+        process.execPath,
+        [
+          join(single, 'node_modules/typescript/lib/tsc.js'),
+          '--noEmit',
+          '--strict',
+          '--module',
+          'NodeNext',
+          '--moduleResolution',
+          'NodeNext',
+          '--skipLibCheck',
+          'false',
+          join(single, 'contracts.mts'),
+        ],
+        single,
+      );
+      console.log(
+        'Publishing-only public declarations passed without other workspace packages.',
+      );
+    }
     process.stdout.write(
       run(
         process.execPath,

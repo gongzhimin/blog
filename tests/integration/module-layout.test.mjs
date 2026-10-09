@@ -59,6 +59,23 @@ test('six independently versioned modules are private npm workspace packages', (
   }
 });
 
+test('public Node declarations carry their own production type dependency', () => {
+  const { modules } = JSON.parse(
+    readFileSync('packages/tooling/src/modules.json', 'utf8'),
+  );
+  for (const { root } of modules) {
+    const manifest = JSON.parse(readFileSync(`${root}/package.json`, 'utf8'));
+    const declaration = manifest.exports['.'].types;
+    const source = readFileSync(`${root}/${declaration}`, 'utf8');
+    if (/from ['"]node:/.test(source)) {
+      assert.ok(
+        manifest.dependencies?.['@types/node'],
+        `${manifest.name}: public Node types must not depend on another package's optional or development dependencies`,
+      );
+    }
+  }
+});
+
 test('root layout keeps module implementations, CLIs and engineering configuration together', () => {
   for (const path of [
     'packages/tooling/src/api/index.mjs',

@@ -3,7 +3,7 @@ id: 'scripts-publishing-docs-testing-strategy'
 type: 'testing'
 status: 'active'
 created: '2026-10-04'
-modified: '2026-10-06'
+modified: '2026-10-09'
 scope: 'publishing'
 owner: 'Publishing 模块维护者'
 parent: 'packages/publishing/README.md'
@@ -82,6 +82,8 @@ npm run verify
 - 模块 API、设计和方案同步；[接口参考](../reference/api.md) 不降低源码缺陷的原定要求。
 
 ## 证据与限制
+
+`check:packages` 单独安装 Publishing tarball 及其生产依赖，仅额外提供 TypeScript 编译器，编译 `publishing-contracts.mts`。正常调用及 HTTP Server 句柄须通过，非法参数和错误返回值类型须触发预期错误；`skipLibCheck=false`。不安装其他 workspace 包，不执行 `startServer()`，也不由测试工具补装 `@types/node`。
 
 替身不证明真实权限、ref 更新和响应丢失后的幂等恢复。队列仅同实例，不是跨进程或持久队列。请求体积/速率控制和 HTML 沙箱不是现有测试已证明的能力。webhook-receiver 新增 blobs / trees / commits / refs 四阶段拒绝案例，断言原异常传播、精确调用前缀、无后续写入与自动重试；截断 tree 在读取 blob 前拒绝。它们不证明远程失败时的最终状态，新增远程阶段仍须补等价矩阵。
 

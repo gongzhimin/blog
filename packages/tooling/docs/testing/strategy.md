@@ -3,7 +3,7 @@ id: 'tooling-docs-testing-strategy'
 type: 'testing'
 status: 'active'
 created: '2026-10-04'
-modified: '2026-10-06'
+modified: '2026-10-09'
 scope: 'tooling'
 owner: 'tooling 维护者'
 parent: 'packages/tooling/README.md'
@@ -62,6 +62,8 @@ engineering-boundaries 与 document-contract 验证有限 AST/Markdown 规则；
 新增接口字段、配置分支、错误或状态转移时，补充对应的正常、边界和失败断言。仅断言 `ok`、非空数组或文件存在不合格；外部副作用必须检查次数、顺序以及失败后禁止的调用。
 
 公开类型的编译夹具位于 tests/fixtures/public-api-contracts.ts：六包正常调用必须编译，非法参数必须触发 @ts-expect-error；类型退化为 any 会因未使用的错误标记而失败。skipLibCheck=false，不隐藏声明路径错误。
+
+Publishing 另用 `tests/fixtures/publishing-contracts.mts` 在单包消费目录编译。该目录只有 Publishing 的依赖闭包与测试编译器，不允许从其他 workspace 包间接获得 Node 类型。集成测试同时检查引用 `node:` 的公开声明是否显式携带生产类型依赖。
 
 ## 执行步骤
 
